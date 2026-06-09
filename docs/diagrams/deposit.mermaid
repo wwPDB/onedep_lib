@@ -1,0 +1,90 @@
+---
+id: 5ff3fd06-1b37-4c57-901c-5738d744d64a
+---
+sequenceDiagram
+    box Local machine
+    participant A as Adapter
+    participant D as DSP
+    end
+    participant dAPI as DepAPI
+
+    Note over A,D: Initialization (new session)
+    A->>D: deposit_init(email, users, country, [experiment_type])
+    D-->>A: Deposition
+
+    alt EM deposition
+        A->>D: dep.set_experiment_type(ExperimentType.EM)
+        A->>D: dep.set_em_params(em_subtype, coordinates)
+    else other experiment type
+        A->>D: dep.set_experiment_type(experiment_type)
+    end
+
+    Note over A,D: — OR — Resume existing session
+    A->>D: deposit_resume(session_id)
+    D-->>A: Deposition (state restored from SQLite)
+
+    loop For each file
+        Note over A,D: Register files locally (no upload yet)
+        A->>D: dep.add_file(file_path, file_type)
+        D-->>A: file_id (local UUID)
+
+        opt Map files (EM_MAP, EM_HALF_MAP)
+            A->>D: dep.set_voxel_values(file_id, spacing_x, spacing_y, spacing_z, contour)
+        end
+    end
+
+    opt Pre-submission checks (any order, any subset)
+        A->>D: dep.check_required_files()
+        D-->>A: CheckReport
+
+        Note left of A: mmCIF files only
+        A->>D: dep.check_mmcif_file(file_id)
+        D-->>A: CheckReport
+
+        A->>D: dep.check_mmcif_category(file_id, category)
+        D-->>A: CheckReport
+
+        A->>D: dep.check_mmcif_field(file_id, category, field)
+        D-->>A: CheckReport
+
+        Note left of A: Other file types
+        A->>D: dep.check_file_type(file_id, file_type)
+        D-->>A: CheckReport
+    end
+
+    Note over A,dAPI: Submit — dep.deposit() [non-blocking]
+    A->>D: dep.deposit()
+
+    alt New deposition (remote_dep_id not yet set)
+        alt EM experiment
+            D->>dAPI: POST depositions/new (em, subtype, coordinates)
+        else other experiment
+            D->>dAPI: POST depositions/new (experiment type)
+        end
+        dAPI-->>D: dep_id
+        D->>D: persist dep_id to SQLite
+    else Re-submission (remote_dep_id already set)
+        Note over D: skip creation, reuse existing dep_id
+    end
+
+    loop For each registered file
+        D->>dAPI: POST depositions/{dep_id}/files/
+        dAPI-->>D: remote file_id
+
+        opt File has voxel values
+            D->>dAPI: POST depositions/{dep_id}/files/{file_id}/metadata
+        end
+    end
+
+    D->>dAPI: POST depositions/{dep_id}/process
+    D-->>A: dep_id
+
+    Note over A,dAPI: Status polling (caller-driven)
+    loop Until finished or max attempts
+        A->>D: dep.get_status()
+        D->>dAPI: GET depositions/{dep_id}/status
+        dAPI-->>D: DepositStatus | DepositError
+        D-->>A: DepositStatus | DepositError
+    end
+
+    Note right of dAPI: deposit() only triggers file processing.<br/>To obtain a PDB/EMDB accession, the depositor must:<br/>1. Log in to DepUI<br/>2. Complete metadata<br/>3. Review validation report<br/>4. Check ligands, sequence, assembly<br/>5. Submit for annotation

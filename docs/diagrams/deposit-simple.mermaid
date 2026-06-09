@@ -1,0 +1,49 @@
+---
+id: 5ff3fd06-1b37-4c57-901c-5738d744d64a
+---
+sequenceDiagram
+    box Local machine
+    participant A as Adapter
+    participant D as DSP
+    end
+    participant dAPI as DepAPI
+
+    Note over A,D: Initialization (new session)
+    A->>D: deposit_init(email, users, country, [experiment_type])
+    D-->>A: Deposition
+
+    loop For each file
+        Note over A,D: Register files locally (no upload yet)
+        A->>D: dep.add_file(file_path, file_type)
+        D-->>A: file_id (local UUID)
+    end
+
+    opt Pre-submission checks (any order, any subset)
+        A->>D: dep.check_required_files() or dep.check_mmcif_category() etc
+        D-->>A: CheckReport
+    end
+
+    Note over A,dAPI: Submit — dep.deposit() [non-blocking]
+    A->>D: dep.deposit()
+
+    alt New deposition (remote_dep_id not yet set)
+        D->>dAPI: POST depositions/new (experiment type)
+        dAPI-->>D: dep_id
+        D->>D: persist dep_id to internal storage
+    end
+
+    loop Upload files
+        D->>dAPI: POST depositions/{dep_id}/files/
+        dAPI-->>D: remote file_id
+    end
+
+    D->>dAPI: POST depositions/{dep_id}/process
+    D-->>A: dep_id
+
+    Note over A,dAPI: Status polling (caller-driven)
+    loop Until finished or max attempts
+        A->>D: dep.get_status()
+        D->>dAPI: GET depositions/{dep_id}/status
+    end
+
+    Note right of dAPI: deposit() only triggers file processing.<br/>To obtain a PDB/EMDB accession, the depositor must:<br/>1. Log in to DepUI<br/>2. Complete metadata<br/>3. Review validation report<br/>4. Check ligands, sequence, assembly<br/>5. Submit for annotation
