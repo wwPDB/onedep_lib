@@ -6,7 +6,7 @@ from datetime import datetime
 from pathlib import Path
 
 from onedep_lib.config import DepositConfig
-from onedep_lib.enums import Country, ExperimentType, FileType
+from onedep_lib.enums import Country, EMSubType, ExperimentType, FileType
 from onedep_lib.session.models import LocalFile, LocalSession
 
 
@@ -45,9 +45,7 @@ class JsonSessionStore:
     def _require_session(self) -> dict:
         session = self._data["session"]
         if session is None:
-            raise RuntimeError(
-                f"No session initialised for {self._session_id!r}. Call create_session() first."
-            )
+            raise RuntimeError(f"No session initialised for {self._session_id!r}. Call create_session() first.")
         return session
 
     def create_session(self, session: LocalSession) -> None:
@@ -85,7 +83,7 @@ class JsonSessionStore:
         session["experiment_type"] = experiment_type.value
         self._save()
 
-    def update_em_params(self, em_subtype: str | None, coordinates: bool | None) -> None:
+    def update_em_params(self, em_subtype: EMSubType | None, coordinates: bool | None) -> None:
         session = self._require_session()
         session["em_subtype"] = em_subtype
         session["coordinates"] = coordinates

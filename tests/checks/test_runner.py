@@ -5,7 +5,7 @@ import pytest
 
 from onedep_lib.checks.report import CheckSeverity
 from onedep_lib.checks.runner import CheckRunner
-from onedep_lib.enums import ExperimentType, FileType
+from onedep_lib.enums import EMSubType, ExperimentType, FileType
 from onedep_lib.exceptions import SchemaError
 from onedep_lib.session.models import LocalFile
 
@@ -90,7 +90,7 @@ def test_em_spa_passes_with_correct_files(runner_with_files_schema: CheckRunner)
         LocalFile("f4", "s1", "/tmp/h1.map", FileType.EM_HALF_MAP),
         LocalFile("f5", "s1", "/tmp/h2.map", FileType.EM_HALF_MAP),
     ]
-    report = runner_with_files_schema.check_required_files(files, ExperimentType.EM, em_subtype="single")
+    report = runner_with_files_schema.check_required_files(files, ExperimentType.EM, em_subtype=EMSubType.SPA)
     assert report.ok is True
 
 
