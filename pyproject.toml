@@ -1,0 +1,105 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "onedep_lib"
+version = "0.1.0"
+description = "A Python package to interact with OneDep APIs."
+readme = "README.md"
+authors = [
+  {name = "Weslley M Bueno", email = "wbueno@ebi.ac.uk"},
+  {name = "James Smith", email = "james.smith@rcsb.org"}
+]
+maintainers = [
+  {name = "Weslley M Bueno", email = "wbueno@ebi.ac.uk"},
+  {name = "James Smith", email = "james.smith@rcsb.org"}
+]
+classifiers = [
+    "Typing :: Typed",
+]
+license = {text = "MIT"}
+dependencies = [
+  "requests>=2.32.5",
+  "tomli; python_version < '3.11'",
+  "jsonschema~=4.13",
+  "pyjwt~=2.13",
+  "tomli-w~=1.2"
+]
+requires-python = ">= 3.9"
+
+[dependency-groups]
+dev = [
+    { include-group = "lint" },
+    { include-group = "test" },
+    { include-group = "typecheck" },
+]
+lint = [
+    "ruff",
+]
+test = [
+    "coverage",
+    "pytest",
+    "pytest-httpserver",
+]
+typecheck = [
+    "ty",
+]
+docs = [
+    "zensical",
+    "mkdocstrings-python",
+]
+
+[project.urls]
+homepage = "https://github.com/wwPDB/onedep_lib"
+
+[project.scripts]
+onedep_lib = "onedep_lib.cli:app"
+
+[tool.ty]
+# All rules are enabled as "error" by default; no need to specify unless overriding.
+# Example override: relax a rule for the entire project (uncomment if needed).
+# rules.TY015 = "warn"  # For invalid-argument-type, warn instead of error.
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # Pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "UP",  # pyupgrade
+]
+
+ignore = ["UP007"]
+
+[tool.coverage.run]
+branch = true
+parallel = true
+source = ["src/", "tests/"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+fail_under = 50
+exclude_also = [
+    "if TYPE_CHECKING:",
+    "if typing.TYPE_CHECKING:",
+    "@overload",
+    "@typing.overload",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+    "raise NotImplementedError",
+    "\\.\\.\\.",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src", "."]
+testpaths = ["tests"]
+
+[tool.uv]
+package = true
+default-groups = ["dev"]
