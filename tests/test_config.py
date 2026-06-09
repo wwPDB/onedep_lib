@@ -149,8 +149,6 @@ def test_constructor_overrides_env_var(monkeypatch, tmp_path):
     assert config.hostname == "https://explicit.example.com"
 
 
-
-
 def test_defaults_include_schema_and_session_dirs(monkeypatch, tmp_path):
     monkeypatch.setenv("HOME", str(tmp_path))
     cfg = DepositConfig()
@@ -220,9 +218,7 @@ def test_read_auth_entry_returns_none_when_key_absent(tmp_path):
 
 def test_read_auth_entry_returns_dict_when_present(tmp_path):
     cfg_file = tmp_path / "config.toml"
-    cfg_file.write_text(
-        '[default]\n[auths.example_com]\naccess_token = "tok"\nrefresh_token = "ref"\n'
-    )
+    cfg_file.write_text('[default]\n[auths.example_com]\naccess_token = "tok"\nrefresh_token = "ref"\n')
     cfg = DepositConfig(config_path=cfg_file)
     assert cfg.read_auth_entry("example_com") == {"access_token": "tok", "refresh_token": "ref"}
 
@@ -240,9 +236,7 @@ def test_write_auth_entry_creates_entry_and_preserves_default(tmp_path):
 
 def test_write_auth_entry_updates_existing_entry(tmp_path):
     cfg_file = tmp_path / "config.toml"
-    cfg_file.write_text(
-        '[default]\n[auths.example_com]\naccess_token = "old"\nrefresh_token = "old_r"\n'
-    )
+    cfg_file.write_text('[default]\n[auths.example_com]\naccess_token = "old"\nrefresh_token = "old_r"\n')
     cfg = DepositConfig(config_path=cfg_file)
     cfg.write_auth_entry("example_com", {"access_token": "new", "refresh_token": "new_r"})
     assert cfg.read_auth_entry("example_com") == {"access_token": "new", "refresh_token": "new_r"}
@@ -251,8 +245,7 @@ def test_write_auth_entry_updates_existing_entry(tmp_path):
 def test_delete_auth_entry_removes_entry_and_preserves_rest(tmp_path):
     cfg_file = tmp_path / "config.toml"
     cfg_file.write_text(
-        '[default]\nhostname = "https://example.com"\n'
-        '[auths.example_com]\naccess_token = "a"\nrefresh_token = "r"\n'
+        '[default]\nhostname = "https://example.com"\n[auths.example_com]\naccess_token = "a"\nrefresh_token = "r"\n'
     )
     cfg = DepositConfig(config_path=cfg_file)
     cfg.delete_auth_entry("example_com")
@@ -309,8 +302,7 @@ def test_load_raises_config_error_for_non_string_token(tmp_path):
 def test_load_does_not_read_tokens_from_default_section(tmp_path):
     cfg_file = tmp_path / "config.toml"
     cfg_file.write_text(
-        '[default]\nhostname = "https://deposit.wwpdb.org/deposition"\n'
-        'access_token = "should_be_ignored"\n'
+        '[default]\nhostname = "https://deposit.wwpdb.org/deposition"\naccess_token = "should_be_ignored"\n'
     )
     cfg = DepositConfig.load(config_path=cfg_file)
     assert cfg.access_token is None

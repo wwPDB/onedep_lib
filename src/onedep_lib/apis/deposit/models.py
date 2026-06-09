@@ -127,10 +127,7 @@ class WwPDBDeposition:
             else:
                 parsed_experiments.append(exp)
         self.experiments = parsed_experiments
-        self.errors = [
-            DepositError(**e) if isinstance(e, dict) else e
-            for e in self.errors
-        ]
+        self.errors = [DepositError(**e) if isinstance(e, dict) else e for e in self.errors]
 
 
 @dataclass
@@ -155,16 +152,8 @@ class DepositedFile:
             self.created = datetime.strptime(self.created, self._DATE_FORMAT)
         if isinstance(self.metadata, dict):
             self.metadata = EmMapMetadata(**self.metadata)
-        self.errors = [
-            DepositError(**e) if isinstance(e, dict) else e
-            for e in self.errors
-            if e != ""
-        ]
-        self.warnings = [
-            DepositError(**w) if isinstance(w, dict) else w
-            for w in self.warnings
-            if w != ""
-        ]
+        self.errors = [DepositError(**e) if isinstance(e, dict) else e for e in self.errors if e != ""]
+        self.warnings = [DepositError(**w) if isinstance(w, dict) else w for w in self.warnings if w != ""]
 
 
 @dataclass

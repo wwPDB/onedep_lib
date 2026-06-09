@@ -1,7 +1,12 @@
 from datetime import datetime
 import pytest
 from onedep_lib.apis.deposit.models import (
-    WwPDBDeposition, DepositError, DepositedFile, DepositStatus, Experiment, PixelSpacing,
+    WwPDBDeposition,
+    DepositError,
+    DepositedFile,
+    DepositStatus,
+    Experiment,
+    PixelSpacing,
 )
 from onedep_lib.apis.deposit.enums import Status
 from onedep_lib.enums import ExperimentType, FileType
@@ -9,12 +14,17 @@ from onedep_lib.enums import ExperimentType, FileType
 
 def _deposit(**overrides) -> WwPDBDeposition:
     defaults = dict(
-        dep_id="D_1", email="a@b.com",
-        pdb_id="?", emdb_id="?", bmrb_id="?",
-        title="T", hold_exp_date=None,
+        dep_id="D_1",
+        email="a@b.com",
+        pdb_id="?",
+        emdb_id="?",
+        bmrb_id="?",
+        title="T",
+        hold_exp_date=None,
         created="2024-01-01T00:00:00",
         last_login="2024-01-01T00:00:00",
-        site="pdbe", status="DEP",
+        site="pdbe",
+        status="DEP",
     )
     return WwPDBDeposition(**{**defaults, **overrides})
 
@@ -49,7 +59,8 @@ def test_experiment_coerces_string_type():
 
 def test_deposited_file_parses_custom_date_format():
     f = DepositedFile(
-        file_id=1, name="f.cif",
+        file_id=1,
+        name="f.cif",
         file_type="co-cif",
         created="Monday, January 01, 2024 12:00:00",
     )
@@ -60,8 +71,11 @@ def test_deposited_file_parses_custom_date_format():
 
 def test_deposit_status_parses_iso_date():
     s = DepositStatus(
-        status="DEP", action="deposit", step="1",
-        details="deposited", date="2024-01-01T00:00:00",
+        status="DEP",
+        action="deposit",
+        step="1",
+        details="deposited",
+        date="2024-01-01T00:00:00",
     )
     assert s.date == datetime(2024, 1, 1)
 

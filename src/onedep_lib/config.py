@@ -55,9 +55,7 @@ class DepositConfig:
     schema_base_url: str = "https://schemas.wwpdb.org/nextdep"
     schema_cache_dir: Path = field(default_factory=lambda: Path.home() / ".onedep" / "schemas")
     session_dir: Path = field(default_factory=lambda: Path.home() / ".onedep" / "sessions")
-    config_path: Path = field(
-        default_factory=lambda: Path.home() / ".config" / "onedep" / "config.toml"
-    )
+    config_path: Path = field(default_factory=lambda: Path.home() / ".config" / "onedep" / "config.toml")
 
     @staticmethod
     def _load_toml_file(path: Path) -> dict:

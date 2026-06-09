@@ -22,11 +22,7 @@ def _make_jwt(exp_offset: int = 3600) -> str:
 @pytest.fixture
 def config_file(tmp_path: Path) -> Path:
     path = tmp_path / "config.toml"
-    path.write_text(
-        '[default]\n'
-        'hostname = "https://deposit.wwpdb.org/deposition"\n'
-        'ssl_verify = true\n'
-    )
+    path.write_text('[default]\nhostname = "https://deposit.wwpdb.org/deposition"\nssl_verify = true\n')
     return path
 
 

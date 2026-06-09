@@ -51,9 +51,7 @@ _STATUS_RESPONSE = {
 
 
 def test_create_deposition(httpserver: HTTPServer, client: HttpApiClient):
-    httpserver.expect_request("/api/v1/depositions/new", method="POST").respond_with_json(
-        _DEPOSIT_RESPONSE
-    )
+    httpserver.expect_request("/api/v1/depositions/new", method="POST").respond_with_json(_DEPOSIT_RESPONSE)
     dep = client.create_deposition(
         email="test@example.com",
         users=["0000-0001-2345-6789"],
@@ -78,9 +76,7 @@ def test_auth_provider_sets_bearer_token_before_request(httpserver: HTTPServer, 
 
 
 def test_get_status(httpserver: HTTPServer, client: HttpApiClient):
-    httpserver.expect_request("/api/v1/depositions/D_800001/status", method="GET").respond_with_json(
-        _STATUS_RESPONSE
-    )
+    httpserver.expect_request("/api/v1/depositions/D_800001/status", method="GET").respond_with_json(_STATUS_RESPONSE)
     status = client.get_status("D_800001")
     assert isinstance(status, DepositStatus)
     assert status.status == "DEP"
@@ -89,9 +85,7 @@ def test_get_status(httpserver: HTTPServer, client: HttpApiClient):
 def test_upload_file(httpserver: HTTPServer, client: HttpApiClient, tmp_path):
     test_file = tmp_path / "test.cif"
     test_file.write_text("data_test")
-    httpserver.expect_request("/api/v1/depositions/D_800001/files/", method="POST").respond_with_json(
-        _FILE_RESPONSE
-    )
+    httpserver.expect_request("/api/v1/depositions/D_800001/files/", method="POST").respond_with_json(_FILE_RESPONSE)
     deposited = client.upload_file("D_800001", str(test_file), FileType.MMCIF_COORD)
     assert isinstance(deposited, DepositedFile)
     assert deposited.file_id == 1
@@ -104,31 +98,27 @@ def test_upload_file_missing_raises(client: HttpApiClient):
 
 
 def test_non_2xx_raises_api_error(httpserver: HTTPServer, client: HttpApiClient):
-    httpserver.expect_request("/api/v1/depositions/D_999/status").respond_with_data(
-        "Not Found", status=404
-    )
+    httpserver.expect_request("/api/v1/depositions/D_999/status").respond_with_data("Not Found", status=404)
     with pytest.raises(ApiError):
         client.get_status("D_999")
 
 
 def test_redirect_updates_base_url_and_retries(httpserver: HTTPServer, api_config):
     correct_base = httpserver.url_for("").rstrip("/")
-    httpserver.expect_ordered_request("/api/v1/depositions/", method="GET").respond_with_json({
-        "code": "invalid_location",
-        "extras": {"base_url": correct_base},
-    })
-    httpserver.expect_ordered_request("/api/v1/depositions/", method="GET").respond_with_json({
-        "items": []
-    })
+    httpserver.expect_ordered_request("/api/v1/depositions/", method="GET").respond_with_json(
+        {
+            "code": "invalid_location",
+            "extras": {"base_url": correct_base},
+        }
+    )
+    httpserver.expect_ordered_request("/api/v1/depositions/", method="GET").respond_with_json({"items": []})
     client = HttpApiClient(api_config)
     result = client.get_all_depositions()
     assert result == []
 
 
 def test_204_returns_empty(httpserver: HTTPServer, client: HttpApiClient):
-    httpserver.expect_request("/api/v1/depositions/D_1/files/1", method="DELETE").respond_with_data(
-        "", status=204
-    )
+    httpserver.expect_request("/api/v1/depositions/D_1/files/1", method="DELETE").respond_with_data("", status=204)
     result = client.remove_file("D_1", 1)
     assert result is True
 
@@ -189,7 +179,5 @@ def test_upload_file_resumes_from_uploaded_bytes(httpserver: HTTPServer, client:
         method="POST",
         headers={"Content-Range": "bytes 8-15/16"},
     ).respond_with_json(_FILE_RESPONSE)
-    deposited = client.upload_file(
-        "D_800001", str(test_file), FileType.MMCIF_COORD, uploaded_bytes=8, _chunk_size=8
-    )
+    deposited = client.upload_file("D_800001", str(test_file), FileType.MMCIF_COORD, uploaded_bytes=8, _chunk_size=8)
     assert deposited.file_id == 1
