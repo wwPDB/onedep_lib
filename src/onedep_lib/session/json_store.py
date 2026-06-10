@@ -57,7 +57,7 @@ class JsonSessionStore:
             "experiment_type": session.experiment_type.value if session.experiment_type else None,
             "created_at": session.created_at.isoformat(),
             "remote_dep_id": session.remote_dep_id,
-            "em_subtype": session.em_subtype,
+            "em_subtype": session.em_subtype.value if session.em_subtype else None,
             "coordinates": session.coordinates,
         }
         self._save()
@@ -74,7 +74,7 @@ class JsonSessionStore:
             experiment_type=ExperimentType(session["experiment_type"]) if session["experiment_type"] else None,
             created_at=datetime.fromisoformat(session["created_at"]),
             remote_dep_id=session.get("remote_dep_id"),
-            em_subtype=session.get("em_subtype"),
+            em_subtype=EMSubType(session.get("em_subtype")) if session.get("em_subtype") else None,
             coordinates=session.get("coordinates"),
         )
 
@@ -85,7 +85,7 @@ class JsonSessionStore:
 
     def update_em_params(self, em_subtype: EMSubType | None, coordinates: bool | None) -> None:
         session = self._require_session()
-        session["em_subtype"] = em_subtype
+        session["em_subtype"] = em_subtype.value if em_subtype else None
         session["coordinates"] = coordinates
         self._save()
 
