@@ -76,7 +76,7 @@ class DepositConfig:
         config_file = (
             Path(config_path_override)  # type: ignore[arg-type]
             if config_path_override is not None
-            else Path.home() / ".config" / "onedep" / "config.toml"
+            else DepositConfig().config_path
         )
         merged["config_path"] = config_file
 
