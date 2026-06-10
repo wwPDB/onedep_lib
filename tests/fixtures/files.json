@@ -45,17 +45,18 @@
           "nm-shi",
           "nm-res-amb",
           "nm-aux-amb",
+          "nm-res-ari",
           "nm-res-bio",
+          "nm-aux-cha",
           "nm-res-cha",
           "nm-res-cns",
           "nm-res-cya",
-          "nm-res-dyn",
-          "nm-res-dyn",
           "nm-res-dyn",
           "nm-res-gro",
           "nm-aux-gro",
           "nm-res-isd",
           "nm-res-ros",
+          "nm-res-sch",
           "nm-res-syb",
           "nm-res-xpl",
           "nm-res-oth",
@@ -322,28 +323,20 @@
           "files": {
             "contains": {
               "enum": [
-                "vo-map",
                 "xs-cif",
                 "xs-mtz"
               ]
             },
             "minContains": 1,
-            "maxContains": 2,
+            "maxContains": 1,
             "items": {
               "enum": [
-                "co-pdb",
                 "co-cif",
                 "xs-cif",
                 "xs-mtz",
                 "xa-par",
                 "xa-top",
-                "xa-mat",
-                "vo-map",
-                "img-emdb",
-                "add-map",
-                "mask-map",
-                "half-map",
-                "fsc-xml"
+                "xa-mat"
               ]
             }
           }
@@ -371,17 +364,18 @@
                 "nm-shi",
                 "nm-res-amb",
                 "nm-aux-amb",
+                "nm-res-ari",
                 "nm-res-bio",
+                "nm-aux-cha",
                 "nm-res-cha",
                 "nm-res-cns",
                 "nm-res-cya",
-                "nm-res-dyn",
-                "nm-res-dyn",
                 "nm-res-dyn",
                 "nm-res-gro",
                 "nm-aux-gro",
                 "nm-res-isd",
                 "nm-res-ros",
+                "nm-res-sch",
                 "nm-res-syb",
                 "nm-res-xpl",
                 "nm-res-oth",
@@ -435,16 +429,16 @@
                   "contains": {
                     "enum": [
                       "nm-res-amb",
+                      "nm-res-ari",
                       "nm-res-bio",
                       "nm-res-cha",
                       "nm-res-cns",
                       "nm-res-cya",
                       "nm-res-dyn",
-                      "nm-res-dyn",
-                      "nm-res-dyn",
                       "nm-res-gro",
                       "nm-res-isd",
                       "nm-res-ros",
+                      "nm-res-sch",
                       "nm-res-syb",
                       "nm-res-xpl",
                       "nm-res-oth"
