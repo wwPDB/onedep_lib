@@ -31,7 +31,8 @@ def _md5_of_file(path: Path, chunk_size: int = 1 << 20) -> str:
 
 def list_sessions(base_dir: Path | None = None) -> list[tuple[LocalSession, list[LocalFile]]]:
     """Return all local sessions with their registered files, newest first."""
-    _base = base_dir or (Path.home() / ".onedep" / "sessions")
+    config = DepositConfig.load()
+    _base = base_dir or config.session_dir
     if not _base.exists():
         return []
 
