@@ -133,7 +133,7 @@ def main() -> None:
             fail("Aborting: required files check failed.")
             return
 
-        # ── 8. Deposit ────────────────────────────────────────────────────────
+        # # ── 8. Deposit ────────────────────────────────────────────────────────
         spin.update("[cyan]Submitting deposit…[/cyan]")
         try:
             dep_id = dep.deposit()
@@ -144,11 +144,16 @@ def main() -> None:
 
         # ── 9. Poll status ────────────────────────────────────────────────────
         for _ in range(1, 64):
-            status = dep.get_status()
-            spin.update(f"[cyan]{status.details}[/cyan]")
-            if isinstance(status, dsp.DepositStatus) and status.status.lower() == "finished":
-                ok(f"Processing finished  dep_id={dep_id}")
-                break
+            try:
+                status = dep.get_status()
+                spin.update(
+                    f"[cyan]{status.details if isinstance(status, dsp.DepositStatus) else status.message}[/cyan]"
+                )
+                if isinstance(status, dsp.DepositStatus) and status.status.lower() == "finished":
+                    ok(f"Processing finished  dep_id={dep_id}")
+                    break
+            except Exception as exc:
+                fail(f"get_status() failed: {exc}")
             time.sleep(5)
 
     _console.print("\n[bold]Done.[/bold] Log in to the DepUI to complete your submission.")

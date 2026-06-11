@@ -25,7 +25,7 @@ type-check-watch:
 # Run all the formatting, linting, and testing commands
 qa:
     uv run --python=3.13 ruff format .
-    uv run --python=3.13 ruff check . --fix
+    uv run --python=3.13 ruff check .
     uv run --python=3.13 ruff check --select I --fix .
     uv run --python=3.13 ty check --output-format=concise .
     uv run --python=3.13 pytest .

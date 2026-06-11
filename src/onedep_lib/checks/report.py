@@ -43,16 +43,10 @@ class CheckReport:
 
     @property
     def ok(self) -> bool:
-        return not any(
-            i.severity in (CheckSeverity.ERROR, CheckSeverity.FATAL)
-            for i in self.issues
-        )
+        return not any(i.severity in (CheckSeverity.ERROR, CheckSeverity.FATAL) for i in self.issues)
 
     def errors(self) -> list[CheckIssue]:
-        return [
-            i for i in self.issues
-            if i.severity in (CheckSeverity.ERROR, CheckSeverity.FATAL)
-        ]
+        return [i for i in self.issues if i.severity in (CheckSeverity.ERROR, CheckSeverity.FATAL)]
 
     def warnings(self) -> list[CheckIssue]:
         return [i for i in self.issues if i.severity == CheckSeverity.WARNING]

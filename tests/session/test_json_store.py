@@ -118,9 +118,7 @@ def test_uses_configured_session_dir_when_base_dir_omitted(monkeypatch, tmp_path
     session_dir = tmp_path / "configured-sessions"
     config_dir = tmp_path / ".config" / "onedep"
     config_dir.mkdir(parents=True)
-    (config_dir / "config.toml").write_text(
-        f'[default]\nsession_dir = "{session_dir}"\n'
-    )
+    (config_dir / "config.toml").write_text(f'[default]\nsession_dir = "{session_dir}"\n')
     monkeypatch.setenv("HOME", str(tmp_path))
 
     store = JsonSessionStore("configured-session")

@@ -52,12 +52,12 @@ class DepositConfig:
     hostname: str = "https://deposit.wwpdb.org/deposition"
     ssl_verify: bool = True
     redirect: bool = True
+    fetch_local_schema: bool = True
+    local_schema_cache_dir: Path = field(default_factory=lambda: Path(__file__).parent / "schemas" / "json")
     schema_base_url: str = "https://schemas.wwpdb.org/nextdep"
     schema_cache_dir: Path = field(default_factory=lambda: Path.home() / ".onedep" / "schemas")
     session_dir: Path = field(default_factory=lambda: Path.home() / ".onedep" / "sessions")
-    config_path: Path = field(
-        default_factory=lambda: Path.home() / ".config" / "onedep" / "config.toml"
-    )
+    config_path: Path = field(default_factory=lambda: Path.home() / ".config" / "onedep" / "config.toml")
 
     @staticmethod
     def _load_toml_file(path: Path) -> dict:
@@ -78,7 +78,7 @@ class DepositConfig:
         config_file = (
             Path(config_path_override)  # type: ignore[arg-type]
             if config_path_override is not None
-            else Path.home() / ".config" / "onedep" / "config.toml"
+            else DepositConfig().config_path
         )
         merged["config_path"] = config_file
 

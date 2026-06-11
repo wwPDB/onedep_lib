@@ -5,7 +5,7 @@ from collections import Counter
 import jsonschema
 
 from onedep_lib.checks.report import CheckIssue, CheckReport, CheckSeverity
-from onedep_lib.enums import ExperimentType, FileType
+from onedep_lib.enums import EMSubType, ExperimentType, FileType
 from onedep_lib.exceptions import SchemaError
 from onedep_lib.schemas.types import SchemaProvider
 from onedep_lib.session.models import LocalFile
@@ -32,9 +32,7 @@ _HALF_MAP_SUBTYPES = {"single", "helical", "subtomogram"}
 
 
 def _human_readable_messages(
-    filetypes: list[str],
-    experiment_type: ExperimentType,
-    em_subtype: str | None,
+    filetypes: list[str], experiment_type: ExperimentType, em_subtype: EMSubType | None
 ) -> list[str]:
     counts = Counter(filetypes)
     present = set(filetypes)
@@ -57,7 +55,7 @@ def _human_readable_messages(
             messages.append("Missing required EM image file: expected img-emdb")
         if "vo-map" not in present:
             messages.append("Missing required EM map file: expected vo-map")
-        if em_subtype in _HALF_MAP_SUBTYPES and counts["half-map"] < 2:
+        if em_subtype and em_subtype.value in _HALF_MAP_SUBTYPES and counts["half-map"] < 2:
             messages.append("Missing required half-map files: expected 2 half-map files")
 
     if experiment_type == ExperimentType.EC and not present.intersection(_EC_DATA_TYPES):
@@ -81,7 +79,7 @@ class CheckRunner:
         self,
         files: list[LocalFile],
         experiment_type: ExperimentType | None,
-        em_subtype: str | None = None,
+        em_subtype: EMSubType | None = None,
     ) -> CheckReport:
         if experiment_type is None:
             return CheckReport(
@@ -114,7 +112,7 @@ class CheckRunner:
             "files": [file.file_type.value for file in files],
         }
         if em_subtype:
-            data["subtype"] = em_subtype
+            data["subtype"] = em_subtype.value
 
         validator = jsonschema.Draft202012Validator(schema)
         errors = list(validator.iter_errors(data))

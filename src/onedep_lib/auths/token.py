@@ -48,9 +48,7 @@ class TokenStore:
             raise AuthError(f"Token refresh failed: {exc}") from exc
 
         if response.status_code == 401:
-            raise AuthError(
-                "Refresh token is expired, revoked, or invalid; generate and paste a new token pair."
-            )
+            raise AuthError("Refresh token is expired, revoked, or invalid; generate and paste a new token pair.")
 
         try:
             response.raise_for_status()
@@ -61,9 +59,7 @@ class TokenStore:
         access_token = body.get("access_token")
         refresh_token = body.get("refresh_token")
         if not isinstance(access_token, str) or not isinstance(refresh_token, str):
-            raise AuthError(
-                "Token refresh response missing access_token or refresh_token"
-            )
+            raise AuthError("Token refresh response missing access_token or refresh_token")
 
         self.store_tokens(access_token, refresh_token)
         return access_token

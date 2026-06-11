@@ -6,7 +6,7 @@ from datetime import datetime
 from pathlib import Path
 
 from onedep_lib.config import DepositConfig
-from onedep_lib.enums import Country, ExperimentType, FileType
+from onedep_lib.enums import Country, EMSubType, ExperimentType, FileType
 from onedep_lib.session.models import LocalFile, LocalSession
 
 
@@ -45,9 +45,7 @@ class JsonSessionStore:
     def _require_session(self) -> dict:
         session = self._data["session"]
         if session is None:
-            raise RuntimeError(
-                f"No session initialised for {self._session_id!r}. Call create_session() first."
-            )
+            raise RuntimeError(f"No session initialised for {self._session_id!r}. Call create_session() first.")
         return session
 
     def create_session(self, session: LocalSession) -> None:
@@ -59,7 +57,7 @@ class JsonSessionStore:
             "experiment_type": session.experiment_type.value if session.experiment_type else None,
             "created_at": session.created_at.isoformat(),
             "remote_dep_id": session.remote_dep_id,
-            "em_subtype": session.em_subtype,
+            "em_subtype": session.em_subtype.value if session.em_subtype else None,
             "coordinates": session.coordinates,
         }
         self._save()
@@ -76,7 +74,7 @@ class JsonSessionStore:
             experiment_type=ExperimentType(session["experiment_type"]) if session["experiment_type"] else None,
             created_at=datetime.fromisoformat(session["created_at"]),
             remote_dep_id=session.get("remote_dep_id"),
-            em_subtype=session.get("em_subtype"),
+            em_subtype=EMSubType(session.get("em_subtype")) if session.get("em_subtype") else None,
             coordinates=session.get("coordinates"),
         )
 
@@ -85,9 +83,9 @@ class JsonSessionStore:
         session["experiment_type"] = experiment_type.value
         self._save()
 
-    def update_em_params(self, em_subtype: str | None, coordinates: bool | None) -> None:
+    def update_em_params(self, em_subtype: EMSubType | None, coordinates: bool | None) -> None:
         session = self._require_session()
-        session["em_subtype"] = em_subtype
+        session["em_subtype"] = em_subtype.value if em_subtype else None
         session["coordinates"] = coordinates
         self._save()
 

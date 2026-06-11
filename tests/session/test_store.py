@@ -182,12 +182,14 @@ def test_add_file_raises_for_mismatched_session_id(tmp_path):
     store.create_session(session)
 
     with pytest.raises(ValueError):
-        store.add_file(LocalFile(
-            file_id="f-mismatch",
-            session_id="wrong-session",
-            file_path="/data/file.cif",
-            file_type=FileType.MMCIF_COORD,
-        ))
+        store.add_file(
+            LocalFile(
+                file_id="f-mismatch",
+                session_id="wrong-session",
+                file_path="/data/file.cif",
+                file_type=FileType.MMCIF_COORD,
+            )
+        )
     store.close()
 
 

@@ -13,11 +13,13 @@ from onedep_lib.checks.runner import CheckRunner
 from onedep_lib.checks.types import CheckRunner as CheckRunnerProtocol
 from onedep_lib.config import DepositConfig
 from onedep_lib.enums import Country, EMSubType, ExperimentType, FileType
+from onedep_lib.schemas.local import LocalSchemaProvider
 from onedep_lib.schemas.remote import RemoteSchemaProvider
 from onedep_lib.session.json_store import JsonSessionStore
 from onedep_lib.session.models import LocalFile, LocalSession
 from onedep_lib.session.types import SessionStore
 from onedep_lib.auths.token import TokenStore
+
 
 def _md5_of_file(path: Path, chunk_size: int = 1 << 20) -> str:
     h = hashlib.md5()
@@ -29,7 +31,8 @@ def _md5_of_file(path: Path, chunk_size: int = 1 << 20) -> str:
 
 def list_sessions(base_dir: Path | None = None) -> list[tuple[LocalSession, list[LocalFile]]]:
     """Return all local sessions with their registered files, newest first."""
-    _base = base_dir or (Path.home() / ".onedep" / "sessions")
+    config = DepositConfig.load()
+    _base = base_dir or config.session_dir
     if not _base.exists():
         return []
 
@@ -55,7 +58,7 @@ def deposit_init(
     users: list[str],
     country: Country,
     experiment_type: ExperimentType | None = None,
-    em_subtype: EMSubType | str | None = None,
+    em_subtype: EMSubType | None = None,
     coordinates: bool | None = None,
     config: DepositConfig | None = None,
     _base_dir: Path | None = None,
@@ -85,9 +88,10 @@ def deposit_init(
     store: SessionStore = JsonSessionStore(session_id, base_dir=base_dir)
     api_client: ApiClient = _api_client or HttpApiClient(config, auth_provider=TokenStore(config))
     check_runner: CheckRunnerProtocol = _check_runner or CheckRunner(
-        RemoteSchemaProvider(config.schema_base_url, config.schema_cache_dir)
+        LocalSchemaProvider(config.local_schema_cache_dir)
+        if config.fetch_local_schema
+        else RemoteSchemaProvider(config.schema_base_url, config.schema_cache_dir)
     )
-    em_subtype_str = em_subtype.value if isinstance(em_subtype, EMSubType) else em_subtype
     session = LocalSession(
         session_id=session_id,
         email=email,
@@ -95,7 +99,7 @@ def deposit_init(
         country=country,
         experiment_type=experiment_type,
         created_at=datetime.now(),
-        em_subtype=em_subtype_str,
+        em_subtype=em_subtype,
         coordinates=coordinates,
     )
     store.create_session(session)
@@ -130,7 +134,9 @@ def deposit_resume(
     store.get_session()  # raises KeyError if not found
     api_client: ApiClient = _api_client or HttpApiClient(config, auth_provider=TokenStore(config))
     check_runner: CheckRunnerProtocol = _check_runner or CheckRunner(
-        RemoteSchemaProvider(config.schema_base_url, config.schema_cache_dir)
+        LocalSchemaProvider(config.local_schema_cache_dir)
+        if config.fetch_local_schema
+        else RemoteSchemaProvider(config.schema_base_url, config.schema_cache_dir)
     )
     return Deposition(store=store, api_client=api_client, check_runner=check_runner)
 
@@ -166,13 +172,12 @@ class Deposition:
 
     def set_em_params(
         self,
-        em_subtype: EMSubType | str | None = None,
+        em_subtype: EMSubType | None = None,
         coordinates: bool | None = None,
     ) -> None:
         """Set EM-specific parameters for this deposition."""
-        em_subtype_str = em_subtype.value if isinstance(em_subtype, EMSubType) else em_subtype
-        self._store.update_em_params(em_subtype_str, coordinates)
-        self._session.em_subtype = em_subtype_str
+        self._store.update_em_params(em_subtype, coordinates)
+        self._session.em_subtype = em_subtype
         self._session.coordinates = coordinates
 
     def check_auth_key(self) -> bool:
@@ -228,9 +233,7 @@ class Deposition:
     def check_required_files(self) -> CheckReport:
         """Check that the session contains all required files for the experiment type."""
         files = self._store.get_all_files()
-        return self._check_runner.check_required_files(
-            files, self._session.experiment_type, self._session.em_subtype
-        )
+        return self._check_runner.check_required_files(files, self._session.experiment_type, self._session.em_subtype)
 
     def check_mmcif_file(self, file_id: str) -> CheckReport:
         """Check that the file identified by file_id is a valid mmCIF."""
