@@ -52,8 +52,10 @@ class DepositConfig:
     hostname: str = "https://deposit.wwpdb.org/deposition"
     ssl_verify: bool = True
     redirect: bool = True
+    fetch_local_schema: bool = True
+    local_schema_cache_dir: Path = field(default_factory=lambda: Path(__file__).parent / "schemas" / "json" )
     schema_base_url: str = "https://schemas.wwpdb.org/nextdep"
-    schema_cache_dir: Path = field(default_factory=lambda: Path(__file__).parent / "schemas" / "json" )
+    schema_cache_dir: Path = field(default_factory=lambda: Path.home() / ".onedep" / "schemas")
     session_dir: Path = field(default_factory=lambda: Path.home() / ".onedep" / "sessions")
     config_path: Path = field(default_factory=lambda: Path.home() / ".config" / "onedep" / "config.toml")
 

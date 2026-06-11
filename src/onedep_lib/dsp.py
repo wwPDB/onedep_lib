@@ -13,6 +13,7 @@ from onedep_lib.checks.runner import CheckRunner
 from onedep_lib.checks.types import CheckRunner as CheckRunnerProtocol
 from onedep_lib.config import DepositConfig
 from onedep_lib.enums import Country, EMSubType, ExperimentType, FileType
+from onedep_lib.schemas.local import LocalSchemaProvider
 from onedep_lib.schemas.remote import RemoteSchemaProvider
 from onedep_lib.session.json_store import JsonSessionStore
 from onedep_lib.session.models import LocalFile, LocalSession
@@ -86,7 +87,7 @@ def deposit_init(
     store: SessionStore = JsonSessionStore(session_id, base_dir=base_dir)
     api_client: ApiClient = _api_client or HttpApiClient(config, auth_provider=TokenStore(config))
     check_runner: CheckRunnerProtocol = _check_runner or CheckRunner(
-        RemoteSchemaProvider(config.schema_base_url, config.schema_cache_dir)
+        LocalSchemaProvider(config.local_schema_cache_dir) if config.fetch_local_schema else RemoteSchemaProvider(config.schema_base_url, config.schema_cache_dir)
     )
     session = LocalSession(
         session_id=session_id,
@@ -130,7 +131,7 @@ def deposit_resume(
     store.get_session()  # raises KeyError if not found
     api_client: ApiClient = _api_client or HttpApiClient(config, auth_provider=TokenStore(config))
     check_runner: CheckRunnerProtocol = _check_runner or CheckRunner(
-        RemoteSchemaProvider(config.schema_base_url, config.schema_cache_dir)
+        LocalSchemaProvider(config.local_schema_cache_dir) if config.fetch_local_schema else RemoteSchemaProvider(config.schema_base_url, config.schema_cache_dir)
     )
     return Deposition(store=store, api_client=api_client, check_runner=check_runner)
 
