@@ -88,7 +88,9 @@ def deposit_init(
     store: SessionStore = JsonSessionStore(session_id, base_dir=base_dir)
     api_client: ApiClient = _api_client or HttpApiClient(config, auth_provider=TokenStore(config))
     check_runner: CheckRunnerProtocol = _check_runner or CheckRunner(
-        LocalSchemaProvider(config.local_schema_cache_dir) if config.fetch_local_schema else RemoteSchemaProvider(config.schema_base_url, config.schema_cache_dir)
+        LocalSchemaProvider(config.local_schema_cache_dir)
+        if config.fetch_local_schema
+        else RemoteSchemaProvider(config.schema_base_url, config.schema_cache_dir)
     )
     session = LocalSession(
         session_id=session_id,
@@ -132,7 +134,9 @@ def deposit_resume(
     store.get_session()  # raises KeyError if not found
     api_client: ApiClient = _api_client or HttpApiClient(config, auth_provider=TokenStore(config))
     check_runner: CheckRunnerProtocol = _check_runner or CheckRunner(
-        LocalSchemaProvider(config.local_schema_cache_dir) if config.fetch_local_schema else RemoteSchemaProvider(config.schema_base_url, config.schema_cache_dir)
+        LocalSchemaProvider(config.local_schema_cache_dir)
+        if config.fetch_local_schema
+        else RemoteSchemaProvider(config.schema_base_url, config.schema_cache_dir)
     )
     return Deposition(store=store, api_client=api_client, check_runner=check_runner)
 

@@ -146,7 +146,9 @@ def main() -> None:
         for _ in range(1, 64):
             try:
                 status = dep.get_status()
-                spin.update(f"[cyan]{status.details if isinstance(status, dsp.DepositStatus) else status.message}[/cyan]")
+                spin.update(
+                    f"[cyan]{status.details if isinstance(status, dsp.DepositStatus) else status.message}[/cyan]"
+                )
                 if isinstance(status, dsp.DepositStatus) and status.status.lower() == "finished":
                     ok(f"Processing finished  dep_id={dep_id}")
                     break
