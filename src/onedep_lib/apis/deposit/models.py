@@ -120,10 +120,10 @@ class WwPDBDeposition:
         parsed_experiments = []
         for exp in self.experiments:
             if isinstance(exp, dict):
-                exp = dict(exp)
-                if "type" in exp:
-                    exp["exp_type"] = exp.pop("type")
-                parsed_experiments.append(Experiment(**exp))
+                exp_t = dict(exp)
+                if "type" in exp_t:
+                    exp_t["exp_type"] = exp_t.pop("type")
+                parsed_experiments.append(Experiment(**exp_t))
             else:
                 parsed_experiments.append(exp)
         self.experiments = parsed_experiments
