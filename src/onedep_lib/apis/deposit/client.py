@@ -203,6 +203,8 @@ class HttpApiClient:
         with open(file_path, "rb") as fp:
             fp.seek(uploaded_bytes)
             while uploaded_bytes < file_size:
+                self._refresh_auth_header()
+
                 chunk_start = uploaded_bytes
                 chunk = fp.read(_chunk_size)
                 if not chunk:
