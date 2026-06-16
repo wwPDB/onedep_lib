@@ -11,11 +11,12 @@ from onedep_lib.enums import Country, ExperimentType, FileType
 from onedep_lib.schemas.remote import RemoteSchemaProvider
 from onedep_lib.session.json_store import JsonSessionStore
 from onedep_lib.session.models import LocalFile, LocalSession
+from onedep_lib.config import DepositConfig
 
 
 @pytest.fixture
 def files_schema() -> dict:
-    schema_path = Path(__file__).parent.parent / "fixtures" / "files.json"
+    schema_path = DepositConfig().local_schema_cache_dir / "required_files.json"
     with schema_path.open() as f:
         return json.load(f)
 
