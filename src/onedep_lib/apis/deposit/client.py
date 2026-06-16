@@ -5,6 +5,7 @@ import os
 from json import JSONDecodeError
 from typing import Union
 
+import hashlib
 import requests
 import urllib3
 
@@ -134,6 +135,13 @@ class HttpApiClient:
     def _delete(self, endpoint: str) -> None:
         self._do("DELETE", endpoint)
 
+    def _compute_md5(self, file_path: str, _chunk_size: int = 8 * 1024 * 1024) -> str:
+        h = hashlib.md5()
+        with open(file_path, "rb") as fp:
+            for chunk in iter(lambda: fp.read(_chunk_size), b""):
+                h.update(chunk)
+        return h.hexdigest()
+
     # --- ApiClient Protocol implementation ---
 
     def create_deposition(
@@ -183,7 +191,8 @@ class HttpApiClient:
 
         file_type_str = file_type.value if isinstance(file_type, FileType) else file_type
         file_name = os.path.basename(file_path)
-        form = {"name": file_name, "type": file_type_str}
+        checksum = self._compute_md5(file_path, _chunk_size)
+        form = {"name": file_name, "type": file_type_str, "md5": checksum}
 
         if overwrite:
             for existing in self.get_files(dep_id):
@@ -198,7 +207,7 @@ class HttpApiClient:
         last_data: dict | None = None
 
         self._refresh_auth_header()
-        self._logger.info("Uploading %s", file_name)
+        self._logger.info("Uploading %s (%d bytes, md5=%s)", file_name, file_size, checksum)
 
         with open(file_path, "rb") as fp:
             fp.seek(uploaded_bytes)
