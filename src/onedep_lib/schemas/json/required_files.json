@@ -1,8 +1,8 @@
 {
   "$schemas": "http://json-schema.org/draft/2020-12/schema",
-  "$id": "files.json",
+  "$id": "required_files.json",
   "title": "filecheck",
-  "description": "schema for validation of input files for pdb deposition",
+  "description": "schema for validation of required input files for pdb deposition",
   "type": "object",
   "properties": {
     "method": {
