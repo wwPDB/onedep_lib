@@ -176,8 +176,8 @@
                 "maxContains": 1,
                 "feedback": {
                   "contains": "one reflections file is required for neutron",
-                  "minContains": "only one reflections file is allowed for fiber",
-                  "maxContains": "only one reflections file is allowed for fiber"
+                  "minContains": "only one reflections file is allowed for neutron",
+                  "maxContains": "only one reflections file is allowed for neutron"
                 }
               }
             ],
@@ -280,9 +280,9 @@
                 "minContains": 1,
                 "maxContains": 1,
                 "feedback": {
-                  "contains": "an img-emdb file is required for em",
-                  "minContains": "only one img-emdb file is allowed",
-                  "maxContains": "only one img-emdb file is allowed"
+                  "contains": "an image file is required for em",
+                  "minContains": "only one image file is allowed for em",
+                  "maxContains": "only one image file is allowed for em"
                 }
               },
               {
@@ -307,7 +307,6 @@
                 "minContains": 0,
                 "maxContains": 1,
                 "feedback": {
-                  "contains": "one of reflections file is required for em",
                   "maxContains": "only one reflections file is allowed for em"
                 }
               }
@@ -509,9 +508,9 @@
                   "minContains": 1,
                   "maxContains": 1,
                   "feedback": {
-                    "contains": "one shifts file is required for nmr",
-                    "minContains": "only one shifts file is allowed for nmr",
-                    "maxContains": "only one shifts file is allowed for nmr"
+                    "contains": "one chemical shifts file is required for nmr",
+                    "minContains": "only one chemical shifts file is allowed for nmr",
+                    "maxContains": "only one chemical shifts file is allowed for nmr"
                   }
                 },
                 {
@@ -535,7 +534,8 @@
                   },
                   "minContains": 1,
                   "feedback": {
-                    "contains": "one restraints file is required for nmr"
+                    "contains": "one restraints file is required for nmr",
+                    "minContains": "at least one restraints file is required for nmr"
                   }
                 }
               ]
