@@ -43,7 +43,7 @@ def dep(tmp_path, stub_api):
         users=["0000-0001-2345-6789"],
         country=Country.USA,
         experiment_type=ExperimentType.XRAY,
-        _base_dir=tmp_path,
+        base_dir=tmp_path,
         _api_client=stub_api,
         _check_runner=StubCheckRunner(),
     )
@@ -84,7 +84,7 @@ def test_deposit_without_experiment_type_raises(tmp_path):
         email="test@example.com",
         users=[],
         country=Country.USA,
-        _base_dir=tmp_path,
+        base_dir=tmp_path,
         _api_client=StubApiClient(),
         _check_runner=StubCheckRunner(),
     )
@@ -115,7 +115,7 @@ def test_deposit_resume_restores_session(dep, tmp_path, stub_api):
     dep.close()
     resumed = deposit_resume(
         session_id,
-        _base_dir=tmp_path,
+        base_dir=tmp_path,
         _api_client=stub_api,
         _check_runner=StubCheckRunner(),
     )
@@ -160,10 +160,10 @@ def test_session_metadata_entry_points(dep, tmp_path):
 
     summary = get_session_metadata(session_id, base_dir=tmp_path)
     assert summary.session_id == session_id
-    assert summary.email == "test@example.com"
-    assert summary.country == Country.USA
     assert summary.experiment_type == ExperimentType.XRAY
     assert summary.file_count == 1
+    assert summary.created_at is not None
+    assert summary.updated_at is not None
 
     summaries = list_session_metadata(base_dir=tmp_path)
     assert len(summaries) == 1
@@ -177,7 +177,7 @@ def test_context_manager(tmp_path, stub_api):
         users=[],
         country=Country.USA,
         experiment_type=ExperimentType.XRAY,
-        _base_dir=tmp_path,
+        base_dir=tmp_path,
         _api_client=stub_api,
         _check_runner=StubCheckRunner(),
     ) as dep:

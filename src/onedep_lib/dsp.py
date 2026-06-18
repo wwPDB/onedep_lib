@@ -29,23 +29,17 @@ def _md5_of_file(path: Path, chunk_size: int = 1 << 20) -> str:
     return h.hexdigest()
 
 
-def _session_base_dir(config: DepositConfig, base_dir: Path | None = None, _base_dir: Path | None = None) -> Path:
-    if base_dir is not None and _base_dir is not None:
-        raise ValueError("Specify either base_dir or _base_dir, not both.")
-    return base_dir or _base_dir or config.session_dir
+def _session_base_dir(config: DepositConfig, base_dir: Path | None = None) -> Path:
+    return Path(base_dir or config.session_dir)
 
 
 def _summarize_session(session: LocalSession, files: list[LocalFile]) -> SessionSummary:
     return SessionSummary(
         session_id=session.session_id,
-        email=session.email,
-        users=session.users,
-        country=session.country,
+        remote_dep_id=session.remote_dep_id,
         experiment_type=session.experiment_type,
         created_at=session.created_at,
-        remote_dep_id=session.remote_dep_id,
-        em_subtype=session.em_subtype,
-        coordinates=session.coordinates,
+        updated_at=session.updated_at or session.created_at,
         file_count=len(files),
     )
 
@@ -118,7 +112,6 @@ def deposit_init(
     coordinates: bool | None = None,
     config: DepositConfig | None = None,
     base_dir: Path | None = None,
-    _base_dir: Path | None = None,
     _api_client: ApiClient | None = None,
     _check_runner: CheckRunnerProtocol | None = None,
 ) -> Deposition:
@@ -134,7 +127,6 @@ def deposit_init(
         config: Optional pre-built DepositConfig; loaded from default sources if None.
         base_dir: Optional session storage directory. Defaults to the configured
             OneDep Lib session directory.
-        _base_dir: Override session storage directory (for testing only).
         _api_client: Override API client (for testing only).
         _check_runner: Override check runner (for testing only).
 
@@ -143,7 +135,7 @@ def deposit_init(
     """
     config = config or DepositConfig.load()
     session_id = str(uuid.uuid4())
-    session_base_dir = _session_base_dir(config, base_dir=base_dir, _base_dir=_base_dir)
+    session_base_dir = _session_base_dir(config, base_dir=base_dir)
     store: SessionStore = JsonSessionStore(session_id, base_dir=session_base_dir)
     api_client: ApiClient = _api_client or HttpApiClient(config, auth_provider=TokenStore(config))
     check_runner: CheckRunnerProtocol = _check_runner or CheckRunner(
@@ -158,6 +150,7 @@ def deposit_init(
         country=country,
         experiment_type=experiment_type,
         created_at=datetime.now(),
+        updated_at=datetime.now(),
         em_subtype=em_subtype,
         coordinates=coordinates,
     )
@@ -169,7 +162,6 @@ def deposit_resume(
     session_id: str,
     config: DepositConfig | None = None,
     base_dir: Path | None = None,
-    _base_dir: Path | None = None,
     _api_client: ApiClient | None = None,
     _check_runner: CheckRunnerProtocol | None = None,
 ) -> Deposition:
@@ -180,7 +172,6 @@ def deposit_resume(
         config: Optional pre-built DepositConfig; loaded from default sources if None.
         base_dir: Optional session storage directory. Defaults to the configured
             OneDep Lib session directory.
-        _base_dir: Override session storage directory (for testing only).
         _api_client: Override API client (for testing only).
         _check_runner: Override check runner (for testing only).
 
@@ -191,7 +182,7 @@ def deposit_resume(
         KeyError: If no session with the given session_id exists.
     """
     config = config or DepositConfig.load()
-    session_base_dir = _session_base_dir(config, base_dir=base_dir, _base_dir=_base_dir)
+    session_base_dir = _session_base_dir(config, base_dir=base_dir)
     store: SessionStore = JsonSessionStore(session_id, base_dir=session_base_dir)
     store.get_session()  # raises KeyError if not found
     api_client: ApiClient = _api_client or HttpApiClient(config, auth_provider=TokenStore(config))
@@ -200,7 +191,11 @@ def deposit_resume(
         if config.fetch_local_schema
         else RemoteSchemaProvider(config.schema_base_url, config.schema_cache_dir)
     )
-    return Deposition(store=store, api_client=api_client, check_runner=check_runner)
+    return Deposition(
+        store=store,
+        api_client=api_client,
+        check_runner=check_runner,
+    )
 
 
 class Deposition:
