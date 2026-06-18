@@ -28,3 +28,17 @@ class LocalSession:
     remote_dep_id: str | None = None
     em_subtype: EMSubType | None = None
     coordinates: bool | None = None
+
+
+@dataclass
+class SessionSummary:
+    session_id: str
+    email: str
+    users: list[str]
+    country: Country
+    experiment_type: ExperimentType | None
+    created_at: datetime
+    remote_dep_id: str | None = None
+    em_subtype: EMSubType | None = None
+    coordinates: bool | None = None
+    file_count: int = 0
