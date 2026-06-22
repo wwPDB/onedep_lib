@@ -98,7 +98,7 @@ def deposit_init(
         users=users,
         country=country,
         experiment_type=experiment_type,
-        created_at=datetime.now(),
+        created_at=datetime.now(tz=timezone.utc),
         em_subtype=em_subtype,
         coordinates=coordinates,
     )
