@@ -1,0 +1,470 @@
+{
+  "$schemas": "http://json-schema.org/draft/2020-12/schema",
+  "$id": "files.json",
+  "title": "filecheck",
+  "description": "schema for validation of input files for pdb deposition",
+  "type": "object",
+  "properties": {
+    "method": {
+      "enum": [
+        "xray",
+        "fiber",
+        "neutron",
+        "em",
+        "ec",
+        "nmr",
+        "ssnmr"
+      ]
+    },
+    "subtype": {
+      "enum": [
+        "single",
+        "helical",
+        "tomography",
+        "subtomogram"
+      ]
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "co-pdb",
+          "co-cif",
+          "xs-cif",
+          "xs-mtz",
+          "xa-par",
+          "xa-top",
+          "xa-mat",
+          "layer-lines",
+          "vo-map",
+          "img-emdb",
+          "add-map",
+          "mask-map",
+          "half-map",
+          "fsc-xml",
+          "nm-shi",
+          "nm-res-amb",
+          "nm-aux-amb",
+          "nm-res-ari",
+          "nm-res-bio",
+          "nm-aux-cha",
+          "nm-res-cha",
+          "nm-res-cns",
+          "nm-res-cya",
+          "nm-res-dyn",
+          "nm-res-gro",
+          "nm-aux-gro",
+          "nm-res-isd",
+          "nm-res-ros",
+          "nm-res-sch",
+          "nm-res-syb",
+          "nm-res-xpl",
+          "nm-res-oth",
+          "nm-pea-any",
+          "nm-uni-nef",
+          "nm-uni-str"
+        ]
+      }
+    }
+  },
+  "required": [
+    "method",
+    "files"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "method": {
+            "const": "xray"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "files": {
+            "allOf": [
+              {
+                "contains": {
+                  "const": "co-cif"
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "enum": [
+                    "xs-cif",
+                    "xs-mtz"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              }
+            ],
+            "items": {
+              "enum": [
+                "co-cif",
+                "xs-cif",
+                "xs-mtz",
+                "xa-par",
+                "xa-top",
+                "xa-mat"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "method": {
+            "const": "neutron"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "files": {
+            "allOf": [
+              {
+                "contains": {
+                  "enum": [
+                    "co-cif",
+                    "co-pdb"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "enum": [
+                    "xs-cif",
+                    "xs-mtz"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              }
+            ],
+            "items": {
+              "enum": [
+                "co-pdb",
+                "co-cif",
+                "xs-cif",
+                "xs-mtz",
+                "xa-par",
+                "xa-top",
+                "xa-mat"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "method": {
+            "const": "fiber"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "files": {
+            "allOf": [
+              {
+                "contains": {
+                  "enum": [
+                    "co-pdb",
+                    "co-cif"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "enum": [
+                    "xs-cif",
+                    "xs-mtz"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              }
+            ],
+            "items": {
+              "enum": [
+                "co-pdb",
+                "co-cif",
+                "layer-lines",
+                "xs-cif",
+                "xs-mtz",
+                "xa-par",
+                "xa-top",
+                "xa-mat"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "method": {
+            "const": "em"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "files": {
+            "allOf": [
+              {
+                "contains": {
+                  "const": "img-emdb"
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "const": "vo-map"
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "enum": [
+                    "xs-cif",
+                    "xs-mtz"
+                  ]
+                },
+                "minContains": 0,
+                "maxContains": 1
+              }
+            ],
+            "items": {
+              "enum": [
+                "co-pdb",
+                "co-cif",
+                "vo-map",
+                "img-emdb",
+                "add-map",
+                "mask-map",
+                "half-map",
+                "fsc-xml",
+                "layer-lines",
+                "xs-cif",
+                "xs-mtz"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "method": {
+            "const": "em"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "subtype"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "subtype": {
+            "enum": [
+              "single",
+              "helical",
+              "subtomogram"
+            ]
+          }
+        },
+        "required": [
+          "subtype"
+        ]
+      },
+      "then": {
+        "properties": {
+          "files": {
+            "contains": {
+              "const": "half-map"
+            },
+            "minContains": 2,
+            "maxContains": 2
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "method": {
+            "const": "ec"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "files": {
+            "contains": {
+              "enum": [
+                "xs-cif",
+                "xs-mtz"
+              ]
+            },
+            "minContains": 1,
+            "maxContains": 1,
+            "items": {
+              "enum": [
+                "co-cif",
+                "xs-cif",
+                "xs-mtz",
+                "xa-par",
+                "xa-top",
+                "xa-mat"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "method": {
+            "enum": [
+              "nmr",
+              "ssnmr"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "files": {
+            "items": {
+              "enum": [
+                "co-pdb",
+                "co-cif",
+                "nm-shi",
+                "nm-res-amb",
+                "nm-aux-amb",
+                "nm-res-ari",
+                "nm-res-bio",
+                "nm-aux-cha",
+                "nm-res-cha",
+                "nm-res-cns",
+                "nm-res-cya",
+                "nm-res-dyn",
+                "nm-res-gro",
+                "nm-aux-gro",
+                "nm-res-isd",
+                "nm-res-ros",
+                "nm-res-sch",
+                "nm-res-syb",
+                "nm-res-xpl",
+                "nm-res-oth",
+                "nm-pea-any",
+                "nm-uni-nef",
+                "nm-uni-str"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "method": {
+            "enum": [
+              "nmr",
+              "ssnmr"
+            ]
+          }
+        }
+      },
+      "then": {
+        "if": {
+          "not": {
+            "properties": {
+              "files": {
+                "contains": {
+                  "enum": [
+                    "nm-uni-nef",
+                    "nm-uni-str"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "then": {
+          "properties": {
+            "files": {
+              "allOf": [
+                {
+                  "contains": {
+                    "const": "nm-shi"
+                  },
+                  "minContains": 1,
+                  "maxContains": 1
+                },
+                {
+                  "contains": {
+                    "enum": [
+                      "nm-res-amb",
+                      "nm-res-ari",
+                      "nm-res-bio",
+                      "nm-res-cha",
+                      "nm-res-cns",
+                      "nm-res-cya",
+                      "nm-res-dyn",
+                      "nm-res-gro",
+                      "nm-res-isd",
+                      "nm-res-ros",
+                      "nm-res-sch",
+                      "nm-res-syb",
+                      "nm-res-xpl",
+                      "nm-res-oth"
+                    ]
+                  },
+                  "minContains": 1
+                }
+              ]
+            }
+          }
+        },
+        "else": {
+          "properties": {
+            "files": {
+              "contains": {
+                "enum": [
+                  "nm-uni-nef",
+                  "nm-uni-str"
+                ]
+              },
+              "minContains": 1,
+              "maxContains": 1
+            }
+          }
+        }
+      }
+    }
+  ]
+}
