@@ -7,7 +7,7 @@ packages = ["src/onedep_lib"]
 
 [project]
 name = "onedep_lib"
-version = "0.1.0"
+version = "0.1.0.dev1"
 description = "A Python package to interact with OneDep APIs."
 readme = "README.md"
 authors = [
