@@ -1,6 +1,8 @@
 import pytest
 from pathlib import Path
 from onedep_lib.checks.report import CheckReport
+from onedep_lib import dsp
+from onedep_lib.config import DepositConfig
 from onedep_lib.dsp import deposit_init, deposit_resume
 from onedep_lib.enums import Country, ExperimentType, FileType
 from tests.unit.apis.deposit.test_stub_api_client import StubApiClient
@@ -99,9 +101,21 @@ def test_add_nonexistent_file_raises(dep):
         dep.add_file("/nonexistent/path.cif", FileType.MMCIF_COORD)
 
 
-def test_check_auth_key_returns_bool(dep):
-    result = dep.check_auth_key()
+def test_check_auth_key_returns_bool(monkeypatch):
+    class StubAuthClient:
+        def __init__(self, config, auth_provider):
+            self.config = config
+            self.auth_provider = auth_provider
+
+        def get_all_depositions(self):
+            return []
+
+    monkeypatch.setattr(dsp, "HttpApiClient", StubAuthClient)
+
+    result = dsp.check_auth_key(DepositConfig(access_token="access", refresh_token="refresh"))
+
     assert isinstance(result, bool)
+    assert result is True
 
 
 def test_deposit_resume_restores_session(dep, tmp_path, stub_api):

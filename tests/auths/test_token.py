@@ -163,12 +163,12 @@ def test_revoke_posts_refresh_token_and_clears_local_storage(tmp_path: Path, htt
         json={"refresh_token": "refresh"},
     ).respond_with_data(status=204)
     store.revoke()
-    with pytest.raises(AuthError, match="No access token"):
+    with pytest.raises(AuthError, match="No refresh token stored. Paste a refresh token first."):
         store.get_access_token()
 
 
 def test_get_access_token_raises_auth_error_when_no_tokens_loaded(config: DepositConfig):
     store = TokenStore(config=config)
     # config was constructed directly (not via load()), so access_token is None
-    with pytest.raises(AuthError, match="No access token"):
+    with pytest.raises(AuthError, match="No refresh token stored. Paste a refresh token first."):
         store.get_access_token()

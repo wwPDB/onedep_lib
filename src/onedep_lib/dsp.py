@@ -53,6 +53,16 @@ def list_sessions(base_dir: Path | None = None) -> list[tuple[LocalSession, list
     return results
 
 
+def check_auth_key(config) -> bool:
+    """Return True if the configured credentials are valid, False otherwise."""
+    try:
+        api_client = HttpApiClient(config, auth_provider=TokenStore(config))
+        api_client.get_all_depositions()
+        return True
+    except Exception:  # noqa: BLE001
+        return False
+
+
 def deposit_init(
     email: str,
     users: list[str],
@@ -179,14 +189,6 @@ class Deposition:
         self._store.update_em_params(em_subtype, coordinates)
         self._session.em_subtype = em_subtype
         self._session.coordinates = coordinates
-
-    def check_auth_key(self) -> bool:
-        """Return True if the configured credentials are valid, False otherwise."""
-        try:
-            self._api_client.get_all_depositions()
-            return True
-        except Exception:  # noqa: BLE001
-            return False
 
     def add_file(self, file_path: str, file_type: FileType) -> str:
         """Register a local file for this deposition.
