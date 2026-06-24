@@ -113,7 +113,9 @@ class DepositConfig:
                     acc = entry.get("access_token")
                     ref = entry.get("refresh_token")
                     if acc is not None or ref is not None:
-                        if not isinstance(acc, str) or not isinstance(ref, str):
+                        if acc is not None and not isinstance(acc, str):
+                            raise ConfigError(f"Malformed token data in [auths.{fqdn_key}]")
+                        if not isinstance(ref, str):
                             raise ConfigError(f"Malformed token data in [auths.{fqdn_key}]")
                         merged["access_token"] = acc
                         merged["refresh_token"] = ref

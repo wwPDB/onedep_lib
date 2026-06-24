@@ -30,8 +30,8 @@ class TokenStore:
 
     def get_access_token(self) -> str:
         entry = self._read_entry()
-        token = entry["access_token"]
-        if self._is_expired(token):
+        token = entry.get("access_token")
+        if token is None or self._is_expired(token):
             return self.refresh()
         return token
 
@@ -93,9 +93,12 @@ class TokenStore:
     def _read_entry(self) -> dict[str, str]:
         access_token = self._config.access_token
         refresh_token = self._config.refresh_token
-        if access_token is None or refresh_token is None:
-            raise AuthError("No access token stored. Paste a token pair first.")
-        return {"access_token": access_token, "refresh_token": refresh_token}
+        if refresh_token is None:
+            raise AuthError("No refresh token stored. Paste a refresh token first.")
+        entry = {"refresh_token": refresh_token}
+        if access_token is not None:
+            entry["access_token"] = access_token
+        return entry
 
     def _fqdn_key(self) -> str:
         key = _hostname_to_fqdn_key(self._config.hostname)
