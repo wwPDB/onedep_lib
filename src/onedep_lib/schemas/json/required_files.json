@@ -97,11 +97,9 @@
                 "contains": {
                   "const": "co-cif"
                 },
-                "minContains": 1,
                 "maxContains": 1,
                 "feedback": {
                   "contains": "one coordinates file is required for xray",
-                  "minContains": "only one coordinates file is allowed for xray",
                   "maxContains": "only one coordinates file is allowed for xray"
                 }
               },
@@ -112,11 +110,9 @@
                     "xs-mtz"
                   ]
                 },
-                "minContains": 1,
                 "maxContains": 1,
                 "feedback": {
                   "contains": "one reflections file is required for xray",
-                  "minContains": "only one reflections file is allowed for xray",
                   "maxContains": "only one reflections file is allowed for xray"
                 }
               }
@@ -157,11 +153,9 @@
                     "co-pdb"
                   ]
                 },
-                "minContains": 1,
                 "maxContains": 1,
                 "feedback": {
                   "contains": "one coordinates file is required for neutron",
-                  "minContains": "only one coordinates file is allowed for neutron",
                   "maxContains": "only one coordinates file is allowed for neutron"
                 }
               },
@@ -172,11 +166,9 @@
                     "xs-mtz"
                   ]
                 },
-                "minContains": 1,
                 "maxContains": 1,
                 "feedback": {
                   "contains": "one reflections file is required for neutron",
-                  "minContains": "only one reflections file is allowed for neutron",
                   "maxContains": "only one reflections file is allowed for neutron"
                 }
               }
@@ -218,11 +210,9 @@
                     "co-cif"
                   ]
                 },
-                "minContains": 1,
                 "maxContains": 1,
                 "feedback": {
                   "contains": "one coordinates file is required for fiber",
-                  "minContains": "only one coordinates file is allowed for fiber",
                   "maxContains": "only one coordinates file is allowed for fiber"
                 }
               },
@@ -233,11 +223,9 @@
                     "xs-mtz"
                   ]
                 },
-                "minContains": 1,
                 "maxContains": 1,
                 "feedback": {
                   "contains": "one reflections file is required for fiber",
-                  "minContains": "only one reflections file is allowed for fiber",
                   "maxContains": "only one reflections file is allowed for fiber"
                 }
               }
@@ -277,11 +265,9 @@
                 "contains": {
                   "const": "img-emdb"
                 },
-                "minContains": 1,
                 "maxContains": 1,
                 "feedback": {
                   "contains": "an image file is required for em",
-                  "minContains": "only one image file is allowed for em",
                   "maxContains": "only one image file is allowed for em"
                 }
               },
@@ -289,11 +275,9 @@
                 "contains": {
                   "const": "vo-map"
                 },
-                "minContains": 1,
                 "maxContains": 1,
                 "feedback": {
                   "contains": "a map file is required for em",
-                  "minContains": "only one map file is allowed for em",
                   "maxContains": "only one map file is allowed for em"
                 }
               },
@@ -353,6 +337,9 @@
     {
       "if": {
         "properties": {
+          "method": {
+            "const": "em"
+          },
           "subtype": {
             "enum": [
               "single",
@@ -362,6 +349,7 @@
           }
         },
         "required": [
+          "method",
           "subtype"
         ]
       },
@@ -412,11 +400,9 @@
                 "xs-mtz"
               ]
             },
-            "minContains": 1,
             "maxContains": 1,
             "feedback": {
               "contains": "one reflections file is required for ec",
-              "minContains": "only one reflections file is allowed for ec",
               "maxContains": "only one reflections file is allowed for ec"
             }
           }
@@ -505,11 +491,9 @@
                   "contains": {
                     "const": "nm-shi"
                   },
-                  "minContains": 1,
                   "maxContains": 1,
                   "feedback": {
                     "contains": "one chemical shifts file is required for nmr",
-                    "minContains": "only one chemical shifts file is allowed for nmr",
                     "maxContains": "only one chemical shifts file is allowed for nmr"
                   }
                 },
@@ -551,11 +535,8 @@
                   "nm-uni-str"
                 ]
               },
-              "minContains": 1,
               "maxContains": 1,
               "feedback": {
-                "contains": "one unified file is required for nmr",
-                "minContains": "only one unified file is allowed for nmr",
                 "maxContains": "only one unified file is allowed for nmr"
               }
             }
