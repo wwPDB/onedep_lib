@@ -10,7 +10,7 @@ sibling of the validator keyword that actually runs.  These tests verify:
 
 Known schema issues documented by these tests:
   Invalid file type triggers two enum errors (global items + method-specific items).
-
+  (however, retained for sake of explainability)
 """
 from __future__ import annotations
 
@@ -25,7 +25,7 @@ from onedep_lib.config import DepositConfig
 
 @pytest.fixture(scope="module")
 def schema() -> dict:
-    schema_path = Path(DepositConfig().local_schema_cache_dir) / "required_files.json"
+    schema_path : Path  = DepositConfig().local_schema_cache_dir / "required_files.json"
     with schema_path.open() as f:
         return json.load(f)
 
