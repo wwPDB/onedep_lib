@@ -1,8 +1,8 @@
 {
   "$schemas": "http://json-schema.org/draft/2020-12/schema",
-  "$id": "files.json",
+  "$id": "required_files.json",
   "title": "filecheck",
-  "description": "schema for validation of input files for pdb deposition",
+  "description": "schema for validation of required input files for pdb deposition",
   "type": "object",
   "properties": {
     "method": {
@@ -14,7 +14,10 @@
         "ec",
         "nmr",
         "ssnmr"
-      ]
+      ],
+      "feedback": {
+        "enum": "unknown method"
+      }
     },
     "subtype": {
       "enum": [
@@ -22,7 +25,10 @@
         "helical",
         "tomography",
         "subtomogram"
-      ]
+      ],
+      "feedback": {
+        "enum": "unknown subtype"
+      }
     },
     "files": {
       "type": "array",
@@ -63,7 +69,10 @@
           "nm-pea-any",
           "nm-uni-nef",
           "nm-uni-str"
-        ]
+        ],
+        "feedback": {
+          "enum": "unknown file type"
+        }
       }
     }
   },
@@ -88,8 +97,11 @@
                 "contains": {
                   "const": "co-cif"
                 },
-                "minContains": 1,
-                "maxContains": 1
+                "maxContains": 1,
+                "feedback": {
+                  "contains": "one coordinates file is required for xray",
+                  "maxContains": "only one coordinates file is allowed for xray"
+                }
               },
               {
                 "contains": {
@@ -98,8 +110,11 @@
                     "xs-mtz"
                   ]
                 },
-                "minContains": 1,
-                "maxContains": 1
+                "maxContains": 1,
+                "feedback": {
+                  "contains": "one reflections file is required for xray",
+                  "maxContains": "only one reflections file is allowed for xray"
+                }
               }
             ],
             "items": {
@@ -110,7 +125,10 @@
                 "xa-par",
                 "xa-top",
                 "xa-mat"
-              ]
+              ],
+              "feedback": {
+                "enum": "unknown file type for xray diffraction"
+              }
             }
           }
         }
@@ -135,8 +153,11 @@
                     "co-pdb"
                   ]
                 },
-                "minContains": 1,
-                "maxContains": 1
+                "maxContains": 1,
+                "feedback": {
+                  "contains": "one coordinates file is required for neutron",
+                  "maxContains": "only one coordinates file is allowed for neutron"
+                }
               },
               {
                 "contains": {
@@ -145,8 +166,11 @@
                     "xs-mtz"
                   ]
                 },
-                "minContains": 1,
-                "maxContains": 1
+                "maxContains": 1,
+                "feedback": {
+                  "contains": "one reflections file is required for neutron",
+                  "maxContains": "only one reflections file is allowed for neutron"
+                }
               }
             ],
             "items": {
@@ -158,7 +182,10 @@
                 "xa-par",
                 "xa-top",
                 "xa-mat"
-              ]
+              ],
+              "feedback": {
+                "enum": "unknown file type for neutron diffraction"
+              }
             }
           }
         }
@@ -183,8 +210,11 @@
                     "co-cif"
                   ]
                 },
-                "minContains": 1,
-                "maxContains": 1
+                "maxContains": 1,
+                "feedback": {
+                  "contains": "one coordinates file is required for fiber",
+                  "maxContains": "only one coordinates file is allowed for fiber"
+                }
               },
               {
                 "contains": {
@@ -193,8 +223,11 @@
                     "xs-mtz"
                   ]
                 },
-                "minContains": 1,
-                "maxContains": 1
+                "maxContains": 1,
+                "feedback": {
+                  "contains": "one reflections file is required for fiber",
+                  "maxContains": "only one reflections file is allowed for fiber"
+                }
               }
             ],
             "items": {
@@ -207,7 +240,10 @@
                 "xa-par",
                 "xa-top",
                 "xa-mat"
-              ]
+              ],
+              "feedback": {
+                "enum": "unknown file type for fiber diffraction"
+              }
             }
           }
         }
@@ -229,15 +265,21 @@
                 "contains": {
                   "const": "img-emdb"
                 },
-                "minContains": 1,
-                "maxContains": 1
+                "maxContains": 1,
+                "feedback": {
+                  "contains": "an image file is required for em",
+                  "maxContains": "only one image file is allowed for em"
+                }
               },
               {
                 "contains": {
                   "const": "vo-map"
                 },
-                "minContains": 1,
-                "maxContains": 1
+                "maxContains": 1,
+                "feedback": {
+                  "contains": "a map file is required for em",
+                  "maxContains": "only one map file is allowed for em"
+                }
               },
               {
                 "contains": {
@@ -247,7 +289,10 @@
                   ]
                 },
                 "minContains": 0,
-                "maxContains": 1
+                "maxContains": 1,
+                "feedback": {
+                  "maxContains": "only one reflections file is allowed for em"
+                }
               }
             ],
             "items": {
@@ -263,7 +308,10 @@
                 "layer-lines",
                 "xs-cif",
                 "xs-mtz"
-              ]
+              ],
+              "feedback": {
+                "enum": "unknown file type for em"
+              }
             }
           }
         }
@@ -280,12 +328,18 @@
       "then": {
         "required": [
           "subtype"
-        ]
+        ],
+        "feedback": {
+          "required": "subtype is required for em"
+        }
       }
     },
     {
       "if": {
         "properties": {
+          "method": {
+            "const": "em"
+          },
           "subtype": {
             "enum": [
               "single",
@@ -295,6 +349,7 @@
           }
         },
         "required": [
+          "method",
           "subtype"
         ]
       },
@@ -305,7 +360,12 @@
               "const": "half-map"
             },
             "minContains": 2,
-            "maxContains": 2
+            "maxContains": 2,
+            "feedback": {
+              "contains": "half-map is required for single, helical, and subtomogram",
+              "minContains": "exactly two half-map files are required for single, helical, and subtomogram",
+              "maxContains": "exactly two half-map files are required for single, helical, and subtomogram"
+            }
           }
         }
       }
@@ -321,14 +381,6 @@
       "then": {
         "properties": {
           "files": {
-            "contains": {
-              "enum": [
-                "xs-cif",
-                "xs-mtz"
-              ]
-            },
-            "minContains": 1,
-            "maxContains": 1,
             "items": {
               "enum": [
                 "co-cif",
@@ -337,7 +389,21 @@
                 "xa-par",
                 "xa-top",
                 "xa-mat"
+              ],
+              "feedback": {
+                "enum": "unknown file type for ec"
+              }
+            },
+            "contains": {
+              "enum": [
+                "xs-cif",
+                "xs-mtz"
               ]
+            },
+            "maxContains": 1,
+            "feedback": {
+              "contains": "one reflections file is required for ec",
+              "maxContains": "only one reflections file is allowed for ec"
             }
           }
         }
@@ -382,7 +448,10 @@
                 "nm-pea-any",
                 "nm-uni-nef",
                 "nm-uni-str"
-              ]
+              ],
+              "feedback": {
+                "enum": "unknown file type for nmr"
+              }
             }
           }
         }
@@ -422,8 +491,11 @@
                   "contains": {
                     "const": "nm-shi"
                   },
-                  "minContains": 1,
-                  "maxContains": 1
+                  "maxContains": 1,
+                  "feedback": {
+                    "contains": "one chemical shifts file is required for nmr",
+                    "maxContains": "only one chemical shifts file is allowed for nmr"
+                  }
                 },
                 {
                   "contains": {
@@ -444,7 +516,11 @@
                       "nm-res-oth"
                     ]
                   },
-                  "minContains": 1
+                  "minContains": 1,
+                  "feedback": {
+                    "contains": "one restraints file is required for nmr",
+                    "minContains": "at least one restraints file is required for nmr"
+                  }
                 }
               ]
             }
@@ -459,8 +535,10 @@
                   "nm-uni-str"
                 ]
               },
-              "minContains": 1,
-              "maxContains": 1
+              "maxContains": 1,
+              "feedback": {
+                "maxContains": "only one unified file is allowed for nmr"
+              }
             }
           }
         }
