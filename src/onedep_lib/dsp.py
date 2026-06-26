@@ -53,8 +53,10 @@ def list_sessions(base_dir: Path | None = None) -> list[tuple[LocalSession, list
     return results
 
 
-def check_auth_key(config) -> bool:
+def check_auth_key(config: DepositConfig = None) -> bool:
     """Return True if the configured credentials are valid, False otherwise."""
+    config = config or DepositConfig.load()
+
     try:
         api_client = HttpApiClient(config, auth_provider=TokenStore(config))
         api_client.get_all_depositions()

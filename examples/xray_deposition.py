@@ -83,7 +83,7 @@ def main() -> None:
 
         # ── 3. Check auth key ─────────────────────────────────────────────────
         spin.update("[cyan]Checking auth key…[/cyan]")
-        auth_ok = dep.check_auth_key()
+        auth_ok = dsp.check_auth_key()
         if auth_ok:
             ok("Auth key valid")
         else:
