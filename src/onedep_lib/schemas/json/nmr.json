@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft/2020-12/schema",
+  "$id": "nmr.json",
+  "title": "NMR allowed files",
+  "description": "valid file types for NMR",
+  "enum": [
+    "co-pdb",
+    "co-cif",
+    "nm-shi",
+    "nm-res-amb",
+    "nm-aux-amb",
+    "nm-res-ari",
+    "nm-res-bio",
+    "nm-aux-cha",
+    "nm-res-cha",
+    "nm-res-cns",
+    "nm-res-cya",
+    "nm-res-dyn",
+    "nm-res-gro",
+    "nm-aux-gro",
+    "nm-res-isd",
+    "nm-res-ros",
+    "nm-res-sch",
+    "nm-res-syb",
+    "nm-res-xpl",
+    "nm-res-oth",
+    "nm-pea-any",
+    "nm-uni-nef",
+    "nm-uni-str"
+  ],
+  "feedback": {
+    "enum": "unknown file type for nmr"
+  }
+}
