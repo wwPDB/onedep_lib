@@ -14,6 +14,8 @@ from onedep_lib.session.models import LocalFile
 class CheckRunner:
 
     subschemas: list[str] = ["xray", "neutron"]
+    validator_specification = jsonschema.Draft202012Validator
+    referencing_specification = DRAFT202012
 
     def __init__(self, schema_provider: SchemaProvider) -> None:
         self._schema_provider = schema_provider
@@ -39,7 +41,7 @@ class CheckRunner:
         try:
             schema = self._schema_provider.get_schema("required_files")
             resources = [
-                (f"{name}.json", Resource(contents=self._schema_provider.get_schema(name), specification=DRAFT202012))
+                (f"{name}.json", Resource(contents=self._schema_provider.get_schema(name), specification=CheckRunner.referencing_specification))
                 for name in CheckRunner.subschemas
             ]
         except SchemaError as exc:
@@ -62,7 +64,7 @@ class CheckRunner:
             data["subtype"] = em_subtype.value
 
         registry = Registry().with_resources(resources)
-        validator = jsonschema.Draft202012Validator(schema, registry=registry)
+        validator = CheckRunner.validator_specification(schema, registry=registry)
         errors = list(validator.iter_errors(data))
         if not errors:
             return CheckReport(source="session")
