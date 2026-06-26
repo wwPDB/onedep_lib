@@ -25,6 +25,17 @@ class LocalSession:
     country: Country
     experiment_type: ExperimentType | None
     created_at: datetime
+    updated_at: datetime | None = None
     remote_dep_id: str | None = None
     em_subtype: EMSubType | None = None
     coordinates: bool | None = None
+
+
+@dataclass
+class SessionSummary:
+    session_id: str
+    remote_dep_id: str | None = None
+    experiment_type: ExperimentType | None = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+    file_count: int = 0

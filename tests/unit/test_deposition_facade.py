@@ -1,7 +1,13 @@
 import pytest
-from pathlib import Path
+
 from onedep_lib.checks.report import CheckReport
-from onedep_lib.dsp import deposit_init, deposit_resume
+from onedep_lib.dsp import (
+    deposit_init,
+    deposit_resume,
+    get_session,
+    get_session_metadata,
+    list_session_metadata,
+)
 from onedep_lib.enums import Country, ExperimentType, FileType
 from tests.unit.apis.deposit.test_stub_api_client import StubApiClient
 
@@ -37,7 +43,7 @@ def dep(tmp_path, stub_api):
         users=["0000-0001-2345-6789"],
         country=Country.USA,
         experiment_type=ExperimentType.XRAY,
-        _base_dir=tmp_path,
+        base_dir=tmp_path,
         _api_client=stub_api,
         _check_runner=StubCheckRunner(),
     )
@@ -78,7 +84,7 @@ def test_deposit_without_experiment_type_raises(tmp_path):
         email="test@example.com",
         users=[],
         country=Country.USA,
-        _base_dir=tmp_path,
+        base_dir=tmp_path,
         _api_client=StubApiClient(),
         _check_runner=StubCheckRunner(),
     )
@@ -109,12 +115,60 @@ def test_deposit_resume_restores_session(dep, tmp_path, stub_api):
     dep.close()
     resumed = deposit_resume(
         session_id,
-        _base_dir=tmp_path,
+        base_dir=tmp_path,
         _api_client=stub_api,
         _check_runner=StubCheckRunner(),
     )
     assert resumed.session_id == session_id
     resumed.close()
+
+
+def test_deposit_resume_accepts_public_base_dir(tmp_path, stub_api):
+    dep = deposit_init(
+        email="test@example.com",
+        users=[],
+        country=Country.USA,
+        experiment_type=ExperimentType.XRAY,
+        base_dir=tmp_path,
+        _api_client=stub_api,
+        _check_runner=StubCheckRunner(),
+    )
+    session_id = dep.session_id
+    dep.close()
+
+    resumed = deposit_resume(
+        session_id,
+        base_dir=tmp_path,
+        _api_client=stub_api,
+        _check_runner=StubCheckRunner(),
+    )
+    assert resumed.session_id == session_id
+    resumed.close()
+
+
+def test_session_metadata_entry_points(dep, tmp_path):
+    test_file = tmp_path / "coords.cif"
+    test_file.write_text("data_test")
+    file_id = dep.add_file(str(test_file), FileType.MMCIF_COORD)
+    session_id = dep.session_id
+    dep.close()
+
+    session, files = get_session(session_id, base_dir=tmp_path)
+    assert session.session_id == session_id
+    assert session.email == "test@example.com"
+    assert [file.file_id for file in files] == [file_id]
+
+    summary = get_session_metadata(session_id, base_dir=tmp_path)
+    assert summary.session_id == session_id
+    assert summary.experiment_type == ExperimentType.XRAY
+    assert summary.file_count == 1
+    assert summary.created_at is not None
+    assert summary.updated_at is not None
+
+    summaries = list_session_metadata(base_dir=tmp_path)
+    assert len(summaries) == 1
+    assert summaries[0].session_id == session_id
+    assert summaries[0].file_count == 1
 
 
 def test_context_manager(tmp_path, stub_api):
@@ -123,7 +177,7 @@ def test_context_manager(tmp_path, stub_api):
         users=[],
         country=Country.USA,
         experiment_type=ExperimentType.XRAY,
-        _base_dir=tmp_path,
+        base_dir=tmp_path,
         _api_client=stub_api,
         _check_runner=StubCheckRunner(),
     ) as dep:

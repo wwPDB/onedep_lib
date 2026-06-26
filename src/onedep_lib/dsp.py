@@ -8,6 +8,7 @@ from pathlib import Path
 from onedep_lib.apis.deposit.client import HttpApiClient
 from onedep_lib.apis.deposit.models import DepositError, DepositStatus, Experiment
 from onedep_lib.apis.deposit.types import ApiClient
+from onedep_lib.auths.token import TokenStore
 from onedep_lib.checks.report import CheckReport
 from onedep_lib.checks.runner import CheckRunner
 from onedep_lib.checks.types import CheckRunner as CheckRunnerProtocol
@@ -16,9 +17,8 @@ from onedep_lib.enums import Country, EMSubType, ExperimentType, FileType
 from onedep_lib.schemas.local import LocalSchemaProvider
 from onedep_lib.schemas.remote import RemoteSchemaProvider
 from onedep_lib.session.json_store import JsonSessionStore
-from onedep_lib.session.models import LocalFile, LocalSession
+from onedep_lib.session.models import LocalFile, LocalSession, SessionSummary
 from onedep_lib.session.types import SessionStore
-from onedep_lib.auths.token import TokenStore
 
 
 def _md5_of_file(path: Path, chunk_size: int = 1 << 20) -> str:
@@ -27,6 +27,21 @@ def _md5_of_file(path: Path, chunk_size: int = 1 << 20) -> str:
         for chunk in iter(lambda: fh.read(chunk_size), b""):
             h.update(chunk)
     return h.hexdigest()
+
+
+def _session_base_dir(config: DepositConfig, base_dir: Path | None = None) -> Path:
+    return Path(base_dir or config.session_dir)
+
+
+def _summarize_session(session: LocalSession, files: list[LocalFile]) -> SessionSummary:
+    return SessionSummary(
+        session_id=session.session_id,
+        remote_dep_id=session.remote_dep_id,
+        experiment_type=session.experiment_type,
+        created_at=session.created_at,
+        updated_at=session.updated_at or session.created_at,
+        file_count=len(files),
+    )
 
 
 def list_sessions(base_dir: Path | None = None) -> list[tuple[LocalSession, list[LocalFile]]]:
@@ -53,6 +68,41 @@ def list_sessions(base_dir: Path | None = None) -> list[tuple[LocalSession, list
     return results
 
 
+def list_session_metadata(base_dir: Path | None = None) -> list[SessionSummary]:
+    """Return metadata summaries for all local sessions, newest first."""
+    return [_summarize_session(session, files) for session, files in list_sessions(base_dir=base_dir)]
+
+
+def get_session(session_id: str, base_dir: Path | None = None) -> tuple[LocalSession, list[LocalFile]]:
+    """Return one local session and its registered files.
+
+    Args:
+        session_id: Local session UUID.
+        base_dir: Optional session storage directory. Defaults to the configured
+            OneDep Lib session directory.
+
+    Raises:
+        KeyError: If no local session with the given session_id exists.
+    """
+    config = DepositConfig.load()
+    _base = base_dir or config.session_dir
+    json_path = _base / session_id / "session.json"
+    if not json_path.exists():
+        raise KeyError(f"No session found for {session_id!r}")
+
+    store = JsonSessionStore(session_id, base_dir=_base)
+    try:
+        return store.get_session(), store.get_all_files()
+    finally:
+        store.close()
+
+
+def get_session_metadata(session_id: str, base_dir: Path | None = None) -> SessionSummary:
+    """Return a metadata summary for one local session."""
+    session, files = get_session(session_id, base_dir=base_dir)
+    return _summarize_session(session, files)
+
+
 def deposit_init(
     email: str,
     users: list[str],
@@ -61,7 +111,7 @@ def deposit_init(
     em_subtype: EMSubType | None = None,
     coordinates: bool | None = None,
     config: DepositConfig | None = None,
-    _base_dir: Path | None = None,
+    base_dir: Path | None = None,
     _api_client: ApiClient | None = None,
     _check_runner: CheckRunnerProtocol | None = None,
 ) -> Deposition:
@@ -75,7 +125,8 @@ def deposit_init(
         em_subtype: EM experiment subtype (can be set later via set_em_params).
         coordinates: Whether coordinates are being deposited (can be set later).
         config: Optional pre-built DepositConfig; loaded from default sources if None.
-        _base_dir: Override session storage directory (for testing only).
+        base_dir: Optional session storage directory. Defaults to the configured
+            OneDep Lib session directory.
         _api_client: Override API client (for testing only).
         _check_runner: Override check runner (for testing only).
 
@@ -84,8 +135,8 @@ def deposit_init(
     """
     config = config or DepositConfig.load()
     session_id = str(uuid.uuid4())
-    base_dir = _base_dir or config.session_dir
-    store: SessionStore = JsonSessionStore(session_id, base_dir=base_dir)
+    session_base_dir = _session_base_dir(config, base_dir=base_dir)
+    store: SessionStore = JsonSessionStore(session_id, base_dir=session_base_dir)
     api_client: ApiClient = _api_client or HttpApiClient(config, auth_provider=TokenStore(config))
     check_runner: CheckRunnerProtocol = _check_runner or CheckRunner(
         LocalSchemaProvider(config.local_schema_cache_dir)
@@ -99,6 +150,7 @@ def deposit_init(
         country=country,
         experiment_type=experiment_type,
         created_at=datetime.now(),
+        updated_at=datetime.now(),
         em_subtype=em_subtype,
         coordinates=coordinates,
     )
@@ -109,7 +161,7 @@ def deposit_init(
 def deposit_resume(
     session_id: str,
     config: DepositConfig | None = None,
-    _base_dir: Path | None = None,
+    base_dir: Path | None = None,
     _api_client: ApiClient | None = None,
     _check_runner: CheckRunnerProtocol | None = None,
 ) -> Deposition:
@@ -118,7 +170,8 @@ def deposit_resume(
     Args:
         session_id: The session_id returned by a previous deposit_init() call.
         config: Optional pre-built DepositConfig; loaded from default sources if None.
-        _base_dir: Override session storage directory (for testing only).
+        base_dir: Optional session storage directory. Defaults to the configured
+            OneDep Lib session directory.
         _api_client: Override API client (for testing only).
         _check_runner: Override check runner (for testing only).
 
@@ -129,8 +182,8 @@ def deposit_resume(
         KeyError: If no session with the given session_id exists.
     """
     config = config or DepositConfig.load()
-    base_dir = _base_dir or config.session_dir
-    store: SessionStore = JsonSessionStore(session_id, base_dir=base_dir)
+    session_base_dir = _session_base_dir(config, base_dir=base_dir)
+    store: SessionStore = JsonSessionStore(session_id, base_dir=session_base_dir)
     store.get_session()  # raises KeyError if not found
     api_client: ApiClient = _api_client or HttpApiClient(config, auth_provider=TokenStore(config))
     check_runner: CheckRunnerProtocol = _check_runner or CheckRunner(
@@ -138,7 +191,11 @@ def deposit_resume(
         if config.fetch_local_schema
         else RemoteSchemaProvider(config.schema_base_url, config.schema_cache_dir)
     )
-    return Deposition(store=store, api_client=api_client, check_runner=check_runner)
+    return Deposition(
+        store=store,
+        api_client=api_client,
+        check_runner=check_runner,
+    )
 
 
 class Deposition:
