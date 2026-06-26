@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft/2020-12/schema",
+  "$id": "ec.json",
+  "title": "EC allowed files",
+  "description": "valid file types for electron crystallography",
+  "enum": [
+    "co-cif",
+    "xs-cif",
+    "xs-mtz",
+    "xa-par",
+    "xa-top",
+    "xa-mat"
+  ],
+  "feedback": {
+    "enum": "unknown file type for ec"
+  }
+}
