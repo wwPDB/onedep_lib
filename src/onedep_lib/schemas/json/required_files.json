@@ -164,18 +164,7 @@
               }
             ],
             "items": {
-              "enum": [
-                "co-pdb",
-                "co-cif",
-                "xs-cif",
-                "xs-mtz",
-                "xa-par",
-                "xa-top",
-                "xa-mat"
-              ],
-              "feedback": {
-                "enum": "unknown file type for neutron diffraction"
-              }
+              "$ref": "neutron.json"
             }
           }
         }

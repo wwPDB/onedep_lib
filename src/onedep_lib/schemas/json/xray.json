@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft/2020-12/schema",
   "$id": "xray.json",
-  "title": "filecheck",
+  "title": "xray allowed files",
   "description": "valid file types for xray diffraction",
   "enum": [
     "co-cif",

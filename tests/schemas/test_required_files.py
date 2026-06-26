@@ -34,11 +34,13 @@ def schema() -> dict:
 
 @pytest.fixture(scope="module")
 def validator(schema: dict) -> jsonschema.Draft202012Validator:
+    from onedep_lib.checks.runner import CheckRunner
     schema_dir = DepositConfig().local_schema_cache_dir
-    xray_schema = json.loads((schema_dir / "xray.json").read_text())
-    registry = Registry().with_resources([
-        ("xray.json", Resource(contents=xray_schema, specification=DRAFT202012))
-    ])
+    resources = [
+        (f"{name}.json", Resource(contents=json.loads((schema_dir / f"{name}.json").read_text()), specification=DRAFT202012))
+        for name in CheckRunner.subschemas
+    ]
+    registry = Registry().with_resources(resources)
     return jsonschema.Draft202012Validator(schema, registry=registry)
 
 

@@ -27,8 +27,8 @@ def _load_files_schema() -> dict:
         return json.load(f)
 
 
-def _load_xray_schema() -> dict:
-    schema_path = DepositConfig().local_schema_cache_dir / "xray.json"
+def _load_subschema(name: str) -> dict:
+    schema_path = DepositConfig().local_schema_cache_dir / f"{name}.json"
     with schema_path.open() as f:
         return json.load(f)
 
@@ -37,7 +37,7 @@ def _load_xray_schema() -> dict:
 def runner_with_files_schema() -> CheckRunner:
     provider = StubSchemaProvider({
         "required_files": _load_files_schema(),
-        "xray": _load_xray_schema(),
+        **{name: _load_subschema(name) for name in CheckRunner.subschemas},
     })
     return CheckRunner(schema_provider=provider)
 

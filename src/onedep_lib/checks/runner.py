@@ -13,9 +13,8 @@ from onedep_lib.session.models import LocalFile
 
 class CheckRunner:
 
-    subschema:list[str] = [
-        "xray"
-    ]
+    subschemas: list[str] = ["xray", "neutron"]
+
     def __init__(self, schema_provider: SchemaProvider) -> None:
         self._schema_provider = schema_provider
 
@@ -39,7 +38,10 @@ class CheckRunner:
 
         try:
             schema = self._schema_provider.get_schema("required_files")
-            resources = [(filename, Resource(contents=self._schema_provider.get_schema(filename), specification=DRAFT202012)) for filename in CheckRunner.subschema]
+            resources = [
+                (f"{name}.json", Resource(contents=self._schema_provider.get_schema(name), specification=DRAFT202012))
+                for name in CheckRunner.subschemas
+            ]
         except SchemaError as exc:
             return CheckReport(
                 source="session",
