@@ -13,6 +13,11 @@ class LocalSchemaProvider:
     def get_schema(self, schema_name: str) -> dict:
         cache_path = self._cache_dir / f"{schema_name}.json"
         if cache_path.exists():
-            with cache_path.open() as f:
-                return json.load(f)
+            try:
+                with cache_path.open() as f:
+                    return json.load(f)
+            except (ValueError, OSError) as exc:
+                raise SchemaError(
+                    f"Schema '{schema_name}' is corrupted or unreadable: {exc}"
+                ) from exc
         raise SchemaError(f"Schema '{schema_name}' not available")
