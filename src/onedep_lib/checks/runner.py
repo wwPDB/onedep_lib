@@ -13,7 +13,7 @@ from onedep_lib.session.models import LocalFile
 
 class CheckRunner:
 
-    subschemas: list[str] = ["xray", "neutron", "fiber", "em", "nmr", "ec"]
+    subschemas: list[str] = ["xray", "neutron", "fiber", "em", "nmr", "ec", "ssnmr"]
     validator_specification = jsonschema.Draft202012Validator
     referencing_specification = DRAFT202012
 
