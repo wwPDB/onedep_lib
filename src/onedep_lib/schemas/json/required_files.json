@@ -118,10 +118,7 @@
               }
             ],
             "items": {
-              "$ref": "xray.json",
-              "feedback": {
-                "enum": "unknown file type for xray diffraction"
-              }
+              "$ref": "xray.json"
             }
           }
         }
