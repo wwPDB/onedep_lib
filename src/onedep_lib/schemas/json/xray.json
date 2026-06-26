@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft/2020-12/schema",
+  "$id": "xray.json",
+  "title": "filecheck",
+  "description": "valid file types for xray diffraction",
+  "enum": [
+    "co-cif",
+    "xs-cif",
+    "xs-mtz",
+    "xa-par",
+    "xa-top",
+    "xa-mat"
+  ],
+  "feedback": {
+    "enum": "unknown file type for xray diffraction"
+  }
+}

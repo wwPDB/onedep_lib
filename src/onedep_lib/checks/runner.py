@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import jsonschema
+from referencing import Registry, Resource
+from referencing.jsonschema import DRAFT202012
 
 from onedep_lib.checks.report import CheckIssue, CheckReport, CheckSeverity
 from onedep_lib.enums import EMSubType, ExperimentType, FileType
@@ -10,6 +12,10 @@ from onedep_lib.session.models import LocalFile
 
 
 class CheckRunner:
+
+    subschema:list[str] = [
+        "xray"
+    ]
     def __init__(self, schema_provider: SchemaProvider) -> None:
         self._schema_provider = schema_provider
 
@@ -33,6 +39,7 @@ class CheckRunner:
 
         try:
             schema = self._schema_provider.get_schema("required_files")
+            resources = [(filename, Resource(contents=self._schema_provider.get_schema(filename), specification=DRAFT202012)) for filename in CheckRunner.subschema]
         except SchemaError as exc:
             return CheckReport(
                 source="session",
@@ -52,15 +59,16 @@ class CheckRunner:
         if em_subtype:
             data["subtype"] = em_subtype.value
 
-        validator = jsonschema.Draft202012Validator(schema)
+        registry = Registry().with_resources(resources)
+        validator = jsonschema.Draft202012Validator(schema, registry=registry)
         errors = list(validator.iter_errors(data))
         if not errors:
             return CheckReport(source="session")
 
         messages = []
         for error in errors:
-            schema = error.schema
-            feedback = schema.get("feedback", {})
+            error_schema = error.schema
+            feedback = error_schema.get("feedback", {})
             message = feedback.get(error.validator, None)
             if message:
                 messages.append(message)

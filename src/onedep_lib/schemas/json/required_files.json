@@ -1,5 +1,5 @@
 {
-  "$schemas": "http://json-schema.org/draft/2020-12/schema",
+  "$schema": "http://json-schema.org/draft/2020-12/schema",
   "$id": "required_files.json",
   "title": "filecheck",
   "description": "schema for validation of required input files for pdb deposition",
@@ -118,14 +118,7 @@
               }
             ],
             "items": {
-              "enum": [
-                "co-cif",
-                "xs-cif",
-                "xs-mtz",
-                "xa-par",
-                "xa-top",
-                "xa-mat"
-              ],
+              "$ref": "xray.json",
               "feedback": {
                 "enum": "unknown file type for xray diffraction"
               }
