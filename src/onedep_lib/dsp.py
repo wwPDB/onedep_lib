@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import os
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -19,6 +20,9 @@ from onedep_lib.session.json_store import JsonSessionStore
 from onedep_lib.session.models import LocalFile, LocalSession
 from onedep_lib.session.types import SessionStore
 from onedep_lib.auths.token import TokenStore
+
+import logging
+logging.basicConfig(level=logging.INFO)
 
 
 def _md5_of_file(path: Path, chunk_size: int = 1 << 20) -> str:
@@ -215,9 +219,23 @@ class Deposition:
         self._store.add_file(local_file)
         return file_id
 
-    def remove_file(self, file_id: str) -> None:
+    def remove_file(self, file_id: str, remote: bool = False) -> None:
         """Remove a file from this local session by its file_id."""
-        self._store.remove_file(file_id)
+        if remote and self.remote_dep_id is not None:
+            filename = os.path.basename(self._store.get_file(file_id).file_path)
+            depositedfiles = self._api_client.get_files(self.remote_dep_id)
+            for f in depositedfiles:
+                if f.name == filename:
+                    remote_file_id = f.file_id
+                    self._api_client.remove_file(self.remote_dep_id, remote_file_id)
+                    logging.info(f"Removed remote file {remote_file_id} from deposition {self.remote_dep_id}")
+                    self._store.remove_file(file_id)
+                    logging.info(f"Removed local file {file_id} from session {self.session_id}")
+                    return
+            logging.warning(f"File {file_id} not found in deposition {self.remote_dep_id}")
+        else:
+            self._store.remove_file(file_id)
+            logging.info(f"Removed local file {file_id} from session {self.session_id}")
 
     def set_voxel_values(
         self,
