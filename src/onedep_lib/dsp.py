@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from onedep_lib.apis.deposit.client import HttpApiClient
-from onedep_lib.apis.deposit.models import DepositError, DepositStatus, Experiment
+from onedep_lib.apis.deposit.models import DepositError, DepositStatus, Experiment, DepositedFile
 from onedep_lib.apis.deposit.types import ApiClient
 from onedep_lib.checks.report import CheckReport
 from onedep_lib.checks.runner import CheckRunner
@@ -20,6 +20,7 @@ from onedep_lib.session.json_store import JsonSessionStore
 from onedep_lib.session.models import LocalFile, LocalSession
 from onedep_lib.session.types import SessionStore
 from onedep_lib.auths.token import TokenStore
+from onedep_lib.exceptions import OneDepError
 
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -218,6 +219,22 @@ class Deposition:
         )
         self._store.add_file(local_file)
         return file_id
+
+    def has_file(self, file_path: str) -> bool:
+        return self._store.has_file(file_path)
+
+    def upload_file(self, file_path: str, file_type: FileType) -> DepositedFile:
+        """Register a local file for this deposition and upload it to the remote server."""
+        if self.remote_dep_id is None:
+            raise OneDepError("processing not yet started for this deposition")
+        if not Path(file_path).exists():
+            raise OneDepError(f"file not found: {file_path}")
+        if not self.has_file(file_path):
+            self.add_file(file_path, file_type)
+        result = self._api_client.upload_file(self.remote_dep_id, file_path, file_type)
+        if result is None:
+            raise OneDepError("failed to upload file")
+        return result
 
     def remove_file(self, file_id: str, remote: bool = False) -> None:
         """Remove a file from this local session by its file_id."""
