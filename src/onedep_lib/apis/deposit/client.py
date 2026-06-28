@@ -135,6 +135,13 @@ class HttpApiClient:
     def _delete(self, endpoint: str) -> None:
         self._do("DELETE", endpoint)
 
+    @staticmethod
+    def _compute_chunk_size(file_size: int) -> int:
+        """Compute chunk size targeting ~100 chunks, clamped to [5 MB, 128 MB]."""
+        _min = 5 * 1024 * 1024
+        _max = 128 * 1024 * 1024
+        return max(_min, min(_max, file_size // 100))
+
     def _compute_md5(self, file_path: str, _chunk_size: int = 8 * 1024 * 1024) -> str:
         h = hashlib.md5()
         with open(file_path, "rb") as fp:
@@ -184,22 +191,22 @@ class HttpApiClient:
         file_type: FileType,
         overwrite: bool = False,
         uploaded_bytes: int = 0,
-        _chunk_size: int = 8 * 1024 * 1024,
+        _chunk_size: int | None = None,
     ) -> DepositedFile:
         if not os.path.exists(file_path):
             raise ApiError("Invalid input file", 404)
 
         file_type_str = file_type.value if isinstance(file_type, FileType) else file_type
         file_name = os.path.basename(file_path)
-        checksum = self._compute_md5(file_path, _chunk_size)
+        file_size = os.path.getsize(file_path)
+        chunk_size = _chunk_size if _chunk_size is not None else self._compute_chunk_size(file_size)
+        checksum = self._compute_md5(file_path, chunk_size)
         form = {"name": file_name, "type": file_type_str, "md5": checksum}
 
         if overwrite:
             for existing in self.get_files(dep_id):
                 if existing.file_type.value == file_type_str:
                     self.remove_file(dep_id, existing.file_id)
-
-        file_size = os.path.getsize(file_path)
         if uploaded_bytes >= file_size:
             raise ApiError("uploaded_bytes is already >= file size", 400)
 
@@ -207,7 +214,7 @@ class HttpApiClient:
         last_data: dict | None = None
 
         self._refresh_auth_header()
-        self._logger.info("Uploading %s (%d bytes, md5=%s)", file_name, file_size, checksum)
+        self._logger.info("Uploading %s (%d bytes, chunk=%d, md5=%s)", file_name, file_size, chunk_size, checksum)
 
         with open(file_path, "rb") as fp:
             fp.seek(uploaded_bytes)
@@ -215,7 +222,7 @@ class HttpApiClient:
                 self._refresh_auth_header()
 
                 chunk_start = uploaded_bytes
-                chunk = fp.read(_chunk_size)
+                chunk = fp.read(chunk_size)
                 if not chunk:
                     break
                 chunk_end = chunk_start + len(chunk) - 1
