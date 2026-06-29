@@ -255,7 +255,8 @@ class HttpApiClient:
 
                 last_data = data_out
                 uploaded_bytes = data_out.get("uploadedBytes", chunk_end + 1)
-                self._logger.info("Uploaded %d/%d bytes", uploaded_bytes, file_size)
+
+        self._logger.info("Uploaded %d/%d bytes", uploaded_bytes, file_size)
 
         if last_data is None:
             raise ApiError("No response received during upload", 500)
