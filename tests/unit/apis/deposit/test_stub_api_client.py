@@ -22,6 +22,7 @@ def _stub_deposit(dep_id: str = "D_999", email: str = "test@example.com") -> WwP
         last_login="2024-01-01T00:00:00",
         site="pdbe",
         status="DEP",
+        site_url="https://deposit-pdbe.wwpdb.org/deposition/D_999",
     )
 
 

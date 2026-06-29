@@ -99,9 +99,10 @@ def test_update_experiment_type(store: JsonSessionStore, session: LocalSession):
 
 def test_set_remote_dep_id(store: JsonSessionStore, session: LocalSession):
     store.create_session(session)
-    store.set_remote_dep_id("D_8000000001")
+    store.set_remote_dep_id("D_8000000001", site_url="https://deposit.wwpdb.org/D_8000000001")
     loaded = store.get_session()
     assert loaded.remote_dep_id == "D_8000000001"
+    assert loaded.site_url == "https://deposit.wwpdb.org/D_8000000001"
 
 
 def test_persists_across_store_instances(tmp_path: Path, session: LocalSession):
