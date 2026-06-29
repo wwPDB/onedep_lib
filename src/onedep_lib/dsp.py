@@ -177,6 +177,11 @@ class Deposition:
         """Remote deposition ID, populated after deposit() is called."""
         return self._session.remote_dep_id
 
+    @property
+    def site_url(self) -> str | None:
+        """Remote deposition site URL, populated after deposit() is called."""
+        return self._session.site_url
+
     def set_experiment_type(self, experiment_type: ExperimentType) -> None:
         """Set or update the experiment type for this deposition."""
         self._store.update_experiment_type(experiment_type)
@@ -290,8 +295,9 @@ class Deposition:
                 experiments=[experiment],
             )
             dep_id = remote_dep.dep_id
-            self._store.set_remote_dep_id(dep_id)
+            self._store.set_remote_dep_id(dep_id, site_url=remote_dep.site_url)
             self._session.remote_dep_id = dep_id
+            self._session.site_url = remote_dep.site_url
         else:
             dep_id = self._session.remote_dep_id
 

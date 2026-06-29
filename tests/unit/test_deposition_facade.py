@@ -53,10 +53,19 @@ def test_remote_dep_id_initially_none(dep):
     assert dep.remote_dep_id is None
 
 
+def test_site_url_initially_none(dep):
+    assert dep.site_url is None
+
+
 def test_deposit_returns_remote_id(dep, stub_api):
     remote_id = dep.deposit()
     assert remote_id == "D_999"
     assert dep.remote_dep_id == "D_999"
+
+
+def test_deposit_exposes_site_url(dep, stub_api):
+    dep.deposit()
+    assert dep.site_url == "https://deposit-pdbe.wwpdb.org/deposition/D_999"
 
 
 def test_deposit_calls_process(dep, stub_api):

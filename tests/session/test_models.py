@@ -16,6 +16,7 @@ def test_local_session_fields():
     )
     assert session.session_id == "abc-123"
     assert session.remote_dep_id is None
+    assert session.site_url is None
     assert session.em_subtype is None
     assert session.coordinates is None
 

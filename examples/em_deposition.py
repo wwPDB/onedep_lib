@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import logging
 import time
+import os
 
 import onedep_lib as dsp
 from rich.console import Console
@@ -28,10 +29,10 @@ _console = Console(stderr=True)
 # ── Configuration ─────────────────────────────────────────────────────────────
 # Change all values marked with  <<<< CHANGE THIS  before running.
 
-EMAIL = "your.email@example.com"  # <<<< CHANGE THIS
-USERS = ["0000-0000-0000-0000"]  # <<<< CHANGE THIS  (ORCID iD)
+EMAIL = os.getenv("WWPDB_EMAIL") or "your.email@example.com"  # <<<< CHANGE THIS
+USERS = os.getenv("WWPDB_USERS") and os.getenv("WWPDB_USERS").split(",") or ["0000-0000-0000-0000"]  # <<<< CHANGE THIS  (ORCID iD)
 
-BASE = "/path/to/your/em/files"  # <<<< CHANGE THIS  (directory containing your EM files)
+BASE = os.getenv("WWPDB_EM_BASE") or "/path/to/your/em/files"  # <<<< CHANGE THIS  (directory containing your EM files)
 
 COORD_FILE = f"{BASE}/coord.cif"  # <<<< CHANGE THIS  (adjust filename)
 MAP_FILE = f"{BASE}/primary.map.gz"  # <<<< CHANGE THIS  (adjust filename)
@@ -161,7 +162,7 @@ def main() -> None:
         spin.update("[cyan]Submitting deposit…[/cyan]")
         try:
             dep_id = dep.deposit()
-            ok(f"Deposit submitted  dep_id={dep_id}")
+            ok(f"Deposit submitted  dep_id={dep_id} url: {dep.site_url}")
         except (RuntimeError, dsp.DepositApiException) as exc:
             fail(f"deposit() failed: {exc}")
             return
