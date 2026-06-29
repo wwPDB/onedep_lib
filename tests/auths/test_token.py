@@ -104,6 +104,30 @@ def test_get_access_token_refreshes_expired_token(tmp_path: Path, httpserver):
     assert store._read_entry()["refresh_token"] == "new-refresh"
 
 
+def test_get_access_token_refreshes_when_only_refresh_token_is_loaded(tmp_path: Path, httpserver):
+    config_file = tmp_path / "config.toml"
+    hostname = httpserver.url_for("/deposition").rstrip("/")
+    config_file.write_text(
+        "[default]\n"
+        f"hostname = \"{hostname}\"\n"
+        "ssl_verify = false\n"
+        "\n"
+        "[auths.localhost]\n"
+        "refresh_token = \"bootstrap-refresh\"\n"
+    )
+    fresh = _make_jwt(3600)
+    config = DepositConfig.load(config_path=config_file)
+    store = TokenStore(config=config)
+    httpserver.expect_request(
+        "/deposition/auth/tokens/refresh",
+        method="POST",
+        json={"refresh_token": "bootstrap-refresh"},
+    ).respond_with_json({"access_token": fresh, "refresh_token": "rotated-refresh"})
+
+    assert store.get_access_token() == fresh
+    assert store._read_entry() == {"access_token": fresh, "refresh_token": "rotated-refresh"}
+
+
 def test_refresh_401_explains_manual_token_required(tmp_path: Path, httpserver):
     config_file = tmp_path / "config.toml"
     config_file.write_text("[default]\n")
@@ -139,12 +163,12 @@ def test_revoke_posts_refresh_token_and_clears_local_storage(tmp_path: Path, htt
         json={"refresh_token": "refresh"},
     ).respond_with_data(status=204)
     store.revoke()
-    with pytest.raises(AuthError, match="No access token"):
+    with pytest.raises(AuthError, match="No refresh token stored. Paste a refresh token first."):
         store.get_access_token()
 
 
 def test_get_access_token_raises_auth_error_when_no_tokens_loaded(config: DepositConfig):
     store = TokenStore(config=config)
     # config was constructed directly (not via load()), so access_token is None
-    with pytest.raises(AuthError, match="No access token"):
+    with pytest.raises(AuthError, match="No refresh token stored. Paste a refresh token first."):
         store.get_access_token()
