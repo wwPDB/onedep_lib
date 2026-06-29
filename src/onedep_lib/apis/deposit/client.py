@@ -214,7 +214,7 @@ class HttpApiClient:
         last_data: dict | None = None
 
         self._refresh_auth_header()
-        self._logger.info("Uploading %s (%d bytes, chunk=%d, md5=%s)", file_name, file_size, chunk_size, checksum)
+        self._logger.info("Uploading %s (%d bytes)", file_name, file_size)
 
         with open(file_path, "rb") as fp:
             fp.seek(uploaded_bytes)
