@@ -225,7 +225,7 @@ class Deposition:
         return self._store.has_file(file_path)
 
     def upload_file(self, file_path: str, file_type: FileType) -> DepositedFile:
-        """Register a local file for this deposition and upload it to the remote server."""
+        """Register and upload a file after the deposit function has already run."""
         if self.remote_dep_id is None:
             raise OneDepError("processing not yet started for this deposition")
         if not Path(file_path).exists():
@@ -238,7 +238,9 @@ class Deposition:
         return result
 
     def remove_file(self, file_id: str, remote: bool = False) -> None:
-        """Remove a file from this local session by its file_id."""
+        """Remove a file from this local session by its file_id.
+        If remote is True, also remove the corresponding remote file.
+        """
         if remote and self.remote_dep_id is not None:
             filename = os.path.basename(self._store.get_file(file_id).file_path)
             depositedfiles = self._api_client.get_files(self.remote_dep_id)
