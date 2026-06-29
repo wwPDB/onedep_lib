@@ -229,7 +229,7 @@ class Deposition:
         if self.remote_dep_id is None:
             raise OneDepError("processing not yet started for this deposition")
         if not Path(file_path).exists():
-            raise OneDepError(f"file not found: {file_path}")
+            raise OneDepError("file not found")
         if not self.has_file(file_path):
             self.add_file(file_path, file_type)
         result = self._api_client.upload_file(self.remote_dep_id, file_path, file_type)
