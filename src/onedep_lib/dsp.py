@@ -221,6 +221,7 @@ class Deposition:
         return file_id
 
     def has_file(self, file_path: str) -> bool:
+        """Check if file has already been registered for this deposition."""
         return self._store.has_file(file_path)
 
     def upload_file(self, file_path: str, file_type: FileType) -> DepositedFile:
