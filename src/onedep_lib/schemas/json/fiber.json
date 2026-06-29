@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft/2020-12/schema",
+  "$id": "fiber.json",
+  "title": "fiber allowed files",
+  "description": "valid file types for fiber diffraction",
+  "enum": [
+    "co-pdb",
+    "co-cif",
+    "layer-lines",
+    "xs-cif",
+    "xs-mtz",
+    "xa-par",
+    "xa-top",
+    "xa-mat"
+  ],
+  "feedback": {
+    "enum": "unknown file type for fiber diffraction"
+  }
+}

@@ -19,6 +19,8 @@ from pathlib import Path
 
 import jsonschema
 import pytest
+from referencing import Registry, Resource
+from referencing.jsonschema import DRAFT202012
 
 from onedep_lib.config import DepositConfig
 
@@ -32,7 +34,14 @@ def schema() -> dict:
 
 @pytest.fixture(scope="module")
 def validator(schema: dict) -> jsonschema.Draft202012Validator:
-    return jsonschema.Draft202012Validator(schema)
+    from onedep_lib.checks.runner import CheckRunner
+    schema_dir = DepositConfig().local_schema_cache_dir
+    resources = [
+        (f"{name}.json", Resource(contents=json.loads((schema_dir / f"{name}.json").read_text()), specification=DRAFT202012))
+        for name in CheckRunner.subschemas
+    ]
+    registry = Registry().with_resources(resources)
+    return jsonschema.Draft202012Validator(schema, registry=registry)
 
 
 def _messages(validator: jsonschema.Draft202012Validator, data: dict) -> list[str]:

@@ -1,5 +1,5 @@
 {
-  "$schemas": "http://json-schema.org/draft/2020-12/schema",
+  "$schema": "http://json-schema.org/draft/2020-12/schema",
   "$id": "required_files.json",
   "title": "filecheck",
   "description": "schema for validation of required input files for pdb deposition",
@@ -118,17 +118,7 @@
               }
             ],
             "items": {
-              "enum": [
-                "co-cif",
-                "xs-cif",
-                "xs-mtz",
-                "xa-par",
-                "xa-top",
-                "xa-mat"
-              ],
-              "feedback": {
-                "enum": "unknown file type for xray diffraction"
-              }
+              "$ref": "xray.json"
             }
           }
         }
@@ -174,18 +164,7 @@
               }
             ],
             "items": {
-              "enum": [
-                "co-pdb",
-                "co-cif",
-                "xs-cif",
-                "xs-mtz",
-                "xa-par",
-                "xa-top",
-                "xa-mat"
-              ],
-              "feedback": {
-                "enum": "unknown file type for neutron diffraction"
-              }
+              "$ref": "neutron.json"
             }
           }
         }
@@ -231,19 +210,7 @@
               }
             ],
             "items": {
-              "enum": [
-                "co-pdb",
-                "co-cif",
-                "layer-lines",
-                "xs-cif",
-                "xs-mtz",
-                "xa-par",
-                "xa-top",
-                "xa-mat"
-              ],
-              "feedback": {
-                "enum": "unknown file type for fiber diffraction"
-              }
+              "$ref": "fiber.json"
             }
           }
         }
@@ -296,22 +263,7 @@
               }
             ],
             "items": {
-              "enum": [
-                "co-pdb",
-                "co-cif",
-                "vo-map",
-                "img-emdb",
-                "add-map",
-                "mask-map",
-                "half-map",
-                "fsc-xml",
-                "layer-lines",
-                "xs-cif",
-                "xs-mtz"
-              ],
-              "feedback": {
-                "enum": "unknown file type for em"
-              }
+              "$ref": "em.json"
             }
           }
         }
@@ -382,17 +334,7 @@
         "properties": {
           "files": {
             "items": {
-              "enum": [
-                "co-cif",
-                "xs-cif",
-                "xs-mtz",
-                "xa-par",
-                "xa-top",
-                "xa-mat"
-              ],
-              "feedback": {
-                "enum": "unknown file type for ec"
-              }
+              "$ref": "ec.json"
             },
             "contains": {
               "enum": [
@@ -424,34 +366,7 @@
         "properties": {
           "files": {
             "items": {
-              "enum": [
-                "co-pdb",
-                "co-cif",
-                "nm-shi",
-                "nm-res-amb",
-                "nm-aux-amb",
-                "nm-res-ari",
-                "nm-res-bio",
-                "nm-aux-cha",
-                "nm-res-cha",
-                "nm-res-cns",
-                "nm-res-cya",
-                "nm-res-dyn",
-                "nm-res-gro",
-                "nm-aux-gro",
-                "nm-res-isd",
-                "nm-res-ros",
-                "nm-res-sch",
-                "nm-res-syb",
-                "nm-res-xpl",
-                "nm-res-oth",
-                "nm-pea-any",
-                "nm-uni-nef",
-                "nm-uni-str"
-              ],
-              "feedback": {
-                "enum": "unknown file type for nmr"
-              }
+              "$ref": "nmr.json"
             }
           }
         }

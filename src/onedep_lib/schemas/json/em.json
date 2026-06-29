@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft/2020-12/schema",
+  "$id": "em.json",
+  "title": "EM allowed files",
+  "description": "valid file types for electron microscopy",
+  "enum": [
+    "co-pdb",
+    "co-cif",
+    "vo-map",
+    "img-emdb",
+    "add-map",
+    "mask-map",
+    "half-map",
+    "fsc-xml",
+    "layer-lines",
+    "xs-cif",
+    "xs-mtz"
+  ],
+  "feedback": {
+    "enum": "unknown file type for em"
+  }
+}

@@ -332,8 +332,20 @@ class Deposition:
         return self._api_client.get_status(self._session.remote_dep_id)
 
     def get_experiment_file_types(self) -> list[FileType]:
-        """Return the accepted file types for the current experiment type. (stub)"""
-        return []
+        """Return the accepted file types for the current experiment type."""
+        session = self._session
+        if not session or not session.experiment_type:
+            return []
+        exptype = session.experiment_type.value
+        if exptype is None:
+            return []
+        subschemas = CheckRunner.subschemas
+        if exptype not in subschemas:
+            return []
+        provider = LocalSchemaProvider(DepositConfig().local_schema_cache_dir)
+        schema = provider.get_schema(exptype)
+        filetypes = schema.get("enum", [])
+        return filetypes
 
     def close(self) -> None:
         """Close the underlying session store connection."""

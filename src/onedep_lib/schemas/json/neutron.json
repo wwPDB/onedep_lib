@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft/2020-12/schema",
+  "$id": "neutron.json",
+  "title": "neutron allowed files",
+  "description": "valid file types for neutron diffraction",
+  "enum": [
+    "co-pdb",
+    "co-cif",
+    "xs-cif",
+    "xs-mtz",
+    "xa-par",
+    "xa-top",
+    "xa-mat"
+  ],
+  "feedback": {
+    "enum": "unknown file type for neutron diffraction"
+  }
+}
