@@ -259,8 +259,7 @@ class Deposition:
         self._store.remove_file(file_id)
 
     def _remove_remote_file(self, file_id: str) -> None:
-        """Remove a file from this local session by its file_id.
-        Also remove the corresponding remote file, but not if file has already been processed.
+        """Remove both local file and remote file, but not if file has already been processed.
         For testing only.
         """
         if self.remote_dep_id is not None:
@@ -274,7 +273,7 @@ class Deposition:
                     )
                     return
             except RuntimeError as e:
-                logging.error("Deposit has not been started yet. Please run with remote = False.")
+                logging.error("Deposit has not been started yet.")
                 return
             filename = os.path.basename(self._store.get_file(file_id).file_path)
             depositedfiles = self._api_client.get_files(self.remote_dep_id)
