@@ -167,6 +167,11 @@ class JsonSessionStore:
             for entry in self._data["files"].values()
         ]
 
+    def has_file(self, file_path: str) -> bool:
+        path = str(Path(file_path).resolve())
+        paths = [localfile.file_path for localfile in self.get_all_files()]
+        return path in paths
+
     def close(self) -> None:
         pass
 
