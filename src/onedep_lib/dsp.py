@@ -224,8 +224,10 @@ class Deposition:
         """Check if file has already been registered for this deposition."""
         return self._store.has_file(file_path)
 
-    def upload_file(self, file_path: str, file_type: FileType) -> DepositedFile:
-        """Register and upload a file after the deposit function has already run."""
+    def _upload_file(self, file_path: str, file_type: FileType) -> DepositedFile:
+        """Register and upload a file after the deposit function has already run.
+        For testing only.
+        """
         if self.remote_dep_id is None:
             raise OneDepError("processing not yet started for this deposition")
         if not Path(file_path).exists():
@@ -237,11 +239,43 @@ class Deposition:
             raise OneDepError("failed to upload file")
         return result
 
-    def remove_file(self, file_id: str, remote: bool = False) -> None:
-        """Remove a file from this local session by its file_id.
-        If remote is True, also remove the corresponding remote file.
+    def _process_file(self, file_id: str) -> DepositStatus:
+        """Process a file after the deposit function has already run.
+        For testing only.
         """
-        if remote and self.remote_dep_id is not None:
+        if self.remote_dep_id is None:
+            raise OneDepError("processing not yet started for this deposition")
+        processed = self._api_client.process(self.remote_dep_id)
+        if processed is None:
+            raise OneDepError("failed to process deposition")
+        if isinstance(processed, DepositError):
+            raise OneDepError(processed.message)
+        elif isinstance(processed, DepositStatus):
+            logging.info("processing status %s action %s step %s details %s", processed.status, processed.action, processed.step, processed.details)
+        return processed
+
+    def remove_file(self, file_id: str) -> None:
+        """Remove a file from this local session by its file_id."""
+        self._store.remove_file(file_id)
+
+    def _remove_remote_file(self, file_id: str) -> None:
+        """Remove a file from this local session by its file_id.
+        Also remove the corresponding remote file, but not if file has already been processed.
+        For testing only.
+        """
+        if self.remote_dep_id is not None:
+            try:
+                status = self.get_status()
+                if isinstance(status, DepositError):
+                    raise OneDepError(status.message)
+                if status.status not in ["error", "running"]:
+                    logging.warning(
+                        f"Cannot remove file {file_id} from session {self.session_id} because deposition is already processed: {status.status}"
+                    )
+                    return
+            except RuntimeError as e:
+                logging.error("Deposit has not been started yet. Please run with remote = False.")
+                return
             filename = os.path.basename(self._store.get_file(file_id).file_path)
             depositedfiles = self._api_client.get_files(self.remote_dep_id)
             for f in depositedfiles:
@@ -253,9 +287,6 @@ class Deposition:
                     logging.info(f"Removed local file {file_id} from session {self.session_id}")
                     return
             logging.warning(f"File {file_id} not found in deposition {self.remote_dep_id}")
-        else:
-            self._store.remove_file(file_id)
-            logging.info(f"Removed local file {file_id} from session {self.session_id}")
 
     def set_voxel_values(
         self,
