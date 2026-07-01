@@ -172,3 +172,27 @@ def test_get_access_token_raises_auth_error_when_no_tokens_loaded(config: Deposi
     # config was constructed directly (not via load()), so access_token is None
     with pytest.raises(AuthError, match="No refresh token stored. Paste a refresh token first."):
         store.get_access_token()
+
+
+def _make_jwt_exp(exp_value) -> str:
+    """A JWT carrying an arbitrary `exp` claim value (int, float, or omitted)."""
+    header = base64.urlsafe_b64encode(b'{"alg":"HS256"}').rstrip(b"=").decode()
+    claim = {} if exp_value is None else {"exp": exp_value}
+    body = base64.urlsafe_b64encode(json.dumps(claim).encode()).rstrip(b"=").decode()
+    return f"{header}.{body}."
+
+
+def test_is_expired_accepts_float_exp_in_future(config: DepositConfig):
+    store = TokenStore(config)
+    future_float = float(int(time.time()) + 3600) + 0.5
+    assert store._is_expired(_make_jwt_exp(future_float)) is False
+
+
+def test_is_expired_true_for_past_float_exp(config: DepositConfig):
+    store = TokenStore(config)
+    assert store._is_expired(_make_jwt_exp(float(int(time.time()) - 60))) is True
+
+
+def test_is_expired_true_when_exp_missing(config: DepositConfig):
+    store = TokenStore(config)
+    assert store._is_expired(_make_jwt_exp(None)) is True

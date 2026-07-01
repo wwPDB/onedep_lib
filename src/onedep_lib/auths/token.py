@@ -118,6 +118,6 @@ class TokenStore:
                 algorithms=["HS256", "RS256", "none"],
             )
             exp = payload.get("exp")
-            return not isinstance(exp, int) or exp < time.time() + 60
+            return exp is None or not isinstance(exp, (int, float)) or exp < time.time() + 60
         except Exception:
             return True
