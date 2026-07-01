@@ -31,10 +31,10 @@ _console = Console(stderr=True)
 # ── Configuration ─────────────────────────────────────────────────────────────
 # Change all values marked with  <<<< CHANGE THIS  before running.
 
-EMAIL = os.getenv("WWPDB_EMAIL") or "wbueno@ebi.ac.uk"
-USERS = os.getenv("WWPDB_USERS") and os.getenv("WWPDB_USERS").split(",") or ["0000-0001-6872-1814"]
-COORD_FILE = os.getenv("WWPDB_COORD_FILE") or "/home/wbueno/repos/test_files/xray/2gc2.cif"
-SF_FILE = os.getenv("WWPDB_SF_FILE") or "/home/wbueno/repos/test_files/xray/2gc2-sf.cif"
+EMAIL = os.getenv("WWPDB_EMAIL") or "your.email@example.com"
+USERS = os.getenv("WWPDB_USERS") and os.getenv("WWPDB_USERS").split(",") or ["0000-0000-0000-0000"]
+COORD_FILE = os.getenv("WWPDB_COORD_FILE") or "/path/to/your/coord.cif"
+SF_FILE = os.getenv("WWPDB_SF_FILE") or "/path/to/your/sf.cif"
 
 def _check_config_obj():
     import gc
