@@ -58,10 +58,8 @@ def list_sessions(base_dir: Path | None = None) -> list[tuple[LocalSession, list
     return results
 
 
-def check_auth_key(config: DepositConfig = None) -> bool:
+def check_auth_key(config: DepositConfig) -> bool:
     """Return True if the configured credentials are valid, False otherwise."""
-    config = config or DepositConfig.load()
-
     try:
         api_client = HttpApiClient(config, auth_provider=TokenStore(config))
         api_client.get_all_depositions()
@@ -74,10 +72,10 @@ def deposit_init(
     email: str,
     users: list[str],
     country: Country,
+    config: DepositConfig,
     experiment_type: ExperimentType | None = None,
     em_subtype: EMSubType | None = None,
     coordinates: bool | None = None,
-    config: DepositConfig | None = None,
     _base_dir: Path | None = None,
     _api_client: ApiClient | None = None,
     _check_runner: CheckRunnerProtocol | None = None,
@@ -99,7 +97,6 @@ def deposit_init(
     Returns:
         A Deposition object representing the local session.
     """
-    config = config or DepositConfig.load()
     session_id = str(uuid.uuid4())
     base_dir = _base_dir or config.session_dir
     store: SessionStore = JsonSessionStore(session_id, base_dir=base_dir)
@@ -125,7 +122,7 @@ def deposit_init(
 
 def deposit_resume(
     session_id: str,
-    config: DepositConfig | None = None,
+    config: DepositConfig,
     _base_dir: Path | None = None,
     _api_client: ApiClient | None = None,
     _check_runner: CheckRunnerProtocol | None = None,
@@ -145,7 +142,6 @@ def deposit_resume(
     Raises:
         KeyError: If no session with the given session_id exists.
     """
-    config = config or DepositConfig.load()
     base_dir = _base_dir or config.session_dir
     store: SessionStore = JsonSessionStore(session_id, base_dir=base_dir)
     store.get_session()  # raises KeyError if not found

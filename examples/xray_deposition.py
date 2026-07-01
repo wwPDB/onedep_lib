@@ -22,6 +22,8 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
 
+from onedep_lib.config import DepositConfig
+
 logging.disable(logging.ERROR)
 
 _console = Console(stderr=True)
@@ -29,10 +31,20 @@ _console = Console(stderr=True)
 # ── Configuration ─────────────────────────────────────────────────────────────
 # Change all values marked with  <<<< CHANGE THIS  before running.
 
-EMAIL = os.getenv("WWPDB_EMAIL") or "your.email@example.com"  # <<<< CHANGE THIS
-USERS = os.getenv("WWPDB_USERS") and os.getenv("WWPDB_USERS").split(",") or ["0000-0000-0000-0000"]  # <<<< CHANGE THIS  (ORCID iD)
-COORD_FILE = os.getenv("WWPDB_COORD_FILE") or "/path/to/your/coord.cif"  # <<<< CHANGE THIS
-SF_FILE = os.getenv("WWPDB_SF_FILE") or "/path/to/your/sf.cif"  # <<<< CHANGE THIS
+EMAIL = os.getenv("WWPDB_EMAIL") or "wbueno@ebi.ac.uk"
+USERS = os.getenv("WWPDB_USERS") and os.getenv("WWPDB_USERS").split(",") or ["0000-0001-6872-1814"]
+COORD_FILE = os.getenv("WWPDB_COORD_FILE") or "/home/wbueno/repos/test_files/xray/2gc2.cif"
+SF_FILE = os.getenv("WWPDB_SF_FILE") or "/home/wbueno/repos/test_files/xray/2gc2-sf.cif"
+
+def _check_config_obj():
+    import gc
+    from onedep_lib.dsp import DepositConfig  # adjust class
+
+    instances = [obj for obj in gc.get_objects() if isinstance(obj, DepositConfig)]
+
+    print(len(instances))
+    for obj in instances:
+        print(id(obj), getattr(obj, "refresh_token", None))
 
 
 def ok(msg: str) -> None:
@@ -53,6 +65,8 @@ def print_report(label: str, report: dsp.CheckReport) -> None:
 
 
 def main() -> None:
+    config = DepositConfig.load()
+
     # ── 0. Validate configuration ─────────────────────────────────────────────
     _unset = [
         name
@@ -74,7 +88,7 @@ def main() -> None:
 
     with _console.status("[cyan]Initializing deposit…[/cyan]", spinner="dots") as spin:
         # ── 1. Initialization ────────────────────────────────────────────────
-        dep = dsp.deposit_init(email=EMAIL, users=USERS, country=dsp.Country.USA)
+        dep = dsp.deposit_init(email=EMAIL, users=USERS, country=dsp.Country.USA, config=config)
         ok(f"Deposit initialized  session_id={dep.session_id}")
 
         # ── 2. Set experiment type ────────────────────────────────────────────
@@ -84,7 +98,7 @@ def main() -> None:
 
         # ── 3. Check auth key ─────────────────────────────────────────────────
         spin.update("[cyan]Checking auth key…[/cyan]")
-        auth_ok = dsp.check_auth_key()
+        auth_ok = dsp.check_auth_key(config=config)
         if auth_ok:
             ok("Auth key valid")
         else:
@@ -161,4 +175,8 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as exc:
+        _check_config_obj()
+

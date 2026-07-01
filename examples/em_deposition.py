@@ -22,6 +22,8 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
 
+from onedep_lib.config import DepositConfig
+
 logging.disable(logging.ERROR)
 
 _console = Console(stderr=True)
@@ -60,6 +62,8 @@ def print_report(label: str, report: dsp.CheckReport) -> None:
 
 
 def main() -> None:
+    config = DepositConfig.load()
+
     # ── 0. Validate configuration ─────────────────────────────────────────────
     _unset = [
         name
@@ -80,7 +84,7 @@ def main() -> None:
 
     with _console.status("[cyan]Initializing deposit…[/cyan]", spinner="dots") as spin:
         # ── 1. Initialization ────────────────────────────────────────────────
-        dep = dsp.deposit_init(email=EMAIL, users=USERS, country=dsp.Country.USA)
+        dep = dsp.deposit_init(email=EMAIL, users=USERS, country=dsp.Country.USA, config=config)
         ok(f"Deposit initialized  session_id={dep.session_id}")
 
         # ── 2. Set experiment type and EM-specific params ─────────────────────
@@ -91,7 +95,7 @@ def main() -> None:
 
         # ── 3. Check auth key ─────────────────────────────────────────────────
         spin.update("[cyan]Checking auth key…[/cyan]")
-        auth_ok = dsp.check_auth_key()
+        auth_ok = dsp.check_auth_key(config=config)
         if auth_ok:
             ok("Auth key valid")
         else:
