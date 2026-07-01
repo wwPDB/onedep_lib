@@ -151,3 +151,10 @@ def test_context_manager(tmp_path, stub_api):
         _check_runner=StubCheckRunner(),
     ) as dep:
         assert dep.session_id is not None
+
+
+def test_created_at_is_timezone_aware(dep):
+    # created_at must be tz-aware (UTC) to match the tz-aware file_mtime and
+    # avoid naive/aware comparison errors.
+    created = dep._session.created_at
+    assert created.tzinfo is not None
