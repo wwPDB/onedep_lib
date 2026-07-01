@@ -20,3 +20,11 @@ def test_em_subtypes_have_expected_values():
 
 def test_country_usa():
     assert Country.USA.value == "United States"
+
+
+def test_country_accented_values_restored():
+    # These four values had their accented characters corrupted to a bare "A".
+    assert Country.CURAAAO.value == "Curaçao"
+    assert Country.IVORY_COAST.value == "Côte D'Ivoire"
+    assert Country.RAUNION.value == "Réunion"
+    assert Country.SAINT_BARTHALEMY.value == "Saint Barthélemy"
