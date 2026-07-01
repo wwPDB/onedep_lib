@@ -36,16 +36,6 @@ USERS = os.getenv("WWPDB_USERS") and os.getenv("WWPDB_USERS").split(",") or ["00
 COORD_FILE = os.getenv("WWPDB_COORD_FILE") or "/path/to/your/coord.cif"
 SF_FILE = os.getenv("WWPDB_SF_FILE") or "/path/to/your/sf.cif"
 
-def _check_config_obj():
-    import gc
-    from onedep_lib.dsp import DepositConfig  # adjust class
-
-    instances = [obj for obj in gc.get_objects() if isinstance(obj, DepositConfig)]
-
-    print(len(instances))
-    for obj in instances:
-        print(id(obj), getattr(obj, "refresh_token", None))
-
 
 def ok(msg: str) -> None:
     _console.print(f"[bold green]✓[/bold green] {msg}")
@@ -175,8 +165,5 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    try:
-        main()
-    except Exception as exc:
-        _check_config_obj()
+    main()
 
