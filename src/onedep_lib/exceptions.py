@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 class OneDepError(Exception):
     """Base exception for all onedep_lib errors."""
 

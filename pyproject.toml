@@ -63,6 +63,9 @@ homepage = "https://github.com/wwPDB/onedep_lib"
 # rules.TY015 = "warn"  # For invalid-argument-type, warn instead of error.
 
 [tool.ruff]
+target-version = "py39"
+output-format = "concise"
+
 line-length = 120
 
 [tool.ruff.lint]
@@ -70,12 +73,16 @@ select = [
     "E",   # pycodestyle errors
     "W",   # pycodestyle warnings
     "F",   # Pyflakes
+    "FA",  # flake8-future-annotations
     "I",   # isort
     "B",   # flake8-bugbear
     "UP",  # pyupgrade
 ]
 
-ignore = ["UP007"]
+ignore = [
+    "FA100",  # Add `from __future__ import annotations` to simplify `typing.Union`
+    "UP007",  # Use `X | Y` for type annotations
+]
 
 [tool.coverage.run]
 branch = true
