@@ -8,8 +8,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from onedep_lib.apis.deposit.client import HttpApiClient
-from onedep_lib.apis.deposit.models import DepositError, DepositStatus, Experiment, DepositedFile
+from onedep_lib.apis.deposit.models import DepositError, DepositStatus, Experiment
 from onedep_lib.apis.deposit.types import ApiClient
+from onedep_lib.auths.token import TokenStore
 from onedep_lib.checks.report import CheckReport
 from onedep_lib.checks.runner import CheckRunner
 from onedep_lib.checks.types import CheckRunner as CheckRunnerProtocol
@@ -20,8 +21,6 @@ from onedep_lib.schemas.remote import RemoteSchemaProvider
 from onedep_lib.session.json_store import JsonSessionStore
 from onedep_lib.session.models import LocalFile, LocalSession
 from onedep_lib.session.types import SessionStore
-from onedep_lib.auths.token import TokenStore
-from onedep_lib.exceptions import OneDepError
 
 
 def _md5_of_file(path: Path, chunk_size: int = 1 << 20) -> str:

@@ -341,8 +341,8 @@ def test_is_expired_true_for_past_float_exp(config: DepositConfig):
 def test_is_expired_true_when_exp_missing(config: DepositConfig):
     store = TokenStore(config)
     assert store._is_expired(_make_jwt_exp(None)) is True
-    
-    
+
+
 class _TokenResponse:
     status_code = 200
 
