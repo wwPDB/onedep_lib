@@ -133,9 +133,9 @@ def main() -> None:
 
         # ── 5b. Set voxel values for map files ────────────────────────────────
         spin.update("[cyan]Setting voxel values…[/cyan]")
-        dep.set_voxel_values(map_id, spacing_x=1.0825, spacing_y=1.0825, spacing_z=1.0825, contour=0.01)
-        dep.set_voxel_values(half1_id, spacing_x=1.0825, spacing_y=1.0825, spacing_z=1.0825, contour=0.01)
-        dep.set_voxel_values(half2_id, spacing_x=1.0825, spacing_y=1.0825, spacing_z=1.0825, contour=0.01)
+        dep.set_voxel_values(map_id, spacing_x=1.0825, spacing_y=1.0825, spacing_z=1.0825, contour=0.901)
+        dep.set_voxel_values(half1_id, spacing_x=1.0825, spacing_y=1.0825, spacing_z=1.0825, contour=0.901)
+        dep.set_voxel_values(half2_id, spacing_x=1.0825, spacing_y=1.0825, spacing_z=1.0825, contour=0.901)
         ok("Voxel values set for map, half1, half2")
 
         # ── 6. File checks ────────────────────────────────────────────────────
@@ -177,12 +177,15 @@ def main() -> None:
         for _ in range(1, 64):
             try:
                 status = dep.get_status()
+                if isinstance(status, dsp.DepositStatus) and status.status.lower() == "error":
+                    fail(f"Processing failed  dep_id={dep_id}  details: {status.details}")
+                    break
+                elif isinstance(status, dsp.DepositStatus) and status.status.lower() == "finished":
+                    ok(f"Processing finished  dep_id={dep_id}")
+                    break
                 spin.update(
                     f"[cyan]{status.details if isinstance(status, dsp.DepositStatus) else status.message}[/cyan]"
                 )
-                if isinstance(status, dsp.DepositStatus) and status.status.lower() == "finished":
-                    ok(f"Processing finished  dep_id={dep_id}")
-                    break
             except Exception as exc:
                 fail(f"get_status() failed: {exc}")
             time.sleep(5)
