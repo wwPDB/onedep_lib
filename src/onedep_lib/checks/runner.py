@@ -12,6 +12,12 @@ from onedep_lib.session.models import LocalFile
 
 
 class CheckRunner:
+    """Runs JSON-schema-based checks against deposition files and sessions.
+
+    Uses a SchemaProvider to fetch the JSON schemas checks are validated
+    against, either from a local bundled cache or a remote schema service
+    depending on how the provider was constructed.
+    """
 
     subschemas: list[str] = ["xray", "neutron", "fiber", "em", "nmr", "ec", "ssnmr"]
     validator_specification = jsonschema.Draft202012Validator
@@ -26,6 +32,21 @@ class CheckRunner:
         experiment_type: ExperimentType | None,
         em_subtype: EMSubType | None = None,
     ) -> CheckReport:
+        """Check that files satisfy the required-file rules for experiment_type.
+
+        Returns a report with a single WARNING issue if experiment_type is
+        None (check skipped) or if the required-files schema could not be
+        fetched, or a FATAL issue per missing requirement otherwise.
+
+        Args:
+            files: The files registered on the session.
+            experiment_type: The experiment type to check requirements for,
+                or None to skip the check.
+            em_subtype: The EM experiment subtype, if applicable.
+
+        Returns:
+            A CheckReport with source="session".
+        """
         if experiment_type is None:
             return CheckReport(
                 source="session",
@@ -96,15 +117,51 @@ class CheckRunner:
         )
 
     def check_mmcif_file(self, file: LocalFile) -> CheckReport:
+        """Check that file is a structurally valid mmCIF file.
+
+        Args:
+            file: The file to check.
+
+        Returns:
+            A CheckReport with source=file.file_id.
+        """
         return self._schema_check(file, "mmcif_base")
 
     def check_mmcif_category(self, file: LocalFile, category: str) -> CheckReport:
+        """Check that file's mmCIF content contains the given category.
+
+        Args:
+            file: The file to check.
+            category: The mmCIF category name expected to be present.
+
+        Returns:
+            A CheckReport with source=file.file_id.
+        """
         return self._schema_check(file, f"mmcif_category_{category}")
 
     def check_mmcif_field(self, file: LocalFile, category: str, field: str) -> CheckReport:
+        """Check that file's mmCIF content contains the given field in category.
+
+        Args:
+            file: The file to check.
+            category: The mmCIF category name the field is expected in.
+            field: The mmCIF field name expected to be present.
+
+        Returns:
+            A CheckReport with source=file.file_id.
+        """
         return self._schema_check(file, f"mmcif_field_{category}_{field}")
 
     def check_file_type(self, file: LocalFile, file_type: FileType) -> CheckReport:
+        """Check that file matches the schema expected for file_type.
+
+        Args:
+            file: The file to check.
+            file_type: The expected FileType.
+
+        Returns:
+            A CheckReport with source=file.file_id.
+        """
         return self._schema_check(file, f"filetype_{file_type.value.replace('-', '_')}")
 
     def _schema_check(self, file: LocalFile, schema_name: str) -> CheckReport:
