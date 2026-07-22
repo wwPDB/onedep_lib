@@ -109,9 +109,10 @@ class DepositConfig:
 
         After resolving ``hostname``, also reads the matching ``[auths.<fqdn>]``
         section from the config file and populates ``access_token`` and
-        ``refresh_token`` from it -- unless either token was explicitly passed
-        as a keyword argument, in which case file-based token loading is
-        skipped entirely.
+        ``refresh_token`` from it -- unless either token was explicitly set
+        via an environment variable (``ONEDEP_ACCESS_TOKEN`` or
+        ``ONEDEP_REFRESH_TOKEN``) or passed as a keyword argument, in which
+        case file-based token loading is skipped entirely.
 
         Args:
             **overrides: Field values that take priority over the config file
