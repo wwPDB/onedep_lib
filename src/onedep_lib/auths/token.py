@@ -54,6 +54,10 @@ class TokenStore:
         Raises:
             AuthError: If no refresh token is stored, or refresh fails
                 because the refresh token is expired, revoked, or invalid.
+            ApiUnreachableError: If a refresh is needed and the request cannot
+                reach the server.
+            ApiError: If a refresh is needed and the server returns an
+                unexpected error response.
         """
         entry = self._read_entry()
         token = entry.get("access_token")

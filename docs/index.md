@@ -31,4 +31,4 @@ with dsp.deposit_init(
     print(dep.get_status())
 ```
 
-See [Installation](installation.md) to get set up, [Usage](usage.md) for configuration and the full deposition workflow, and [API Reference](api.md) for complete details on every public class and function.
+See [Installation](installation.md) to get set up, [Usage](usage.md) for configuration and the full deposition workflow, [Authentication Flow](auth_flow.md) for token handling, and [API Reference](api.md) for complete details on every public class and function.
