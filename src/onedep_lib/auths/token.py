@@ -15,6 +15,14 @@ _REVOKE_PATH = "auth/tokens/revoke"
 
 
 class TokenStore:
+    """Manages the OneDep access/refresh token lifecycle for a DepositConfig.
+
+    Tokens are persisted in the ``[auths.<fqdn>]`` section of the config
+    file, keyed by the FQDN derived from the active hostname. Access tokens
+    are short-lived JWTs (30-minute TTL); refresh tokens are long-lived
+    opaque strings (30-day TTL) that rotate on every use.
+    """
+
     def __init__(self, config: DepositConfig) -> None:
         self._config = config
         self._entries = self._load_auth_entries()
@@ -26,9 +34,31 @@ class TokenStore:
             self._entries[active_key] = entry
 
     def store_tokens(self, access_token: str, refresh_token: str) -> None:
+        """Persist a token pair for the config's current hostname.
+
+        Writes both tokens to the [auths.<fqdn>] section of the config file
+        and updates the in-memory config fields.
+
+        Args:
+            access_token: The access token to store.
+            refresh_token: The refresh token to store.
+        """
         self._store_tokens_for_key(self._fqdn_key(), access_token, refresh_token)
 
     def get_access_token(self) -> str:
+        """Return a valid access token, refreshing it first if necessary.
+
+        Returns:
+            A non-expired access token for the config's current hostname.
+
+        Raises:
+            AuthError: If no refresh token is stored, or refresh fails
+                because the refresh token is expired, revoked, or invalid.
+            ApiUnreachableError: If a refresh is needed and the request cannot
+                reach the server.
+            ApiError: If a refresh is needed and the server returns an
+                unexpected error response.
+        """
         entry = self._read_entry()
         token = entry.get("access_token")
         if token is None or self._is_expired(token):
@@ -36,12 +66,45 @@ class TokenStore:
         return token
 
     def refresh(self) -> str:
+        """Exchange the stored refresh token for a new token pair.
+
+        The rotated refresh token replaces the old one; refresh token
+        rotation is mandatory on every call.
+
+        Returns:
+            The new access token.
+
+        Raises:
+            AuthError: If no refresh token is stored, or the server rejects
+                the refresh token as expired, revoked, or invalid.
+            ApiUnreachableError: If the refresh request cannot reach the server.
+            ApiError: If the server returns an unexpected error response.
+        """
         entry = self._read_entry()
         access_token, refresh_token = self._request_refresh(self._config.hostname, entry["refresh_token"])
         self.store_tokens(access_token, refresh_token)
         return access_token
 
     def activate_site(self, site_base_url: str) -> str:
+        """Switch the active hostname to a redirected deposition site.
+
+        If credentials already exist for site_base_url, refreshes them
+        against that site. Otherwise exchanges the current refresh token for
+        a token pair scoped to that site via its /auth/tokens/exchange
+        endpoint. Updates config.hostname to site_base_url on success.
+
+        Args:
+            site_base_url: The deposition site root URL to activate.
+
+        Returns:
+            A valid access token for site_base_url.
+
+        Raises:
+            ConfigError: If site_base_url cannot be converted to a valid FQDN key.
+            AuthError: If the exchange/refresh request is rejected.
+            ApiUnreachableError: If the request cannot reach the server.
+            ApiError: If the server returns an unexpected error response.
+        """
         key = _hostname_to_fqdn_key(site_base_url)
         if not key:
             raise ConfigError(f"Invalid hostname for token storage: {site_base_url!r}")
@@ -57,6 +120,19 @@ class TokenStore:
         return access_token
 
     def revoke(self) -> None:
+        """Revoke the current refresh token on the server and clear it locally.
+
+        Posts the current refresh token to the server's revoke endpoint.
+        On success (204 No Content), removes the [auths.<fqdn>] entry from
+        the config file and clears the in-memory token fields via
+        clear_tokens(). After revocation, get_access_token() raises
+        AuthError until new tokens are stored.
+
+        Raises:
+            AuthError: If the server rejects the revoke request (401/403).
+            ApiUnreachableError: If the request cannot reach the server.
+            ApiError: If the server returns an unexpected error response.
+        """
         entry = self._read_entry()
         access_token = self.get_access_token()
         try:
@@ -77,6 +153,12 @@ class TokenStore:
         self.clear_tokens()
 
     def clear_tokens(self) -> None:
+        """Clear stored tokens locally without contacting the server.
+
+        Removes the in-memory access/refresh tokens and deletes the
+        [auths.<fqdn>] entry for the config's current hostname from the
+        config file.
+        """
         self._config.access_token = None
         self._config.refresh_token = None
         key = self._fqdn_key()

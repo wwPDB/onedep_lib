@@ -109,10 +109,10 @@ def deposit_init(
         email: Depositor e-mail address.
         users: List of ORCID IDs granted access to this deposition.
         country: Depositor country (use the Country enum).
+        config: Pre-built DepositConfig for the target deposition site.
         experiment_type: Experiment type (can be set later via set_experiment_type).
         em_subtype: EM experiment subtype (can be set later via set_em_params).
         coordinates: Whether coordinates are being deposited (can be set later).
-        config: Optional pre-built DepositConfig; loaded from default sources if None.
         _base_dir: Override session storage directory (for testing only).
         _api_client: Override API client (for testing only).
         _check_runner: Override check runner (for testing only).
@@ -154,7 +154,7 @@ def deposit_resume(
 
     Args:
         session_id: The session_id returned by a previous deposit_init() call.
-        config: Optional pre-built DepositConfig; loaded from default sources if None.
+        config: Pre-built DepositConfig for the target deposition site.
         _base_dir: Override session storage directory (for testing only).
         _api_client: Override API client (for testing only).
         _check_runner: Override check runner (for testing only).
