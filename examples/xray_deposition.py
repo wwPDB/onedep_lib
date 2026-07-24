@@ -151,12 +151,15 @@ def main() -> None:
         for _ in range(1, 64):
             try:
                 status = dep.get_status()
+                if isinstance(status, dsp.DepositStatus) and status.status.lower() == "error":
+                    fail(f"Processing failed  dep_id={dep_id}  details: {status.details}")
+                    break
+                elif isinstance(status, dsp.DepositStatus) and status.status.lower() == "finished":
+                    ok(f"Processing finished  dep_id={dep_id}")
+                    break
                 spin.update(
                     f"[cyan]{status.details if isinstance(status, dsp.DepositStatus) else status.message}[/cyan]"
                 )
-                if isinstance(status, dsp.DepositStatus) and status.status.lower() == "finished":
-                    ok(f"Processing finished  dep_id={dep_id}")
-                    break
             except Exception as exc:
                 fail(f"get_status() failed: {exc}")
             time.sleep(5)

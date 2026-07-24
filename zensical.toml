@@ -8,6 +8,7 @@ nav = [
   { "Home" = "index.md" },
   { "Installation" = "installation.md" },
   { "Usage" = "usage.md" },
+  { "Authentication Flow" = "auth_flow.md" },
   { "API Reference" = "api.md" },
 ]
 
@@ -25,3 +26,7 @@ toggle.name = "Switch to light mode"
 
 [project.plugins.mkdocstrings.handlers.python]
 paths = ["src"]
+
+[project.plugins.mkdocstrings.handlers.python.options]
+docstring_style = "google"
+show_root_heading = true

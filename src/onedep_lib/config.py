@@ -47,6 +47,30 @@ _ENV_MAP: dict[str, tuple[str, Callable[[str], object]]] = {
 
 @dataclass
 class DepositConfig:
+    """Resolved configuration for talking to a OneDep deposition site.
+
+    Built by :meth:`load`, which resolves fields from three sources in order
+    of increasing priority: the on-disk config file (``config_path``),
+    environment variables, and keyword argument overrides. See ``load`` for
+    the full resolution order, including how ``access_token`` and
+    ``refresh_token`` are populated from the ``[auths.<fqdn>]`` section.
+
+    Attributes:
+        access_token: Current OAuth access token, or None if not authenticated.
+        refresh_token: Current OAuth refresh token, or None if not authenticated.
+        hostname: Base URL of the OneDep deposition site to talk to.
+        ssl_verify: Whether to verify TLS certificates on API requests.
+        redirect: Whether to follow site-redirect responses from the API.
+        allowed_redirect_domain: Domain suffix that redirect targets must belong to.
+        fetch_local_schema: Whether to use the bundled local JSON schemas instead
+            of fetching them from schema_base_url.
+        local_schema_cache_dir: Directory containing the bundled local JSON schemas.
+        schema_base_url: Base URL to fetch remote JSON schemas from.
+        schema_cache_dir: Local directory used to cache remote JSON schemas.
+        session_dir: Local directory used to store deposition session state.
+        config_path: Path to the TOML config file read and written by this class.
+    """
+
     access_token: str | None = None
     refresh_token: str | None = None
     hostname: str = "https://deposit.wwpdb.org/deposition"
@@ -72,6 +96,37 @@ class DepositConfig:
 
     @classmethod
     def load(cls, **overrides: object) -> DepositConfig:
+        """Resolve a DepositConfig from the config file, environment, and overrides.
+
+        Resolution order (lowest to highest priority):
+
+        1. The TOML config file at ``config_path`` (default
+           ``~/.config/onedep/config.toml``), read from its ``[default]`` section.
+        2. Environment variables (``ONEDEP_ACCESS_TOKEN``, ``ONEDEP_REFRESH_TOKEN``,
+           ``ONEDEP_HOSTNAME``, ``ONEDEP_SSL_VERIFY``, ``ONEDEP_REDIRECT``,
+           ``ONEDEP_SCHEMA_URL``).
+        3. Keyword arguments passed to this method.
+
+        After resolving ``hostname``, also reads the matching ``[auths.<fqdn>]``
+        section from the config file and populates ``access_token`` and
+        ``refresh_token`` from it -- unless either token was explicitly set
+        via an environment variable (``ONEDEP_ACCESS_TOKEN`` or
+        ``ONEDEP_REFRESH_TOKEN``) or passed as a keyword argument, in which
+        case file-based token loading is skipped entirely.
+
+        Args:
+            **overrides: Field values that take priority over the config file
+                and environment variables. Pass config_path to read from a
+                non-default config file location.
+
+        Returns:
+            A fully resolved DepositConfig.
+
+        Raises:
+            ConfigError: If the config file contains invalid TOML, an invalid
+                boolean environment variable value, or malformed token data
+                in an [auths.<fqdn>] section.
+        """
         valid_fields = {f.name for f in fields(cls)}
         merged: dict[str, object] = {}
 
