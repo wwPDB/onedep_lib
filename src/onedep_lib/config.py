@@ -128,6 +128,7 @@ class DepositConfig:
                 in an [auths.<fqdn>] section.
         """
         valid_fields = {f.name for f in fields(cls)}
+        path_fields = {"local_schema_cache_dir", "schema_cache_dir", "session_dir", "config_path"}
         merged: dict[str, object] = {}
 
         config_path_override = overrides.pop("config_path", None)
@@ -175,6 +176,10 @@ class DepositConfig:
                             raise ConfigError(f"Malformed token data in [auths.{fqdn_key}]")
                         merged["access_token"] = acc
                         merged["refresh_token"] = ref
+
+        for key in path_fields:
+            if key in merged and not isinstance(merged[key], Path):
+                merged[key] = Path(merged[key])  # type: ignore[arg-type]
 
         return cls(**merged)  # type: ignore[arg-type]
 
