@@ -22,6 +22,7 @@ from rich.panel import Panel
 from rich.text import Text
 
 import onedep_lib as dsp
+from onedep_lib import check_auth_key
 from onedep_lib.config import DepositConfig
 
 logging.disable(logging.ERROR)
@@ -97,7 +98,7 @@ def main() -> None:
 
         # ── 3. Check auth key ─────────────────────────────────────────────────
         spin.update("[cyan]Checking auth key…[/cyan]")
-        auth_ok = dsp.check_auth_key(config=config)
+        auth_ok = check_auth_key(config=config)
         if auth_ok:
             ok("Auth key valid")
         else:
