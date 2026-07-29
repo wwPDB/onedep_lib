@@ -1,4 +1,4 @@
-# DSP Mock Package
+# OneDep Remote API Library
 
 ![PyPI version](https://img.shields.io/pypi/v/onedep_lib.svg)
 
