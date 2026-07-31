@@ -3,7 +3,9 @@ from __future__ import annotations
 import hashlib
 import logging
 import os
+import platform
 import re
+from importlib.metadata import PackageNotFoundError, version
 from json import JSONDecodeError
 from typing import Union
 from urllib.parse import urlsplit, urlunsplit
@@ -24,6 +26,25 @@ from onedep_lib.enums import Country, FileType
 from onedep_lib.exceptions import ApiError, ApiUnreachableError
 
 _API_SUFFIX_RE = re.compile(r"/api/v[0-9]+/?$")
+
+
+def _package_version() -> str:
+    try:
+        return version("onedep_lib")
+    except PackageNotFoundError:
+        return "unknown"
+
+
+def _user_agent() -> str:
+    """Identify the library to the API so the server can attribute deposition traffic."""
+    return (
+        f"onedep_lib/{_package_version()} "
+        f"python-requests/{requests.__version__} "
+        f"(Python/{platform.python_version()}; {platform.system()}/{platform.release()})"
+    )
+
+
+_USER_AGENT = _user_agent()
 
 
 def _normalize_site_base_url(url: str) -> str:
@@ -70,6 +91,7 @@ class HttpApiClient:
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
         self._session = requests.Session()
         self._session.verify = config.ssl_verify
+        self._session.headers["User-Agent"] = _USER_AGENT
 
     @property
     def site_base_url(self) -> str:
