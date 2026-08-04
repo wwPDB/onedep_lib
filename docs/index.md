@@ -1,6 +1,6 @@
 # onedep_lib
 
-`onedep_lib` prepares data for deposition into the [OneDep](https://onedep.org) system through the Deposition API. It's used by third-party deposition software providers (CCP4, Phenix, GlobalPhasing) to stage files locally, run pre-submission checks against JSON schemas served by OneDep, and submit depositions once all required files are present.
+`onedep_lib` prepares data for deposition into the [OneDep](https://deposit.wwpdb.org/) system through the Deposition API. It's used by third-party deposition software providers (CCP4, Phenix, GlobalPhasing) to stage files locally, run pre-submission checks against JSON schemas served by OneDep, and submit depositions once all required files are present.
 
 ## Quickstart
 
