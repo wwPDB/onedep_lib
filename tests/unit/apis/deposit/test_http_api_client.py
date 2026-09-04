@@ -1,10 +1,12 @@
 import json
+from importlib.metadata import PackageNotFoundError
 
 import pytest
 import requests
 from pytest_httpserver import HTTPServer
 from werkzeug.wrappers import Response
 
+from onedep_lib.apis.deposit import client as client_module
 from onedep_lib.apis.deposit.client import HttpApiClient
 from onedep_lib.apis.deposit.models import DepositedFile, DepositStatus, Experiment, WwPDBDeposition
 from onedep_lib.config import DepositConfig
@@ -97,6 +99,33 @@ def test_auth_provider_sets_bearer_token_before_request(httpserver: HTTPServer, 
     status = client.get_status("D_800001")
     assert isinstance(status, DepositStatus)
     assert auth.calls == 1
+
+
+def test_user_agent_identifies_the_library(httpserver: HTTPServer, client: HttpApiClient):
+    seen = []
+    httpserver.expect_request("/api/v1/depositions/D_800001/status", method="GET").respond_with_handler(
+        lambda request: (
+            seen.append(request.headers.get("User-Agent"))
+            or Response(json.dumps(_STATUS_RESPONSE), content_type="application/json")
+        )
+    )
+
+    client.get_status("D_800001")
+
+    assert seen[0] == client_module._USER_AGENT
+    assert seen[0].startswith("onedep_lib/")
+
+
+def test_user_agent_version_falls_back_when_package_metadata_is_missing(monkeypatch):
+    # Running from a source checkout must still produce a well-formed header
+    # rather than raising at client construction time.
+    def _missing(_name):
+        raise PackageNotFoundError(_name)
+
+    monkeypatch.setattr(client_module, "version", _missing)
+
+    assert client_module._package_version() == "unknown"
+    assert client_module._user_agent().startswith("onedep_lib/unknown ")
 
 
 def test_get_status(httpserver: HTTPServer, client: HttpApiClient):
@@ -206,9 +235,7 @@ def test_upload_file_redirect_normalizes_base_url(httpserver: HTTPServer, api_co
     httpserver.expect_ordered_request(
         "/api/v1/depositions/D_800001/files/",
         method="POST",
-    ).respond_with_json(
-        {**_FILE_RESPONSE, "uploadedBytes": 8}
-    )
+    ).respond_with_json({**_FILE_RESPONSE, "uploadedBytes": 8})
 
     client = HttpApiClient(api_config)
     deposited = client.upload_file("D_800001", str(test_file), FileType.MMCIF_COORD, _chunk_size=8)

@@ -15,7 +15,7 @@ class Experiment:
     subtype: EMSubType | None = None
     related_emdb: str | None = None
     related_bmrb: str | None = None
-    sf_only: bool = False
+    sf_only: bool = True
 
     def __post_init__(self) -> None:
         if isinstance(self.exp_type, str):
