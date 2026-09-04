@@ -36,7 +36,7 @@ def _package_version() -> str:
 
 
 def _user_agent() -> str:
-    """Identify the library to the API so the server can attribute deposition traffic."""
+    """Track provenance of depositions with request headers."""
     return (
         f"onedep_lib/{_package_version()} "
         f"python-requests/{requests.__version__} "
