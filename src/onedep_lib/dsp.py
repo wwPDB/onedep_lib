@@ -379,11 +379,12 @@ class Deposition:
         exptype = session.experiment_type.value
         if exptype is None:
             return []
-        subschemas = CheckRunner.subschemas
+        subschemas = DepositConfig().required_files_subschemas
         if exptype not in subschemas:
             return []
         provider = LocalSchemaProvider(DepositConfig().local_schema_cache_dir)
-        schema = provider.get_schema(exptype)
+        subfolder = DepositConfig().required_files_subfolder
+        schema = provider.get_schema(exptype, subfolder)
         filetypes = schema.get("enum", [])
         return filetypes
 

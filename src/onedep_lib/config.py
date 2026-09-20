@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import typing
 from dataclasses import dataclass, field, fields
 from pathlib import Path
 from typing import Callable
@@ -79,6 +80,8 @@ class DepositConfig:
     allowed_redirect_domain: str = "wwpdb.org"
     fetch_local_schema: bool = True
     local_schema_cache_dir: Path = field(default_factory=lambda: Path(__file__).parent / "schemas" / "json")
+    required_files_subfolder: str = "required_files"
+    required_files_subschemas = ["xray", "neutron", "fiber", "em", "nmr", "ec", "ssnmr"]
     schema_base_url: str = "https://schemas.wwpdb.org/nextdep"
     schema_cache_dir: Path = field(default_factory=lambda: Path.home() / ".onedep" / "schemas")
     session_dir: Path = field(default_factory=lambda: Path.home() / ".onedep" / "sessions")

@@ -14,8 +14,10 @@ class RemoteSchemaProvider:
         self._cache_dir = cache_dir
         self._cache_dir.mkdir(parents=True, exist_ok=True)
 
-    def get_schema(self, schema_name: str) -> dict:
+    def get_schema(self, schema_name: str, subfolder: str | None) -> dict:
         cache_path = self._cache_dir / f"{schema_name}.json"
+        if subfolder:
+            cache_path = self._cache_dir / subfolder / f"{schema_name}.json"
         if cache_path.exists():
             with cache_path.open() as f:
                 return json.load(f)

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import jsonschema
+from onedep_lib.config import DepositConfig
 from referencing import Registry, Resource
 from referencing.jsonschema import DRAFT202012
 
@@ -19,7 +20,6 @@ class CheckRunner:
     depending on how the provider was constructed.
     """
 
-    subschemas: list[str] = ["xray", "neutron", "fiber", "em", "nmr", "ec", "ssnmr"]
     validator_specification = jsonschema.Draft202012Validator
     referencing_specification = DRAFT202012
 
@@ -60,16 +60,18 @@ class CheckRunner:
             )
 
         try:
-            schema = self._schema_provider.get_schema("required_files")
+            schema_name = "required_files"
+            subfolder = DepositConfig().required_files_subfolder
+            schema = self._schema_provider.get_schema(schema_name, subfolder)
             resources = [
                 (
                     f"{name}.json",
                     Resource(
-                        contents=self._schema_provider.get_schema(name),
+                        contents=self._schema_provider.get_schema(name, subfolder),
                         specification=CheckRunner.referencing_specification,
                     ),
                 )
-                for name in CheckRunner.subschemas
+                for name in DepositConfig().required_files_subschemas
             ]
         except SchemaError as exc:
             return CheckReport(

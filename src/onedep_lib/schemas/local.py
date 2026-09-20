@@ -10,8 +10,10 @@ class LocalSchemaProvider:
     def __init__(self, cache_dir: Path) -> None:
         self._cache_dir = cache_dir
 
-    def get_schema(self, schema_name: str) -> dict:
+    def get_schema(self, schema_name: str, subfolder: str | None) -> dict:
         cache_path = self._cache_dir / f"{schema_name}.json"
+        if subfolder:
+            cache_path = self._cache_dir / subfolder / f"{schema_name}.json"
         if cache_path.exists():
             try:
                 with cache_path.open() as f:
