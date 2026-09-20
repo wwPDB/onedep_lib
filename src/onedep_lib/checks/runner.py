@@ -60,8 +60,8 @@ class CheckRunner:
             )
 
         try:
-            schema_name = "required_files"
             subfolder = DepositConfig().required_files_subfolder
+            schema_name = DepositConfig().required_files_schema
             schema = self._schema_provider.get_schema(schema_name, subfolder)
             resources = [
                 (

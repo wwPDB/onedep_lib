@@ -81,6 +81,7 @@ class DepositConfig:
     fetch_local_schema: bool = True
     local_schema_cache_dir: Path = field(default_factory=lambda: Path(__file__).parent / "schemas" / "json")
     required_files_subfolder: str = "required_files"
+    required_files_schema = "required_files"
     required_files_subschemas = ["xray", "neutron", "fiber", "em", "nmr", "ec", "ssnmr"]
     schema_base_url: str = "https://schemas.wwpdb.org/nextdep"
     schema_cache_dir: Path = field(default_factory=lambda: Path.home() / ".onedep" / "schemas")
