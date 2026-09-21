@@ -1,5 +1,10 @@
 from __future__ import annotations
 
+import json
+import os
+import sys
+from pathlib import Path
+
 import jsonschema
 from onedep_lib.config import DepositConfig
 from referencing import Registry, Resource
@@ -100,6 +105,73 @@ class CheckRunner:
 
         messages = []
         for error in errors:
+            error_schema = error.schema
+            feedback = error_schema.get("feedback", {})
+            message = feedback.get(error.validator, None)
+            if message:
+                messages.append(message)
+
+        return CheckReport(
+            source="session",
+            issues=[
+                CheckIssue(
+                    severity=CheckSeverity.FATAL,
+                    code="REQ_FILES_MISSING",
+                    message=message,
+                )
+                for message in messages
+            ],
+        )
+
+    def validate_json_file(self, json_file_path: str, schema_subfolder: str, target_schema_name: str) -> CheckReport:
+        try:
+            with open(json_file_path, "r") as r:
+                data:dict = json.load(r)
+        except FileNotFoundError:
+            sys.exit("json file not found")
+        try:
+            schema_dir = DepositConfig().local_schema_cache_dir
+            subfolder = schema_subfolder
+            subfolder_path = Path(schema_dir / subfolder)
+            schema_name = os.path.splitext(os.path.basename(target_schema_name))[0]
+            subschemas = [os.path.splitext(filename)[0] for filename in os.listdir(subfolder_path)]
+            assert len(subschemas) >= 1, "error reading schema subfolder"
+            assert schema_name in subschemas, "error reading schema subfolder"
+            length = len(subschemas)
+            subschemas.remove(schema_name)
+            assert len(subschemas) == length - 1, "error trimming schema subfolder"
+            schema = self._schema_provider.get_schema(schema_name, subfolder)
+            resources = [
+                (
+                    f"{name}.json",
+                    Resource(
+                        contents=self._schema_provider.get_schema(name, subfolder),
+                        specification=CheckRunner.referencing_specification,
+                    ),
+                )
+                for name in subschemas
+            ]
+        except SchemaError as exc:
+            return CheckReport(
+                source="session",
+                issues=[
+                    CheckIssue(
+                        severity=CheckSeverity.WARNING,
+                        code="SCHEMA_UNAVAILABLE",
+                        message=f"Schema not available: {exc}",
+                    )
+                ],
+            )
+
+        registry = Registry().with_resources(resources)
+        validator = CheckRunner.validator_specification(schema, registry=registry)
+        errors = list(validator.iter_errors(data))
+        if not errors:
+            return CheckReport(source="session")
+
+        messages = []
+        for error in errors:
+            print(error)
             error_schema = error.schema
             feedback = error_schema.get("feedback", {})
             message = feedback.get(error.validator, None)

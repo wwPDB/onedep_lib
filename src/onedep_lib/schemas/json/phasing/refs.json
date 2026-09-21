@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "phasing",
+  "description": "example phasing validation",
+  "type": "object",
+  "properties": {
+    "refine_ref": {
+      "type": "object",
+      "properties": {
+        "pdbx_method_to_determine_struct": {
+          "$anchor": "pdbx_method_to_determine_struct",
+          "description": "method used for determining phases",
+          "enum": [
+            "AB INITIO PHASING",
+            "FOURIER REPLACEMENT",
+            "MAD",
+            "MIR",
+            "MIRAS",
+            "MOLECULAR REPLACEMENT",
+            "SAD",
+            "SIR",
+            "SIRAS"
+          ]
+        }
+      }
+    },
+    "refine_ref_conditional": {
+      "type": "object",
+      "properties": {
+        "pdbx_method_to_determine_struct": {
+          "enum": [
+            "FOURIER REPLACEMENT",
+            "MOLECULAR REPLACEMENT"
+          ]
+        }
+      },
+      "required": [
+        "pdbx_method_to_determine_struct"
+      ]
+    },
+    "initial_refinement_model_ref": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "experimental model",
+            "in-silico model",
+            "integrative model"
+          ]
+        },
+        "source_name": {
+          "enum": [
+            "Alpha Fold",
+            "ITasser",
+            "Model Archive",
+            "Modeller",
+            "Other",
+            "PDB",
+            "PDB-DEV",
+            "Robetta",
+            "Rosetta-Fold",
+            "Swiss Model"
+          ]
+        },
+        "accession_code": {
+          "type": "string"
+        },
+        "entity_id_list": {
+          "type": ["string", "null"]
+        },
+        "details": {
+          "type": ["string", "null"]
+        }
+      }
+    }
+  }
+}
