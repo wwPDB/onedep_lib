@@ -14,7 +14,7 @@ class RemoteSchemaProvider:
         self._cache_dir = cache_dir
         self._cache_dir.mkdir(parents=True, exist_ok=True)
 
-    def get_schema(self, schema_name: str, subfolder: str | None) -> dict:
+    def get_schema(self, schema_name: str, subfolder: str | None = None) -> dict:
         cache_path = self._cache_dir / f"{schema_name}.json"
         if subfolder:
             cache_path = self._cache_dir / subfolder / f"{schema_name}.json"
@@ -34,6 +34,7 @@ class RemoteSchemaProvider:
             schema = response.json()
         except ValueError as exc:
             raise SchemaError(f"Invalid JSON in schema '{schema_name}' from {url}") from exc
+        cache_path.parent.mkdir(parents=True, exist_ok=True)
         with cache_path.open("w") as f:
             json.dump(schema, f)
         return schema
