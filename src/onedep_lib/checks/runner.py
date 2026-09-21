@@ -30,7 +30,6 @@ class CheckRunner:
     validator_specification = jsonschema.Draft202012Validator
     referencing_specification = DRAFT202012
 
-
     def __init__(self, schema_provider: SchemaProvider) -> None:
         self._schema_provider = schema_provider
         self.keywords = Keywords().registry()
@@ -132,8 +131,17 @@ class CheckRunner:
         try:
             with open(json_file_path, "r") as r:
                 data:dict = json.load(r)
-        except FileNotFoundError:
-            sys.exit("json file not found")
+        except FileNotFoundError as exc:
+            return CheckReport(
+                source="session",
+                issues=[
+                    CheckIssue(
+                        severity=CheckSeverity.WARNING,
+                        code="INPUT_UNAVAILABLE",
+                        message=f"Json file not available: {exc}",
+                    )
+                ],
+            )
         try:
             schema_dir = DepositConfig().local_schema_cache_dir
             subfolder = schema_subfolder
@@ -190,7 +198,7 @@ class CheckRunner:
             issues=[
                 CheckIssue(
                     severity=CheckSeverity.FATAL,
-                    code="REQ_FILES_MISSING",
+                    code="VALIDATION_ERROR",
                     message=message,
                 )
                 for message in messages

@@ -102,9 +102,6 @@ def validate_mmcif_file(mmcif_file: str, schema_subfolder: str, schema_file: str
                 print("error converting cif to json")
                 return False
             valid = validate_json_file(tmp.name, schema_subfolder, schema_file)
-    except FileNotFoundError as err:
-        print("file not found")
-        valid = False
     except Exception as exc:
         print("unknown exception: ", str(exc))
         valid = False
