@@ -86,6 +86,7 @@ class DepositConfig:
     local_schema_cache_dir: Path = field(default_factory=lambda: Path(__file__).parent / "schemas" / "json")
     required_files_subfolder: str = "required_files"
     required_files_schema: str = "required_files"
+    # avoid downstream modification side effects by making local instances instead of global singleton
     required_files_subschemas: list[str] = field(
         default_factory=lambda: ["xray", "neutron", "fiber", "em", "nmr", "ec", "ssnmr"]
     )
