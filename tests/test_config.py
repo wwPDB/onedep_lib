@@ -194,6 +194,50 @@ def test_schema_base_url_env_override(monkeypatch):
     assert cfg.schema_base_url == "http://localhost:8080/schemas"
 
 
+def test_required_files_defaults(monkeypatch, tmp_path):
+    monkeypatch.setenv("HOME", str(tmp_path))
+    cfg = DepositConfig()
+    assert cfg.required_files_subfolder == "required_files"
+    assert cfg.required_files_schema == "required_files"
+    assert cfg.required_files_subschemas == ["xray", "neutron", "fiber", "em", "nmr", "ec", "ssnmr"]
+
+
+def test_constructor_overrides_required_files_settings(monkeypatch, tmp_path):
+    monkeypatch.setenv("HOME", str(tmp_path))
+    cfg = DepositConfig.load(
+        required_files_subfolder="other_files",
+        required_files_schema="other_required_files",
+        required_files_subschemas=["xray", "em"],
+    )
+    assert cfg.required_files_subfolder == "other_files"
+    assert cfg.required_files_schema == "other_required_files"
+    assert cfg.required_files_subschemas == ["xray", "em"]
+
+
+def test_load_reads_required_files_settings_from_file(monkeypatch, tmp_path):
+    config_dir = tmp_path / ".config" / "onedep"
+    config_dir.mkdir(parents=True)
+    (config_dir / "config.toml").write_text(
+        "[default]\n"
+        'required_files_subfolder = "other_files"\n'
+        'required_files_schema = "other_required_files"\n'
+        'required_files_subschemas = ["xray", "em"]\n'
+    )
+    monkeypatch.setenv("HOME", str(tmp_path))
+    cfg = DepositConfig.load()
+    assert cfg.required_files_subfolder == "other_files"
+    assert cfg.required_files_schema == "other_required_files"
+    assert cfg.required_files_subschemas == ["xray", "em"]
+
+
+def test_required_files_subschemas_not_shared_between_instances():
+    # A mutable default must not leak between instances.
+    first = DepositConfig()
+    second = DepositConfig()
+    first.required_files_subschemas.append("mutated")
+    assert "mutated" not in second.required_files_subschemas
+
+
 def test_default_config_path_is_onedep_toml(monkeypatch, tmp_path):
     monkeypatch.setenv("HOME", str(tmp_path))
     cfg = DepositConfig()

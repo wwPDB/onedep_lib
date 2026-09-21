@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import os
-import typing
 from dataclasses import dataclass, field, fields
 from pathlib import Path
 from typing import Callable
@@ -66,6 +65,11 @@ class DepositConfig:
         fetch_local_schema: Whether to use the bundled local JSON schemas instead
             of fetching them from schema_base_url.
         local_schema_cache_dir: Directory containing the bundled local JSON schemas.
+        required_files_subfolder: Subfolder of the schema cache holding the
+            required-files schema set.
+        required_files_schema: Name of the top-level required-files schema.
+        required_files_subschemas: Names of the per-method subschemas the
+            top-level required-files schema refers to.
         schema_base_url: Base URL to fetch remote JSON schemas from.
         schema_cache_dir: Local directory used to cache remote JSON schemas.
         session_dir: Local directory used to store deposition session state.
@@ -81,8 +85,10 @@ class DepositConfig:
     fetch_local_schema: bool = True
     local_schema_cache_dir: Path = field(default_factory=lambda: Path(__file__).parent / "schemas" / "json")
     required_files_subfolder: str = "required_files"
-    required_files_schema = "required_files"
-    required_files_subschemas = ["xray", "neutron", "fiber", "em", "nmr", "ec", "ssnmr"]
+    required_files_schema: str = "required_files"
+    required_files_subschemas: list[str] = field(
+        default_factory=lambda: ["xray", "neutron", "fiber", "em", "nmr", "ec", "ssnmr"]
+    )
     schema_base_url: str = "https://schemas.wwpdb.org/nextdep"
     schema_cache_dir: Path = field(default_factory=lambda: Path.home() / ".onedep" / "schemas")
     session_dir: Path = field(default_factory=lambda: Path.home() / ".onedep" / "sessions")
