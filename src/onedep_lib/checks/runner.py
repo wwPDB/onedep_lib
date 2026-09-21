@@ -6,6 +6,7 @@ import sys
 from pathlib import Path
 
 import jsonschema
+from jsonschema import validators
 from onedep_lib.config import DepositConfig
 from referencing import Registry, Resource
 from referencing.jsonschema import DRAFT202012
@@ -15,6 +16,7 @@ from onedep_lib.enums import EMSubType, ExperimentType, FileType
 from onedep_lib.exceptions import SchemaError
 from onedep_lib.schemas.types import SchemaProvider
 from onedep_lib.session.models import LocalFile
+from onedep_lib.checks.keywords import Keywords
 
 
 class CheckRunner:
@@ -28,8 +30,11 @@ class CheckRunner:
     validator_specification = jsonschema.Draft202012Validator
     referencing_specification = DRAFT202012
 
+
     def __init__(self, schema_provider: SchemaProvider) -> None:
         self._schema_provider = schema_provider
+        self.keywords = Keywords().registry()
+        self.validator = validators.extend(getattr(CheckRunner, "validator_specification"), self.keywords)
 
     def check_required_files(
         self,
@@ -98,7 +103,7 @@ class CheckRunner:
             data["subtype"] = em_subtype.value
 
         registry = Registry().with_resources(resources)
-        validator = CheckRunner.validator_specification(schema, registry=registry)
+        validator = self.validator(schema, registry=registry)
         errors = list(validator.iter_errors(data))
         if not errors:
             return CheckReport(source="session")
@@ -164,7 +169,7 @@ class CheckRunner:
             )
 
         registry = Registry().with_resources(resources)
-        validator = CheckRunner.validator_specification(schema, registry=registry)
+        validator = self.validator(schema, registry=registry)
         errors = list(validator.iter_errors(data))
         if not errors:
             return CheckReport(source="session")
