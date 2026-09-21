@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 
 import pytest
@@ -14,29 +16,25 @@ class StubSchemaProvider:
     def __init__(self, schemas: dict[str, dict]) -> None:
         self._schemas = schemas
 
-    def get_schema(self, schema_name: str) -> dict:
+    def get_schema(self, schema_name: str, subfolder: str | None = None) -> dict:
         if schema_name not in self._schemas:
             raise SchemaError(f"Schema '{schema_name}' not available")
         return self._schemas[schema_name]
 
 
-def _load_files_schema() -> dict:
-    schema_path = DepositConfig().local_schema_cache_dir / "required_files.json"
-    with schema_path.open() as f:
-        return json.load(f)
-
-
-def _load_subschema(name: str) -> dict:
-    schema_path = DepositConfig().local_schema_cache_dir / f"{name}.json"
+def _load_schema(name: str) -> dict:
+    config = DepositConfig()
+    schema_path = config.local_schema_cache_dir / config.required_files_subfolder / f"{name}.json"
     with schema_path.open() as f:
         return json.load(f)
 
 
 @pytest.fixture
 def runner_with_files_schema() -> CheckRunner:
+    config = DepositConfig()
     provider = StubSchemaProvider({
-        "required_files": _load_files_schema(),
-        **{name: _load_subschema(name) for name in CheckRunner.subschemas},
+        config.required_files_schema: _load_schema(config.required_files_schema),
+        **{name: _load_schema(name) for name in config.required_files_subschemas},
     })
     return CheckRunner(schema_provider=provider)
 

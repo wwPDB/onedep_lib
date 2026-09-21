@@ -15,14 +15,17 @@ from onedep_lib.session.models import LocalFile, LocalSession
 
 
 @pytest.fixture
-def files_schema() -> dict:
-    schema_path = DepositConfig().local_schema_cache_dir / "required_files.json"
-    with schema_path.open() as f:
-        return json.load(f)
+def served_schemas() -> dict[str, dict]:
+    """Every required-files schema the runner will ask the remote provider for."""
+    config = DepositConfig()
+    schema_dir = config.local_schema_cache_dir / config.required_files_subfolder
+    names = [config.required_files_schema, *config.required_files_subschemas]
+    return {name: json.loads((schema_dir / f"{name}.json").read_text()) for name in names}
 
 
-def test_full_session_create_add_check(tmp_path: Path, httpserver, files_schema: dict):
-    httpserver.expect_request("/required_files.json").respond_with_json(files_schema)
+def test_full_session_create_add_check(tmp_path: Path, httpserver, served_schemas: dict[str, dict]):
+    for name, schema in served_schemas.items():
+        httpserver.expect_request(f"/{name}.json").respond_with_json(schema)
 
     store = JsonSessionStore("integ-session", base_dir=tmp_path / "sessions")
     session = LocalSession(
@@ -58,4 +61,5 @@ def test_full_session_create_add_check(tmp_path: Path, httpserver, files_schema:
     files = store.get_all_files()
     loaded = store.get_session()
     report = runner.check_required_files(files, loaded.experiment_type)
+    assert report.issues == []
     assert report.ok is True

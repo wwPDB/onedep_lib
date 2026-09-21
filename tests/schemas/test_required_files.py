@@ -25,17 +25,22 @@ from referencing.jsonschema import DRAFT202012
 from onedep_lib.config import DepositConfig
 
 
+def _schema_dir() -> Path:
+    config = DepositConfig()
+    return config.local_schema_cache_dir / config.required_files_subfolder
+
+
 @pytest.fixture(scope="module")
 def schema() -> dict:
-    schema_path : Path  = DepositConfig().local_schema_cache_dir / "required_files.json"
+    config = DepositConfig()
+    schema_path: Path = _schema_dir() / f"{config.required_files_schema}.json"
     with schema_path.open() as f:
         return json.load(f)
 
 
 @pytest.fixture(scope="module")
 def validator(schema: dict) -> jsonschema.Draft202012Validator:
-    from onedep_lib.checks.runner import CheckRunner
-    schema_dir = DepositConfig().local_schema_cache_dir
+    schema_dir = _schema_dir()
     resources = [
         (
             f"{name}.json",
@@ -44,7 +49,7 @@ def validator(schema: dict) -> jsonschema.Draft202012Validator:
                 specification=DRAFT202012,
             ),
         )
-        for name in CheckRunner.subschemas
+        for name in DepositConfig().required_files_subschemas
     ]
     registry = Registry().with_resources(resources)
     return jsonschema.Draft202012Validator(schema, registry=registry)
