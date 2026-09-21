@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import os
+import tempfile
 import uuid
 from dataclasses import fields
 from datetime import datetime, timezone
@@ -21,6 +22,7 @@ from onedep_lib.schemas.remote import RemoteSchemaProvider
 from onedep_lib.session.json_store import JsonSessionStore
 from onedep_lib.session.models import LocalFile, LocalSession
 from onedep_lib.session.types import SessionStore
+from onedep_lib.schemas.cif_to_json import cif2json
 
 
 def _md5_of_file(path: Path, chunk_size: int = 1 << 20) -> str:
@@ -89,6 +91,24 @@ def _config_for_hostname(config: DepositConfig, hostname: str) -> DepositConfig:
     }
     overrides["hostname"] = hostname
     return _load_config_without_token_env(**overrides)
+
+
+def validate_mmcif_file(mmcif_file: str, schema_subfolder: str, schema_file: str) -> bool:
+    valid = False
+    try:
+        with tempfile.NamedTemporaryFile(delete=True, mode='w+', encoding='utf-8') as tmp:
+            result = cif2json(mmcif_file, tmp.name, skip_coords=True)
+            if not result:
+                print("error converting cif to json")
+                return False
+            valid = validate_json_file(tmp.name, schema_subfolder, schema_file)
+    except FileNotFoundError as err:
+        print("file not found")
+        valid = False
+    except Exception as exc:
+        print("unknown exception: ", str(exc))
+        valid = False
+    return valid
 
 
 def validate_json_file(json_file: str, schema_subfolder: str, schema_file: str) -> bool:

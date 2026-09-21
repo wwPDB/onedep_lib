@@ -8,7 +8,7 @@ from onedep_lib.apis.deposit.types import ApiClient
 from onedep_lib.auths.token import TokenStore
 from onedep_lib.auths.types import AuthProvider
 from onedep_lib.checks.report import CheckIssue, CheckReport, CheckSeverity, CifLocation
-from onedep_lib.dsp import Deposition, check_auth_key, deposit_init, deposit_resume, list_sessions, validate_json_file
+from onedep_lib.dsp import Deposition, check_auth_key, deposit_init, deposit_resume, list_sessions, validate_json_file, validate_mmcif_file
 from onedep_lib.enums import Country, EMSubType, ExperimentType, FileType
 from onedep_lib.exceptions import (
     ApiError,
@@ -16,6 +16,7 @@ from onedep_lib.exceptions import (
     DepositApiException,
     OneDepError,
 )
+from onedep_lib.schemas.cif_to_json import cif2json
 
 # Library logging is opt-in: a NullHandler on the top-level logger means nothing
 # is emitted unless the embedding application configures a handler for it.
@@ -28,6 +29,8 @@ __all__ = [
     "list_sessions",
     "check_auth_key",
     "validate_json_file",
+    "validate_mmcif_file",
+    "cif2json",
     "Deposition",
     # check result types
     "CheckReport",
