@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "resolution",
+  "description": "example resolution validation",
+  "type": "object",
+
+  "properties": {
+    "refine": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "ls_d_res_low": {
+            "$anchor": "ls_d_res_low",
+            "type": "number",
+            "exclusiveMinimum": 0.0
+          },
+          "ls_d_res_high": {
+            "$anchor": "ls_d_res_hight",
+            "type": "number",
+            "exclusiveMinimum": 0.0
+          }
+        },
+        "required": ["ls_d_res_low", "ls_d_res_high"]
+      }
+    },
+    "reflns": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "d_resolution_low": {
+            "$anchor": "d_resolution_low",
+            "type": "number",
+            "exclusiveMinimum": 0.0
+          },
+          "d_resolution_high": {
+            "$anchor": "d_resolution_high",
+            "type": "number",
+            "exclusiveMinimum": 0.0
+          }
+        },
+        "required": ["d_resolution_low", "d_resolution_high"]
+      }
+    }
+  },
+  "wwpdb_resolution_comparator": true,
+  "required": ["refine", "reflns"]
+}
