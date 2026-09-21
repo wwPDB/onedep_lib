@@ -8,7 +8,7 @@ from onedep_lib.apis.deposit.types import ApiClient
 from onedep_lib.auths.token import TokenStore
 from onedep_lib.auths.types import AuthProvider
 from onedep_lib.checks.report import CheckIssue, CheckReport, CheckSeverity, CifLocation
-from onedep_lib.dsp import Deposition, check_auth_key, deposit_init, deposit_resume, list_sessions
+from onedep_lib.dsp import Deposition, check_auth_key, deposit_init, deposit_resume, list_sessions, validate_json_file
 from onedep_lib.enums import Country, EMSubType, ExperimentType, FileType
 from onedep_lib.exceptions import (
     ApiError,
@@ -27,6 +27,7 @@ __all__ = [
     "deposit_resume",
     "list_sessions",
     "check_auth_key",
+    "validate_json_file",
     "Deposition",
     # check result types
     "CheckReport",

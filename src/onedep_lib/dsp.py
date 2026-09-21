@@ -91,6 +91,26 @@ def _config_for_hostname(config: DepositConfig, hostname: str) -> DepositConfig:
     return _load_config_without_token_env(**overrides)
 
 
+def validate_json_file(json_file: str, schema_subfolder: str, schema_file: str) -> bool:
+    config = DepositConfig.load()
+    check_runner: CheckRunnerProtocol = CheckRunner(
+        LocalSchemaProvider(config.local_schema_cache_dir)
+        if config.fetch_local_schema
+        else RemoteSchemaProvider(config.schema_base_url, config.schema_cache_dir)
+    )
+    report = check_runner.validate_json_file(json_file, schema_subfolder, schema_file)
+    result = True
+    try:
+        for issue in report.issues:
+            print("ISSUE")
+            print(issue.message)
+            result = False
+        assert report.ok, "Error - required files check failed"
+    except Exception as e:
+        print(e)
+    return result
+
+
 def deposit_init(
     email: str,
     users: list[str],

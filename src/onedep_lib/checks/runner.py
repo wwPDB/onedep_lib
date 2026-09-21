@@ -176,7 +176,6 @@ class CheckRunner:
 
         messages = []
         for error in errors:
-            print(error)
             error_schema = error.schema
             feedback = error_schema.get("feedback", {})
             message = feedback.get(error.validator, None)
