@@ -178,7 +178,10 @@ class CheckRunner:
         for error in errors:
             error_schema = error.schema
             feedback = error_schema.get("feedback", {})
-            message = feedback.get(error.validator, None)
+            if feedback:
+                message = feedback.get(error.validator, None)
+            else:
+                message = str(error)[0:300]
             if message:
                 messages.append(message)
 

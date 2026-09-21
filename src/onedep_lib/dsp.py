@@ -102,7 +102,6 @@ def validate_json_file(json_file: str, schema_subfolder: str, schema_file: str) 
     result = True
     try:
         for issue in report.issues:
-            print("ISSUE")
             print(issue.message)
             result = False
         assert report.ok, "Error - required files check failed"
