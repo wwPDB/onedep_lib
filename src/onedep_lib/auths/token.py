@@ -48,18 +48,28 @@ class TokenStore:
     def get_access_token(self) -> str:
         """Return a valid access token, refreshing it first if necessary.
 
+        If no [auths.<fqdn>] entry matches the config's current hostname
+        (e.g. tokens were registered under a different site's key), falls
+        back to exchanging the most recently registered refresh token for
+        one scoped to the current hostname, via activate_site's exchange
+        path.
+
         Returns:
             A non-expired access token for the config's current hostname.
 
         Raises:
-            AuthError: If no refresh token is stored, or refresh fails
-                because the refresh token is expired, revoked, or invalid.
-            ApiUnreachableError: If a refresh is needed and the request cannot
-                reach the server.
-            ApiError: If a refresh is needed and the server returns an
-                unexpected error response.
+            AuthError: If no refresh token is stored anywhere, or refresh/
+                exchange fails because the refresh token is expired,
+                revoked, or invalid.
+            ApiUnreachableError: If a refresh or exchange is needed and the
+                request cannot reach the server.
+            ApiError: If a refresh or exchange is needed and the server
+                returns an unexpected error response.
         """
-        entry = self._read_entry()
+        try:
+            entry = self._read_entry()
+        except AuthError:
+            return self._bootstrap_active_site()
         token = entry.get("access_token")
         if token is None or self._is_expired(token):
             return self.refresh()
@@ -254,6 +264,25 @@ class TokenStore:
         if entry.get("refresh_token") is None:
             raise AuthError("No refresh token stored. Paste a refresh token first.")
         return dict(entry)
+
+    def _bootstrap_active_site(self) -> str:
+        """Bootstrap the active hostname from another site's stored refresh token.
+
+        Called when _read_entry() finds nothing filed under the active
+        hostname's fqdn key. Picks the most recently registered
+        [auths.<fqdn>] entry under a different key and exchanges its
+        refresh token for one scoped to the active hostname, the same way
+        activate_site() does for a redirect target.
+        """
+        self._entries = self._load_auth_entries() | self._entries
+        active_key = self._fqdn_key()
+        fallback_key = next((key for key in reversed(list(self._entries)) if key != active_key), None)
+        if fallback_key is None:
+            raise AuthError("No refresh token stored. Paste a refresh token first.")
+        fallback_refresh_token = self._entries[fallback_key]["refresh_token"]
+        access_token, refresh_token = self._request_exchange(self._config.hostname, fallback_refresh_token)
+        self._store_tokens_for_key(active_key, access_token, refresh_token)
+        return access_token
 
     def _entry_from_config(self) -> dict[str, str] | None:
         refresh_token = self._config.refresh_token

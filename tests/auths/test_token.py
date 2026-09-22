@@ -424,6 +424,48 @@ def test_activate_site_exchanges_current_token_when_site_key_missing(monkeypatch
     assert 'refresh_token = "pdbe-refresh-new"' in text
 
 
+def test_get_access_token_bootstraps_default_site_from_other_registered_key(monkeypatch, tmp_path: Path):
+    # Regression test: tokens registered under a site-specific key (e.g. the
+    # depositor authenticated against their country's deposit site) must
+    # still bootstrap the default hostname, instead of failing before the
+    # server ever gets a chance to redirect.
+    config_file = tmp_path / "config.toml"
+    config_file.write_text(
+        '[default]\nhostname = "https://deposit.wwpdb.org/deposition"\n'
+        "[auths.deposit_pdbe_wwpdb_org]\n"
+        'access_token = "foobar"\n'
+        'refresh_token = "pdbe_prod-foobar"\n',
+        encoding="utf-8",
+    )
+    calls = []
+
+    def fake_post(url, json, verify, timeout):
+        calls.append({"url": url, "json": json, "verify": verify, "timeout": timeout})
+        return _TokenResponse("default-access-new", "default-refresh-new")
+
+    monkeypatch.setattr("onedep_lib.auths.token.requests.post", fake_post)
+    config = DepositConfig.load(config_path=config_file)
+    assert config.access_token is None
+    assert config.refresh_token is None
+    store = TokenStore(config)
+
+    assert store.get_access_token() == "default-access-new"
+
+    assert calls == [
+        {
+            "url": "https://deposit.wwpdb.org/deposition/auth/tokens/exchange",
+            "json": {"refresh_token": "pdbe_prod-foobar"},
+            "verify": True,
+            "timeout": 30,
+        }
+    ]
+    text = config_file.read_text(encoding="utf-8")
+    assert "[auths.deposit_wwpdb_org]" in text
+    assert 'refresh_token = "default-refresh-new"' in text
+    # The original site-specific entry is preserved, not overwritten.
+    assert 'refresh_token = "pdbe_prod-foobar"' in text
+
+
 def test_activate_site_uses_existing_site_token_without_default_token(monkeypatch, tmp_path: Path):
     config_file = tmp_path / "config.toml"
     config_file.write_text(
