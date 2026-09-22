@@ -8,6 +8,9 @@ from dataclasses import fields
 from datetime import datetime, timezone
 from pathlib import Path
 
+import nextdep_dsp_schema
+from nextdep_dsp_schema.dsp.DataBridgeNow import dataBridge
+
 from onedep_lib.apis.deposit.client import HttpApiClient
 from onedep_lib.apis.deposit.models import DepositError, DepositStatus, Experiment
 from onedep_lib.apis.deposit.types import ApiClient
@@ -96,8 +99,11 @@ def _config_for_hostname(config: DepositConfig, hostname: str) -> DepositConfig:
 def validate_mmcif_file(mmcif_file: str, schema_subfolder: str, schema_file: str) -> bool:
     valid = False
     try:
-        with tempfile.NamedTemporaryFile(delete=True, mode='w+', encoding='utf-8') as tmp:
-            result = cif2json(mmcif_file, tmp.name, skip_coords=True)
+        with tempfile.NamedTemporaryFile(suffix='.json', delete=True, mode='w+', encoding='utf-8') as tmp:
+            infile = mmcif_file
+            outfile = tmp.name
+            result = dataBridge(infile, outfile)
+            # result = cif2json(mmcif_file, tmp.name, skip_coords=True)
             if not result:
                 print("error converting cif to json")
                 return False
