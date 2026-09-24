@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import nextdep_dsp_schema
-from nextdep_dsp_schema.dsp.DataBridgeNow import dataBridge
+from nextdep_dsp_schema.dsp.DataBridgeRecruiter import recruitDataBridge, DataBridgeRecruiter
 
 from onedep_lib.apis.deposit.client import HttpApiClient
 from onedep_lib.apis.deposit.models import DepositError, DepositStatus, Experiment
@@ -102,7 +102,7 @@ def validate_mmcif_file(mmcif_file: str, schema_subfolder: str, schema_file: str
         with tempfile.NamedTemporaryFile(suffix='.json', delete=True, mode='w+', encoding='utf-8') as tmp:
             infile = mmcif_file
             outfile = tmp.name
-            result = dataBridge(infile, outfile)
+            result = recruitDataBridge(infile, outfile)
             # result = cif2json(mmcif_file, tmp.name, skip_coords=True)
             if not result:
                 print("error converting cif to json")
