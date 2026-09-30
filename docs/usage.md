@@ -51,6 +51,8 @@ refresh_token = "opaque-string"
 
 `access_token` and `refresh_token` are never read from `[default]`; they always come from the per-host `[auths]` table, written by `TokenStore.store_tokens()` (see [Authentication Flow](auth_flow.md)). Multiple hosts can coexist in the same file under separate `[auths.<fqdn>]` tables without interfering with each other.
 
+If no `[auths.<fqdn>]` entry matches the resolved hostname exactly (for example, tokens were registered while authenticated against a different, e.g. country-specific, site), `TokenStore.get_access_token()` falls back to the most recently registered entry under a different key and exchanges its refresh token for one scoped to the resolved hostname via `/auth/tokens/exchange`. The result is then stored under the resolved hostname's own key, alongside the original entry.
+
 Unknown keys in `[default]` are ignored. An empty `hostname` is ignored so the default remains in effect. Invalid TOML raises `ConfigError`.
 
 Load configuration with no arguments once the file is in place:
