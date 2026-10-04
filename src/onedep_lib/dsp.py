@@ -96,14 +96,14 @@ def _config_for_hostname(config: DepositConfig, hostname: str) -> DepositConfig:
     return _load_config_without_token_env(**overrides)
 
 
-def validate_mmcif_file(mmcif_file: str, schema_subfolder: str, schema_file: str) -> bool:
+def validate_mmcif_file(mmcif_file: str, schema_subfolder: list[str] | str, schema_file: list[str] | str) -> bool:
     valid = False
     try:
         with tempfile.NamedTemporaryFile(suffix='.json', delete=True, mode='w+', encoding='utf-8') as tmp:
             infile = mmcif_file
             outfile = tmp.name
-            result = recruitDataBridge(infile, outfile)
-            # result = cif2json(mmcif_file, tmp.name, skip_coords=True)
+            # result = recruitDataBridge(infile, outfile)
+            result = cif2json(mmcif_file, tmp.name, skip_coords=True)
             if not result:
                 print("error converting cif to json")
                 return False
@@ -114,22 +114,39 @@ def validate_mmcif_file(mmcif_file: str, schema_subfolder: str, schema_file: str
     return valid
 
 
-def validate_json_file(json_file: str, schema_subfolder: str, schema_file: str) -> bool:
+def validate_json_file(json_file: str, schema_subfolder: list[str] | str, schema_file: list[str] | str) -> bool:
     config = DepositConfig.load()
     check_runner: CheckRunnerProtocol = CheckRunner(
         LocalSchemaProvider(config.local_schema_cache_dir)
         if config.fetch_local_schema
         else RemoteSchemaProvider(config.schema_base_url, config.schema_cache_dir)
     )
-    report = check_runner.validate_json_file(json_file, schema_subfolder, schema_file)
     result = True
-    try:
-        for issue in report.issues:
-            print(issue.message)
-            result = False
-        assert report.ok, "Error - required files check failed"
-    except Exception as e:
-        print(e)
+    if isinstance(schema_subfolder, list) and isinstance(schema_file, list):
+        if not len(schema_subfolder) == len(schema_file):
+            print("error - folder and file list lengths differ")
+            return False
+        for folder,schema in zip(schema_subfolder, schema_file):
+            report = check_runner.validate_json_file(json_file, folder, schema)
+            try:
+                for issue in report.issues:
+                    print(issue.message)
+                    result = False
+                assert report.ok, "Error - required files check failed"
+            except Exception as e:
+                print(e)
+    elif isinstance(schema_subfolder, str) and isinstance(schema_file, str):
+        report = check_runner.validate_json_file(json_file, schema_subfolder, schema_file)
+        try:
+            for issue in report.issues:
+                print(issue.message)
+                result = False
+            assert report.ok, "Error - required files check failed"
+        except Exception as e:
+            print(e)
+    else:
+        print("error - folder and file must have same type")
+        return False
     return result
 
 
