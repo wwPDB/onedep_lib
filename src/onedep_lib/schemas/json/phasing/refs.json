@@ -19,7 +19,8 @@
             "MOLECULAR REPLACEMENT",
             "SAD",
             "SIR",
-            "SIRAS"
+            "SIRAS",
+            null
           ]
         }
       }
@@ -45,7 +46,8 @@
           "enum": [
             "experimental model",
             "in-silico model",
-            "integrative model"
+            "integrative model",
+            null
           ]
         },
         "source_name": {
@@ -59,11 +61,12 @@
             "PDB-DEV",
             "Robetta",
             "Rosetta-Fold",
-            "Swiss Model"
+            "Swiss Model",
+            null
           ]
         },
         "accession_code": {
-          "type": "string"
+          "type": ["string", "null"]
         },
         "entity_id_list": {
           "type": ["string", "null"]
