@@ -102,12 +102,14 @@ def validate_mmcif_file(mmcif_file: str, schema_subfolder: list[str] | str, sche
         with tempfile.NamedTemporaryFile(suffix='.json', delete=True, mode='w+', encoding='utf-8') as tmp:
             infile = mmcif_file
             outfile = tmp.name
-            result = getSchemaReadableJson(infile, outfile)
-            # result = cif2json(mmcif_file, tmp.name, skip_coords=True)
+            # result = getSchemaReadableJson(infile, outfile)
+            result,results = cif2json(mmcif_file, tmp.name, skip_coords=True)
             if not result:
                 print("error converting cif to json")
                 return False
-            valid = validate_json_file(tmp.name, schema_subfolder, schema_file)
+            print("temporary json files: ", results)
+            for resultfile in results:
+                valid = validate_json_file(resultfile, schema_subfolder, schema_file)
     except Exception as exc:
         print("unknown exception: ", str(exc))
         valid = False

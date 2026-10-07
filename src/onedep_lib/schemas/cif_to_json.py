@@ -267,11 +267,11 @@ def converter(infile:str, outfile:str, unit_cardinality:bool, skip_coords:bool=F
     return pklfiles
 
 
-def cif2json(infile:str, outfile:str, skip_coords:bool=False, unit_cardinality:bool=False, dictionary:bool=False) -> bool:
+def cif2json(infile:str, outfile:str, skip_coords:bool=False, unit_cardinality:bool=False, dictionary:bool=False) -> tuple[bool, list[str]]:
 
     if not os.path.exists(infile):
         print("error - file %s does not exist" % infile)
-        return False
+        return False, []
 
     # find name for data block
     inlabel = os.path.splitext(os.path.basename(infile).upper())[0]
@@ -282,7 +282,7 @@ def cif2json(infile:str, outfile:str, skip_coords:bool=False, unit_cardinality:b
     # write result to pickle file
     if (pklfiles := converter(infile, outfile, unit_cardinality, skip_coords)) == []:
         print("error - conversion failed")
-        return False
+        return False, []
 
     # read dictionary from pickle file
     for resultfile in pklfiles:
@@ -301,4 +301,4 @@ def cif2json(infile:str, outfile:str, skip_coords:bool=False, unit_cardinality:b
         print("wrote final result to %s" % resultfile)
 
     print("conversion complete")
-    return True
+    return True, pklfiles
