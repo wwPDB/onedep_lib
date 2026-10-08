@@ -103,12 +103,13 @@ def skip_category(category_name:str) -> bool:
         return True
     return False
 
-def converter(infile:str, outfile:str, unit_cardinality:bool, skip_coords:bool=False) -> list:
+def converter(infile:str, outfile:str, unit_cardinality:bool, skip_coords:bool=False, multiblock:bool=False) -> list:
     """convert cif to python dictionary
     args:
         infile (str): cif file path
         outfile (str): output temporary pickle file path
         skip_coords (bool): do not convert coordinates to json
+        multiblock (bool): expect multiple blocks and output one json file per block
     returns:
         list: list of temporary pickle file paths
     raises:
@@ -127,18 +128,22 @@ def converter(infile:str, outfile:str, unit_cardinality:bool, skip_coords:bool=F
     try:
         while True:
             line = next(gen)
-            if line == "":
-                # blank line outside a multiline value: ignore
+            if line.strip() == "":
+                # blank line within or outside a multiline value: ignore
                 continue
             if line.startswith("data_"):
                 datablocks += 1
                 if datablocks > 1:
                     print("datablock %d" % (datablocks - 1))
-                    outfilepath = format_outfile_path(outfile, datablocks)
+                    outfilepath = outfile
+                    if multiblock:
+                        outfilepath = format_outfile_path(outfile, datablocks)
                     with open(outfilepath, "wb") as w:
                         pickle.dump(template, w)
                     pklfiles.append(outfilepath)
                     print("wrote temporary result to %s" % outfilepath)
+                    if not multiblock:
+                        break
                     template = OrderedDict()
                 continue
             elif line.startswith("#"):
@@ -245,6 +250,9 @@ def converter(infile:str, outfile:str, unit_cardinality:bool, skip_coords:bool=F
                 raise ValueError("error - unrecognized line %s" % line)
     except StopIteration:
         if datablocks > 1:
+            if not multiblock:
+                raise ValueError("error - multiblock should not be true when reaching this line")
+                sys.exit()
             datablocks += 1
             print("datablock %d" % (datablocks - 1))
             outfilepath = format_outfile_path(outfile, datablocks)
@@ -267,7 +275,7 @@ def converter(infile:str, outfile:str, unit_cardinality:bool, skip_coords:bool=F
     return pklfiles
 
 
-def cif2json(infile:str, outfile:str, skip_coords:bool=False, unit_cardinality:bool=False, dictionary:bool=False) -> tuple[bool, list[str]]:
+def cif2json(infile:str, outfile:str, skip_coords:bool=False, unit_cardinality:bool=False, dictionary:bool=False, multiblock:bool=False) -> tuple[bool, list[str]]:
 
     if not os.path.exists(infile):
         print("error - file %s does not exist" % infile)
@@ -280,7 +288,7 @@ def cif2json(infile:str, outfile:str, skip_coords:bool=False, unit_cardinality:b
 
     # convert cif file to python dictionary
     # write result to pickle file
-    if (pklfiles := converter(infile, outfile, unit_cardinality, skip_coords)) == []:
+    if (pklfiles := converter(infile, outfile, unit_cardinality, skip_coords, multiblock)) == []:
         print("error - conversion failed")
         return False, []
 

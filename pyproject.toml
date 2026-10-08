@@ -28,7 +28,8 @@ dependencies = [
   "jsonschema>=3.0.0",
   "pyjwt~=2.13",
   "tomli-w~=1.2",
-  "nextdep_dsp_schema>=0.0.8"
+  "gemmi>=0.7.5"
+#  "nextdep_dsp_schema>=0.0.8",
 ]
 requires-python = ">= 3.9"
 

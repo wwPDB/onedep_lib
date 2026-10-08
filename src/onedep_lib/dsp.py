@@ -8,8 +8,10 @@ from dataclasses import fields
 from datetime import datetime, timezone
 from pathlib import Path
 
-import nextdep_dsp_schema
-from nextdep_dsp_schema.dsp.SchemaReadableJson import getSchemaReadableJson, SchemaReadableJson
+from gemmi import cif
+
+# import nextdep_dsp_schema
+# from nextdep_dsp_schema.dsp.SchemaReadableJson import getSchemaReadableJson, SchemaReadableJson
 
 from onedep_lib.apis.deposit.client import HttpApiClient
 from onedep_lib.apis.deposit.models import DepositError, DepositStatus, Experiment
@@ -83,7 +85,7 @@ def _load_config_without_token_env(**overrides) -> DepositConfig:
             if value is missing:
                 os.environ.pop(name, None)
             else:
-                os.environ[name] = value
+                os.environ[name] = str(value)
 
 
 def _config_for_hostname(config: DepositConfig, hostname: str) -> DepositConfig:
@@ -103,13 +105,11 @@ def validate_mmcif_file(mmcif_file: str, schema_subfolder: list[str] | str, sche
             infile = mmcif_file
             outfile = tmp.name
             # result = getSchemaReadableJson(infile, outfile)
-            result,results = cif2json(mmcif_file, tmp.name, skip_coords=True)
+            result,results = cif2json(mmcif_file, outfile, skip_coords=True)
             if not result:
                 print("error converting cif to json")
                 return False
-            print("temporary json files: ", results)
-            for resultfile in results:
-                valid = validate_json_file(resultfile, schema_subfolder, schema_file)
+            valid = validate_json_file(outfile, schema_subfolder, schema_file)
     except Exception as exc:
         print("unknown exception: ", str(exc))
         valid = False
