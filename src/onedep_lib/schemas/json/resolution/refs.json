@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "resolution",
+  "description": "example resolution validation",
+  "type": "object",
+  "properties": {
+    "refine_ref": {
+      "type": "object",
+      "properties": {
+        "ls_d_res_low": {
+          "$anchor": "ls_d_res_low",
+          "type": "number",
+          "exclusiveMinimum": 0.0
+        },
+        "ls_d_res_high": {
+          "$anchor": "ls_d_res_high",
+          "type": "number",
+          "exclusiveMinimum": 0.0
+        }
+      },
+      "required": ["ls_d_res_low", "ls_d_res_high"]
+    },
+    "reflns_ref": {
+      "type": "object",
+      "properties": {
+        "d_resolution_low": {
+          "$anchor": "d_resolution_low",
+          "type": "number",
+          "exclusiveMinimum": 0.0
+        },
+        "d_resolution_high": {
+          "$anchor": "d_resolution_high",
+          "type": "number",
+          "exclusiveMinimum": 0.0
+        }
+      },
+      "required": ["d_resolution_low", "d_resolution_high"]
+    }
+  }
+}
