@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import os
+import pprint
 import tempfile
 import uuid
 from dataclasses import fields
@@ -98,22 +100,62 @@ def _config_for_hostname(config: DepositConfig, hostname: str) -> DepositConfig:
     return _load_config_without_token_env(**overrides)
 
 
-def validate_mmcif_file(mmcif_file: str, schema_subfolder: list[str] | str, schema_file: list[str] | str) -> bool:
+def validate_mmcif_file(mmcif_file: str, schema_subfolder: list[str] | str, schema_file: list[str] | str, unit_cardinality:bool=True) -> bool:
     valid = False
+    delete_file = True
     try:
-        with tempfile.NamedTemporaryFile(suffix='.json', delete=True, mode='w+', encoding='utf-8') as tmp:
+        with tempfile.NamedTemporaryFile(suffix='.json', delete=delete_file, mode='w+', encoding='utf-8') as tmp:
             infile = mmcif_file
             outfile = tmp.name
+            print("generated temp file %s" % outfile)
             # result = getSchemaReadableJson(infile, outfile)
-            result,results = cif2json(mmcif_file, outfile, skip_coords=True)
-            if not result:
-                print("error converting cif to json")
-                return False
+            # result,results = cif2json(infile, outfile, skip_coords=True, unit_cardinality=unit_cardinality)
+            # assert result, "error converting cif to json"
+            cif_doc = cif.read_file(infile)
+            json_str = cif_doc.as_json(mmjson=True)
+            schema_readable = mmjson_to_schema_readable(json_str, unit_cardinality)
+            with open(outfile, "w") as w:
+                json.dump(schema_readable, w)
             valid = validate_json_file(outfile, schema_subfolder, schema_file)
     except Exception as exc:
-        print("unknown exception: ", str(exc))
+        print("error converting cif to json: ", str(exc))
         valid = False
     return valid
+
+
+def mmjson_to_schema_readable(json_str:str, unit_cardinality:bool) -> dict:
+    input = json.loads(json_str)
+    output = {}
+    key = None
+    for k,v in input.items():
+        if k.startswith("data_"):
+            if key is None:
+                key = k
+            else:
+                raise ValueError("multiple data blocks")
+    input = input[key]
+    # convert from dict of lists to list of dicts
+    for k,v in input.items():
+        output[k] = [] # convert to dict later if unit cardinality
+        if not isinstance(v, dict):
+            raise ValueError("unrecognized value type (not dictionary)")
+        for key,val in v.items():
+            if not isinstance(val, list):
+                raise ValueError("unrecognized value type (not list)")
+            columns = len(val)
+            for index,item in enumerate(val):
+                if len(output[k]) < columns:
+                    output[k].append({})
+                output[k][index][key] = item
+        if unit_cardinality and len(output[k]) == 1:
+            output[k] = output[k][0]
+            assert isinstance(output[k], dict), "error converting to unit cardinality"
+    skip_categories = ["atom_site"]
+    for c in skip_categories:
+        if c in output:
+            output.pop(c)
+    assert "atom_site" not in output, "error removing atom site"
+    return output
 
 
 def validate_json_file(json_file: str, schema_subfolder: list[str] | str, schema_file: list[str] | str) -> bool:
