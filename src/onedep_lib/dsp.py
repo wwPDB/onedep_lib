@@ -98,7 +98,14 @@ def _config_for_hostname(config: DepositConfig, hostname: str) -> DepositConfig:
 
 
 def validate_mmcif_file(mmcif_file: str, schema_subfolder: list[str] | str, schema_file: list[str] | str, unit_cardinality:bool=True) -> bool:
-    valid = False
+    type_valid = False
+    cross_valid = False
+    try:
+        type_valid = dictionary_check(mmcif_file)
+        print(f"dictionary valid: {str(type_valid)}")
+    except Exception as exc:
+        print('error validating against dictionary')
+        type_valid = False
     delete_file = True
     try:
         with tempfile.NamedTemporaryFile(suffix='.json', delete=delete_file, mode='w+', encoding='utf-8') as tmp:
@@ -113,10 +120,12 @@ def validate_mmcif_file(mmcif_file: str, schema_subfolder: list[str] | str, sche
             schema_readable = mmjson_to_schema_readable(json_str, unit_cardinality)
             with open(outfile, "w") as w:
                 json.dump(schema_readable, w)
-            valid = validate_json_file(outfile, schema_subfolder, schema_file)
+            cross_valid = validate_json_file(outfile, schema_subfolder, schema_file)
+            print(f"crosscheck valid: {str(cross_valid)}")
     except Exception as exc:
-        print("error converting cif to json: ", str(exc))
-        valid = False
+        print("error converting cif to json or validating cross-checks: ", str(exc))
+        cross_valid = False
+    valid = type_valid and cross_valid
     return valid
 
 
@@ -153,6 +162,18 @@ def mmjson_to_schema_readable(json_str:str, unit_cardinality:bool) -> dict:
             output.pop(c)
     assert "atom_site" not in output, "error removing atom site"
     return output
+
+
+def dictionary_check(ciffile:str) -> bool:
+    config = DepositConfig.load()
+    schemafile = config.local_dictionary_file
+    dictionaryvalid,ciffilevalid = CheckRunner.dictionary_check(ciffile, str(schemafile))
+    if not dictionaryvalid:
+        print(f"error - dictionary not valid {schemafile}")
+    if not ciffilevalid:
+        print("error - cif file not valid according to dictionary check")
+    valid = dictionaryvalid and ciffilevalid
+    return valid
 
 
 def validate_json_file(json_file: str, schema_subfolder: list[str] | str, schema_file: list[str] | str) -> bool:

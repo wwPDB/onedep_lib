@@ -10,6 +10,7 @@ from jsonschema import validators
 from onedep_lib.config import DepositConfig
 from referencing import Registry, Resource
 from referencing.jsonschema import DRAFT202012
+from gemmi import cif
 
 from onedep_lib.checks.report import CheckIssue, CheckReport, CheckSeverity
 from onedep_lib.enums import EMSubType, ExperimentType, FileType
@@ -204,6 +205,34 @@ class CheckRunner:
                 for message in messages
             ],
         )
+
+
+    @classmethod
+    def dictionary_check(self, ciffile:str, schemafile:str) -> tuple[bool,bool]:
+        if not os.path.exists(ciffile):
+            raise FileNotFoundError(f"file {ciffile} not found")
+        if not os.path.exists(schemafile):
+            raise FileNotFoundError(f"file {schemafile} not found")
+        dictionaryvalid = False
+        ciffilevalid = False
+        try:
+            # Load dictionary
+            msg_list = []
+            ddl = cif.Ddl(logger=(lambda msg: msg_list.append(msg), 6), use_context=False, use_linked_groups=False)
+            ddl.read_ddl(cif.read(schemafile))
+            print("Read dictionary returned:", msg_list)
+            dictionaryvalid = len(msg_list) == 0
+            # Validate cif file
+            msg_list = []
+            ddl.use_deposition_checks = True  # Checks enumerations, etc
+            cif_doc = cif.read_file(ciffile)
+            ddl.validate_cif(cif_doc)
+            print("Dictionary validation returned:", msg_list)
+            ciffilevalid = len(msg_list) == 0
+        except Exception as exc:
+            print(str(exc))
+        return dictionaryvalid,ciffilevalid
+
 
     def check_mmcif_file(self, file: LocalFile) -> CheckReport:
         """Check that file is a structurally valid mmCIF file.

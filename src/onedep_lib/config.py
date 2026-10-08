@@ -83,6 +83,7 @@ class DepositConfig:
     redirect: bool = True
     allowed_redirect_domain: str = "wwpdb.org"
     fetch_local_schema: bool = True
+    local_dictionary_file: Path = Path(__file__).parent / "schemas" / "dictionary" / "mmcif_pdbx_v50.dic"
     local_schema_cache_dir: Path = field(default_factory=lambda: Path(__file__).parent / "schemas" / "json")
     required_files_subfolder: str = "required_files"
     required_files_schema: str = "required_files"
