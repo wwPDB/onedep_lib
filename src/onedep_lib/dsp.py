@@ -3,17 +3,12 @@ from __future__ import annotations
 import hashlib
 import json
 import os
-import pprint
 import tempfile
 import uuid
 from dataclasses import fields
 from datetime import datetime, timezone
 from pathlib import Path
-
 from gemmi import cif
-
-# import nextdep_dsp_schema
-# from nextdep_dsp_schema.dsp.SchemaReadableJson import getSchemaReadableJson, SchemaReadableJson
 
 from onedep_lib.apis.deposit.client import HttpApiClient
 from onedep_lib.apis.deposit.models import DepositError, DepositStatus, Experiment
@@ -29,7 +24,9 @@ from onedep_lib.schemas.remote import RemoteSchemaProvider
 from onedep_lib.session.json_store import JsonSessionStore
 from onedep_lib.session.models import LocalFile, LocalSession
 from onedep_lib.session.types import SessionStore
-from onedep_lib.schemas.cif_to_json import cif2json
+# from onedep_lib.schemas.cif_to_json import cif2json
+# import nextdep_dsp_schema
+# from nextdep_dsp_schema.dsp.SchemaReadableJson import getSchemaReadableJson, SchemaReadableJson
 
 
 def _md5_of_file(path: Path, chunk_size: int = 1 << 20) -> str:
@@ -176,7 +173,7 @@ def validate_json_file(json_file: str, schema_subfolder: list[str] | str, schema
                 for issue in report.issues:
                     print(issue.message)
                     result = False
-                assert report.ok, "Error - required files check failed"
+                assert report.ok, f"Error - validation on ({folder}, {schema}, {json_file}) failed"
             except Exception as e:
                 print(e)
     elif isinstance(schema_subfolder, str) and isinstance(schema_file, str):
@@ -185,7 +182,7 @@ def validate_json_file(json_file: str, schema_subfolder: list[str] | str, schema
             for issue in report.issues:
                 print(issue.message)
                 result = False
-            assert report.ok, "Error - required files check failed"
+            assert report.ok, f"Error - validation on ({schema_subfolder}, {schema_file}, {json_file}) failed"
         except Exception as e:
             print(e)
     else:
