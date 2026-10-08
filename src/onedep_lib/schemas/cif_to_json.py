@@ -310,3 +310,32 @@ def cif2json(infile:str, outfile:str, skip_coords:bool=False, unit_cardinality:b
 
     print("conversion complete")
     return True, pklfiles
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--infile", type=str, required=True)
+    parser.add_argument("--outfile", type=str, required=True)
+    parser.add_argument("--skip_coords", action="store_true", required=False)
+    parser.add_argument("--unit_cardinality", action="store_true", required=False)
+    parser.add_argument("--dictionary", action="store_true", required=False)
+    parser.add_argument("--multiblock", action="store_true", required=False)
+    args = parser.parse_args()
+    infile = args.infile
+    if not os.path.exists(infile):
+        sys.exit("error - infile not found")
+    outfile = args.outfile
+    skip_coords = False
+    if args.skip_coords:
+        skip_coords = True
+    unit_cardinality = False
+    if args.unit_cardinality:
+        unit_cardinality = True
+    dictionary = False
+    if args.dictionary:
+        dictionary = True
+    multiblock = False
+    if args.multiblock:
+        multiblock = True
+    result, resultfiles = cif2json(infile=infile,outfile=outfile,skip_coords=skip_coords,unit_cardinality=unit_cardinality,dictionary=dictionary,multiblock=multiblock)
+    if not result:
+        sys.exit("error - cif2json failed")
