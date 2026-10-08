@@ -138,7 +138,9 @@ def mmjson_to_schema_readable(json_str:str, unit_cardinality:bool) -> dict:
             if key is None:
                 key = k
             else:
-                raise ValueError("multiple data blocks")
+                print(f"warning - multiple data blocks: {k}")
+    if not key:
+        raise ValueError("no data block found")
     input = input[key]
     # convert from dict of lists to list of dicts
     for k,v in input.items():
