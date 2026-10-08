@@ -37,10 +37,12 @@ def _package_version() -> str:
 
 def _user_agent() -> str:
     """Track provenance of depositions with request headers."""
+    software_name = os.getenv("onedep_lib_refinement_software_name", default="?")
+    software_version = os.getenv("onedep_lib_refinement_software_version", default="?")
     return (
-        f"onedep_lib/{_package_version()} "
-        f"python-requests/{requests.__version__} "
-        f"(Python/{platform.python_version()}; {platform.system()}/{platform.release()})"
+        f"onedep_lib/{_package_version()}; "
+        f"Python/{platform.python_version()}; "
+        f"{software_name}/{software_version}"
     )
 
 

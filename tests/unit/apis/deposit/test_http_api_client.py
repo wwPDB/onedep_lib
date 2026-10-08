@@ -125,7 +125,7 @@ def test_user_agent_version_falls_back_when_package_metadata_is_missing(monkeypa
     monkeypatch.setattr(client_module, "version", _missing)
 
     assert client_module._package_version() == "unknown"
-    assert client_module._user_agent().startswith("onedep_lib/unknown ")
+    assert client_module._user_agent().startswith("onedep_lib/unknown; ")
 
 
 def test_get_status(httpserver: HTTPServer, client: HttpApiClient):
