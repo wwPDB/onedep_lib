@@ -1,6 +1,7 @@
 from jsonschema import ValidationError
 import logging
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 class Keywords:
     """storage for custom schema keyword definitions
@@ -29,42 +30,57 @@ class Keywords:
             ValidationError: if the data file is invalid according to the schema
         """
         if not isinstance(instance, dict):
+            logger.debug("skipping keyword validaiton - file content is not an object")
             return
 
         refine = instance.get("refine")
         reflns = instance.get("reflns")
 
-        if refine is None or reflns is None:
+        if refine is None:
+            logger.debug("skipping keyword validation - file is missing refine category")
+            return
+        elif reflns is None:
+            logger.debug("skipping keyword validation - file is missing reflns category")
             return
 
-        if not isinstance(refine, list) or not isinstance(reflns, list):
+        if isinstance(refine, dict) and isinstance(reflns, dict):
+
+            refine_high = float(refine.get("ls_d_res_high"))
+            reflns_high = float(reflns.get("d_resolution_high"))
+            logger.debug(f"testing {refine_high} >= {reflns_high}")
+            if refine_high is None or reflns_high is None:
+                raise ValidationError(f"error - wwpdb_resolution_comparator is missing a value at index {index}")
+            if refine_high < reflns_high:
+                raise ValidationError(
+                    f"Mismatch in wwpdb_resolution_comparator for refine {refine_high} reflns {reflns_high}"
+                )
+
+        elif not isinstance(refine, list) or not isinstance(reflns, list):
+            logger.debug("skipping keyword validation - refine or reflns data types not recognized or not consistent")
             return
 
-        if len(refine) != len(reflns):
+        elif len(refine) != len(reflns):
             raise ValidationError(
                 f"error, refine and reflns do not have the same length: {len(refine)} {len(reflns)}"
             )
 
-        for index in range(len(refine)):
-            item1 = refine[index]
-            item2 = reflns[index]
-
-            if not isinstance(item1, dict) or not isinstance(item2, dict):
-                raise ValidationError(f"Items at index {index} must be objects")
-
-            refine_high = float(item1.get("ls_d_res_high"))
-            reflns_high = float(item2.get("d_resolution_high"))
-            logger.debug(f"testing {refine_high} >= {reflns_high}")
-
-            if refine_high is None or reflns_high is None:
-                raise ValidationError(
-                    f"error - wwpdb_resolution_comparator is missing a value at index {index}"
-                )
-
-            if refine_high != reflns_high or refine_high < reflns_high:
-                raise ValidationError(
-                    f"Mismatch in wwpdb_resolution_comparator at index {index} for refine {refine_high} reflns {reflns_high}"
-                )
+        else:
+            for index in range(len(refine)):
+                item1 = refine[index]
+                item2 = reflns[index]
+                if not isinstance(item1, dict) or not isinstance(item2, dict):
+                    raise ValidationError(f"Items at index {index} must be objects")
+                refine_high = float(item1.get("ls_d_res_high"))
+                reflns_high = float(item2.get("d_resolution_high"))
+                logger.debug(f"testing {refine_high} >= {reflns_high}")
+                if refine_high is None or reflns_high is None:
+                    raise ValidationError(
+                        f"error - wwpdb_resolution_comparator is missing a value at index {index}"
+                    )
+                if refine_high < reflns_high:
+                    raise ValidationError(
+                        f"Mismatch in wwpdb_resolution_comparator at index {index} for refine {refine_high} reflns {reflns_high}"
+                    )
 
 if __name__ == "__main__":
     print(Keywords.registry())
