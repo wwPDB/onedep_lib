@@ -128,6 +128,10 @@ def deposit_init(
     session_id = str(uuid.uuid4())
     base_dir = _base_dir or config.session_dir
     store: SessionStore = JsonSessionStore(session_id, base_dir=base_dir)
+    # must set environment vars before invoking client
+    if refinement_software_name and refinement_software_version:
+        os.environ["onedep_lib_refinement_software_name"] = refinement_software_name
+        os.environ["onedep_lib_refinement_software_version"] = refinement_software_version
     api_client: ApiClient = _api_client or HttpApiClient(config, auth_provider=TokenStore(config))
     check_runner: CheckRunnerProtocol = _check_runner or CheckRunner(
         LocalSchemaProvider(config.local_schema_cache_dir)
@@ -147,9 +151,6 @@ def deposit_init(
         software_version=refinement_software_version
     )
     store.create_session(session)
-    if refinement_software_name and refinement_software_version:
-        os.environ["onedep_lib_refinement_software_name"] = refinement_software_name
-        os.environ["onedep_lib_refinement_software_version"] = refinement_software_version
     return Deposition(store=store, api_client=api_client, check_runner=check_runner)
 
 
@@ -178,10 +179,10 @@ def deposit_resume(
     base_dir = _base_dir or config.session_dir
     store: SessionStore = JsonSessionStore(session_id, base_dir=base_dir)
     session = store.get_session()  # raises KeyError if not found
+    client_config = _config_for_hostname(config, session.site_base_url) if session.site_base_url else config
     if session.software_name and session.software_version:
         os.environ["onedep_lib_refinement_software_name"] = session.software_name
         os.environ["onedep_lib_refinement_software_version"] = session.software_version
-    client_config = _config_for_hostname(config, session.site_base_url) if session.site_base_url else config
     api_client: ApiClient = _api_client or HttpApiClient(client_config, auth_provider=TokenStore(client_config))
     check_runner: CheckRunnerProtocol = _check_runner or CheckRunner(
         LocalSchemaProvider(config.local_schema_cache_dir)
