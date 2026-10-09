@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import os
+import typing
 import uuid
 from dataclasses import fields
 from datetime import datetime, timezone
@@ -102,6 +103,8 @@ def deposit_init(
     _base_dir: Path | None = None,
     _api_client: ApiClient | None = None,
     _check_runner: CheckRunnerProtocol | None = None,
+    refinement_software_name: str | None = None,
+    refinement_software_version: str | None = None
 ) -> Deposition:
     """Create a new local deposition session.
 
@@ -116,6 +119,8 @@ def deposit_init(
         _base_dir: Override session storage directory (for testing only).
         _api_client: Override API client (for testing only).
         _check_runner: Override check runner (for testing only).
+        refinement_software_name: Name of deposition software (e.g. CCP4).
+        refinement_software_version: Version of deposition software (e.g. 1.0.0).
 
     Returns:
         A Deposition object representing the local session.
@@ -123,7 +128,12 @@ def deposit_init(
     session_id = str(uuid.uuid4())
     base_dir = _base_dir or config.session_dir
     store: SessionStore = JsonSessionStore(session_id, base_dir=base_dir)
-    api_client: ApiClient = _api_client or HttpApiClient(config, auth_provider=TokenStore(config))
+    api_client: ApiClient = _api_client or HttpApiClient(
+        config,
+        auth_provider=TokenStore(config),
+        software_name=refinement_software_name,
+        software_version=refinement_software_version,
+    )
     check_runner: CheckRunnerProtocol = _check_runner or CheckRunner(
         LocalSchemaProvider(config.local_schema_cache_dir)
         if config.fetch_local_schema
@@ -138,6 +148,8 @@ def deposit_init(
         created_at=datetime.now(tz=timezone.utc),
         em_subtype=em_subtype,
         coordinates=coordinates,
+        software_name=refinement_software_name,
+        software_version=refinement_software_version
     )
     store.create_session(session)
     return Deposition(store=store, api_client=api_client, check_runner=check_runner)
@@ -169,7 +181,12 @@ def deposit_resume(
     store: SessionStore = JsonSessionStore(session_id, base_dir=base_dir)
     session = store.get_session()  # raises KeyError if not found
     client_config = _config_for_hostname(config, session.site_base_url) if session.site_base_url else config
-    api_client: ApiClient = _api_client or HttpApiClient(client_config, auth_provider=TokenStore(client_config))
+    api_client: ApiClient = _api_client or HttpApiClient(
+        client_config,
+        auth_provider=TokenStore(client_config),
+        software_name=session.software_name,
+        software_version=session.software_version,
+    )
     check_runner: CheckRunnerProtocol = _check_runner or CheckRunner(
         LocalSchemaProvider(config.local_schema_cache_dir)
         if config.fetch_local_schema

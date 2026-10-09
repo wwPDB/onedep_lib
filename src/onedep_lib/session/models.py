@@ -30,3 +30,5 @@ class LocalSession:
     site_base_url: str | None = None
     em_subtype: EMSubType | None = None
     coordinates: bool | None = None
+    software_name: str | None = None
+    software_version: str | None = None

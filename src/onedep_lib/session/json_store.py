@@ -61,6 +61,8 @@ class JsonSessionStore:
             "site_url": session.site_url,
             "em_subtype": session.em_subtype.value if session.em_subtype else None,
             "coordinates": session.coordinates,
+            "software_name": session.software_name,
+            "software_version": session.software_version,
         }
         self._save()
 
@@ -80,6 +82,8 @@ class JsonSessionStore:
             site_url=session.get("site_url"),
             em_subtype=EMSubType(session.get("em_subtype")) if session.get("em_subtype") else None,
             coordinates=session.get("coordinates"),
+            software_name=session.get("software_name"),
+            software_version=session.get("software_version"),
         )
 
     def update_experiment_type(self, experiment_type: ExperimentType) -> None:
