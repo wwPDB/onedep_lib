@@ -128,11 +128,12 @@ def deposit_init(
     session_id = str(uuid.uuid4())
     base_dir = _base_dir or config.session_dir
     store: SessionStore = JsonSessionStore(session_id, base_dir=base_dir)
-    # must set environment vars before invoking client
-    if refinement_software_name and refinement_software_version:
-        os.environ["onedep_lib_refinement_software_name"] = refinement_software_name
-        os.environ["onedep_lib_refinement_software_version"] = refinement_software_version
-    api_client: ApiClient = _api_client or HttpApiClient(config, auth_provider=TokenStore(config))
+    api_client: ApiClient = _api_client or HttpApiClient(
+        config,
+        auth_provider=TokenStore(config),
+        software_name=refinement_software_name,
+        software_version=refinement_software_version,
+    )
     check_runner: CheckRunnerProtocol = _check_runner or CheckRunner(
         LocalSchemaProvider(config.local_schema_cache_dir)
         if config.fetch_local_schema
@@ -180,10 +181,12 @@ def deposit_resume(
     store: SessionStore = JsonSessionStore(session_id, base_dir=base_dir)
     session = store.get_session()  # raises KeyError if not found
     client_config = _config_for_hostname(config, session.site_base_url) if session.site_base_url else config
-    if session.software_name and session.software_version:
-        os.environ["onedep_lib_refinement_software_name"] = session.software_name
-        os.environ["onedep_lib_refinement_software_version"] = session.software_version
-    api_client: ApiClient = _api_client or HttpApiClient(client_config, auth_provider=TokenStore(client_config))
+    api_client: ApiClient = _api_client or HttpApiClient(
+        client_config,
+        auth_provider=TokenStore(client_config),
+        software_name=session.software_name,
+        software_version=session.software_version,
+    )
     check_runner: CheckRunnerProtocol = _check_runner or CheckRunner(
         LocalSchemaProvider(config.local_schema_cache_dir)
         if config.fetch_local_schema

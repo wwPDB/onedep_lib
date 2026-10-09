@@ -35,18 +35,20 @@ def _package_version() -> str:
         return "unknown"
 
 
-def _user_agent() -> str:
-    """Track provenance of depositions with request headers."""
-    software_name = os.getenv("onedep_lib_refinement_software_name", default="?")
-    software_version = os.getenv("onedep_lib_refinement_software_version", default="?")
+def _user_agent(software_name: str | None = None, software_version: str | None = None) -> str:
+    """Track provenance of depositions with request headers.
+
+    Built per client rather than at import time so that values supplied after
+    the module is imported (e.g. via deposit_init) are picked up.
+    """
+    software_name = software_name or os.getenv("onedep_lib_refinement_software_name", default="?")
+    software_version = software_version or os.getenv("onedep_lib_refinement_software_version", default="?")
     return (
         f"onedep_lib/{_package_version()}; "
         f"Python/{platform.python_version()}; "
         f"{software_name}/{software_version}"
     )
 
-
-_USER_AGENT = _user_agent()
 
 
 def _normalize_site_base_url(url: str) -> str:
@@ -82,6 +84,8 @@ class HttpApiClient:
         auth_provider: AuthProvider | None = None,
         ver: str = "v1",
         logger: logging.Logger | None = None,
+        software_name: str | None = None,
+        software_version: str | None = None,
     ) -> None:
         self._config = config
         self._auth_provider = auth_provider
@@ -93,7 +97,7 @@ class HttpApiClient:
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
         self._session = requests.Session()
         self._session.verify = config.ssl_verify
-        self._session.headers["User-Agent"] = _USER_AGENT
+        self._session.headers["User-Agent"] = _user_agent(software_name, software_version)
 
     @property
     def site_base_url(self) -> str:

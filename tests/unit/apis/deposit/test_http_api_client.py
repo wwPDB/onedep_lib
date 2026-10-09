@@ -112,8 +112,13 @@ def test_user_agent_identifies_the_library(httpserver: HTTPServer, client: HttpA
 
     client.get_status("D_800001")
 
-    assert seen[0] == client_module._USER_AGENT
+    assert seen[0] == client_module._user_agent()
     assert seen[0].startswith("onedep_lib/")
+
+
+def test_user_agent_includes_refinement_software(api_config):
+    client = HttpApiClient(api_config, software_name="CCP4", software_version="1.0.0")
+    assert client._session.headers["User-Agent"].endswith("; CCP4/1.0.0")
 
 
 def test_user_agent_version_falls_back_when_package_metadata_is_missing(monkeypatch):

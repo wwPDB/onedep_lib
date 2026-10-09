@@ -137,7 +137,7 @@ refresh_token = "pdbe-refresh"
     captured = {}
 
     class CapturingClient:
-        def __init__(self, config, auth_provider):
+        def __init__(self, config, auth_provider, **kwargs):
             captured["hostname"] = config.hostname
             captured["access_token"] = config.access_token
             captured["auth_provider"] = auth_provider
@@ -244,7 +244,7 @@ def test_add_nonexistent_file_raises(dep):
 
 def test_check_auth_key_returns_bool(monkeypatch):
     class StubAuthClient:
-        def __init__(self, config, auth_provider):
+        def __init__(self, config, auth_provider, **kwargs):
             self.config = config
             self.auth_provider = auth_provider
 
