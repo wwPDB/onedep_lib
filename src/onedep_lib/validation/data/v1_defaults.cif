@@ -1,0 +1,25 @@
+data_v1_compatibility_defaults
+loop_
+_validator_rule_default_message.family
+_validator_rule_default_message.role
+_validator_rule_default_message.severity
+_validator_rule_default_message.template
+cross_reference default error "Cross-reference value '[{source_value}]' does not exist in '[{target_item}]'."
+make_mandatory default error 'No value present for this mandatory item.'
+one_of default error 'At least one related item must be provided.'
+dictionary_enum unmapped error "Value '[{source_value}]' is not compatible with '[{cross_item}]' because no dictionary cross-enumeration mapping is defined."
+dictionary_enum mismatch error "Value '[{source_value}]' is not compatible with '[{cross_item}]=[{cross_value}]'. Allowed values: [{allowed_values}]."
+
+loop_
+_validator_rule_format.id
+_validator_rule_format.pattern
+_validator_rule_format.normalization
+_validator_rule_format.match_mode
+pdb_id '^(pdb_0000)?[\w\d]{4}$' lower match
+emdb_id '^emd-\d+$' lower match
+deposition_id '^D_1\d{9}$' none match
+genbank_id '^([A-Za-z]{2}\d{6}\.\d|[A-Za-z]\d{5}\.\d)$' none match
+uniprot_id '^([OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2})(-\d+)?$' none match
+pdbdev_id '^pdbdev_[\d]{8}$' lower match
+alphafold_id '^((AF-)?([OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2})(-F[0-9])?)?$' none match
+modelarchive_id '^(ma-[\w\d]{5})?$' lower match

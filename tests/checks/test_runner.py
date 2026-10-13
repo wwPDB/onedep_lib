@@ -34,10 +34,12 @@ def _load_subschema(name: str) -> dict:
 
 @pytest.fixture
 def runner_with_files_schema() -> CheckRunner:
-    provider = StubSchemaProvider({
-        "required_files": _load_files_schema(),
-        **{name: _load_subschema(name) for name in CheckRunner.subschemas},
-    })
+    provider = StubSchemaProvider(
+        {
+            "required_files": _load_files_schema(),
+            **{name: _load_subschema(name) for name in CheckRunner.subschemas},
+        }
+    )
     return CheckRunner(schema_provider=provider)
 
 
@@ -111,23 +113,25 @@ def test_em_fails_without_subtype(runner_with_files_schema: CheckRunner):
     assert report.ok is False
 
 
-def test_check_mmcif_file_returns_info_when_no_schema(runner_no_schema: CheckRunner):
+def test_check_mmcif_file_reports_unconfigured_validation(runner_no_schema: CheckRunner):
     file = LocalFile("f1", "s1", "/tmp/model.cif", FileType.MMCIF_COORD)
     report = runner_no_schema.check_mmcif_file(file)
     assert report.ok is True
-    assert any(i.severity == CheckSeverity.INFO for i in report.issues)
+    assert any(i.severity == CheckSeverity.WARNING for i in report.issues)
 
 
-def test_check_mmcif_category_returns_info_when_no_schema(runner_no_schema: CheckRunner):
-    file = LocalFile("f1", "s1", "/tmp/model.cif", FileType.MMCIF_COORD)
+def test_check_mmcif_category_reports_unreadable_input(runner_no_schema: CheckRunner, tmp_path):
+    file = LocalFile("f1", "s1", str(tmp_path / "missing.cif"), FileType.MMCIF_COORD)
     report = runner_no_schema.check_mmcif_category(file, "_atom_site")
-    assert report.ok is True
+    assert report.ok is False
+    assert report.issues[0].code == "INPUT_IO_ERROR"
 
 
-def test_check_mmcif_field_returns_info_when_no_schema(runner_no_schema: CheckRunner):
-    file = LocalFile("f1", "s1", "/tmp/model.cif", FileType.MMCIF_COORD)
+def test_check_mmcif_field_reports_unreadable_input(runner_no_schema: CheckRunner, tmp_path):
+    file = LocalFile("f1", "s1", str(tmp_path / "missing.cif"), FileType.MMCIF_COORD)
     report = runner_no_schema.check_mmcif_field(file, "_atom_site", "Cartn_x")
-    assert report.ok is True
+    assert report.ok is False
+    assert report.issues[0].code == "INPUT_IO_ERROR"
 
 
 def test_check_file_type_returns_info_when_no_schema(runner_no_schema: CheckRunner):

@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import hashlib
+import logging
 import os
-import typing
 import uuid
 from dataclasses import fields
 from datetime import datetime, timezone
@@ -12,7 +12,7 @@ from onedep_lib.apis.deposit.client import HttpApiClient
 from onedep_lib.apis.deposit.models import DepositError, DepositStatus, Experiment
 from onedep_lib.apis.deposit.types import ApiClient
 from onedep_lib.auths.token import TokenStore
-from onedep_lib.checks.report import CheckReport
+from onedep_lib.checks.report import CheckIssue, CheckReport, CheckSeverity
 from onedep_lib.checks.runner import CheckRunner
 from onedep_lib.checks.types import CheckRunner as CheckRunnerProtocol
 from onedep_lib.config import DepositConfig
@@ -22,6 +22,10 @@ from onedep_lib.schemas.remote import RemoteSchemaProvider
 from onedep_lib.session.json_store import JsonSessionStore
 from onedep_lib.session.models import LocalFile, LocalSession
 from onedep_lib.session.types import SessionStore
+from onedep_lib.validation.adapter import MMCIF_TYPES, MmcifAdapter, ValidatorOverride, session_context
+from onedep_lib.validation.models import ValidationContext
+
+_LOG = logging.getLogger(__name__)
 
 
 def _md5_of_file(path: Path, chunk_size: int = 1 << 20) -> str:
@@ -104,7 +108,9 @@ def deposit_init(
     _api_client: ApiClient | None = None,
     _check_runner: CheckRunnerProtocol | None = None,
     refinement_software_name: str | None = None,
-    refinement_software_version: str | None = None
+    refinement_software_version: str | None = None,
+    *,
+    mmcif_validator: ValidatorOverride = None,
 ) -> Deposition:
     """Create a new local deposition session.
 
@@ -118,7 +124,9 @@ def deposit_init(
         coordinates: Whether coordinates are being deposited (can be set later).
         _base_dir: Override session storage directory (for testing only).
         _api_client: Override API client (for testing only).
-        _check_runner: Override check runner (for testing only).
+        _check_runner: Override required-file check runner (for testing only).
+        mmcif_validator: Prepared coordinate validator or mapping of file types to
+            prepared validators. Config prepares the remaining routes once.
         refinement_software_name: Name of deposition software (e.g. CCP4).
         refinement_software_version: Version of deposition software (e.g. 1.0.0).
 
@@ -149,10 +157,15 @@ def deposit_init(
         em_subtype=em_subtype,
         coordinates=coordinates,
         software_name=refinement_software_name,
-        software_version=refinement_software_version
+        software_version=refinement_software_version,
     )
     store.create_session(session)
-    return Deposition(store=store, api_client=api_client, check_runner=check_runner)
+    return Deposition(
+        store=store,
+        api_client=api_client,
+        check_runner=check_runner,
+        mmcif_adapter=MmcifAdapter(config, mmcif_validator),
+    )
 
 
 def deposit_resume(
@@ -161,6 +174,8 @@ def deposit_resume(
     _base_dir: Path | None = None,
     _api_client: ApiClient | None = None,
     _check_runner: CheckRunnerProtocol | None = None,
+    *,
+    mmcif_validator: ValidatorOverride = None,
 ) -> Deposition:
     """Resume an existing local deposition session.
 
@@ -169,7 +184,9 @@ def deposit_resume(
         config: Pre-built DepositConfig for the target deposition site.
         _base_dir: Override session storage directory (for testing only).
         _api_client: Override API client (for testing only).
-        _check_runner: Override check runner (for testing only).
+        _check_runner: Override required-file check runner (for testing only).
+        mmcif_validator: Prepared coordinate validator or mapping of file types to
+            prepared validators. Config prepares the remaining routes once.
 
     Returns:
         A Deposition object for the existing session.
@@ -192,21 +209,35 @@ def deposit_resume(
         if config.fetch_local_schema
         else RemoteSchemaProvider(config.schema_base_url, config.schema_cache_dir)
     )
-    return Deposition(store=store, api_client=api_client, check_runner=check_runner)
+    return Deposition(
+        store=store,
+        api_client=api_client,
+        check_runner=check_runner,
+        mmcif_adapter=MmcifAdapter(config, mmcif_validator),
+    )
 
 
 class Deposition:
-    """Local deposition session. Created via deposit_init() or deposit_resume()."""
+    """Local deposition session, created via deposit_init() or deposit_resume().
+
+    metadata_report maps registered file IDs to their most recent full mmCIF
+    CheckReport. Explicit checks update individual entries. Submission replaces
+    the collection with fresh advisory checks and keeps returning the remote ID.
+    """
 
     def __init__(
         self,
         store: SessionStore,
         api_client: ApiClient,
         check_runner: CheckRunnerProtocol,
+        *,
+        mmcif_adapter: MmcifAdapter | None = None,
     ) -> None:
         self._store = store
         self._api_client = api_client
         self._check_runner = check_runner
+        self._mmcif_adapter = mmcif_adapter or MmcifAdapter()
+        self.metadata_report: dict[str, CheckReport] = {}
         self._session = store.get_session()
 
     @property
@@ -295,31 +326,85 @@ class Deposition:
         files = self._store.get_all_files()
         return self._check_runner.check_required_files(files, self._session.experiment_type, self._session.em_subtype)
 
-    def check_mmcif_file(self, file_id: str) -> CheckReport:
-        """Check that the file identified by file_id is a valid mmCIF."""
+    def check_mmcif_file(self, file_id: str, *, context: ValidationContext | None = None) -> CheckReport:
+        """Return and retain a full mmCIF report using the file-type rule profile.
+
+        Findings do not prevent submission. Context overrides session selectors;
+        unavailable resources and partial coverage are explicit in the report.
+        """
         file = self._store.get_file(file_id)
-        return self._check_runner.check_mmcif_file(file)
+        explicit_context = context
+        defaults = session_context(self._session.experiment_type, self._session.em_subtype)
+        if context is not None:
+            context = ValidationContext(
+                context.experiment_modes if context.experiment_modes is not None else defaults.experiment_modes,
+                context.entry_subtypes if context.entry_subtypes is not None else defaults.entry_subtypes,
+                context.requested_codes,
+                context.block_overrides,
+            )
+        report = self._mmcif_adapter.check_file(file, context=context or defaults)
+        if report.validation is not None:
+            from dataclasses import replace
+
+            origins = {}
+            selected_names = dict(zip(report.validation.resolved_context, report.validation.selected_blocks))
+            for index, provenance in report.validation.resolved_context.items():
+                fields = dict(provenance)
+                override = explicit_context.block_overrides.get(selected_names[index]) if explicit_context else None
+                for name, label in (
+                    ("experiment_modes", "experiment_origin"),
+                    ("entry_subtypes", "subtype_origin"),
+                    ("requested_codes", "code_origin"),
+                ):
+                    if override is not None and getattr(override, name) is not None:
+                        fields[label] = "explicit_block"
+                    elif explicit_context is not None and getattr(explicit_context, name) is not None:
+                        fields[label] = "explicit"
+                    elif getattr(defaults, name) is not None:
+                        fields[label] = "session"
+                origins[index] = fields
+            report.validation = replace(report.validation, resolved_context=origins)
+        self.metadata_report[file_id] = report
+        return report
 
     def check_mmcif_category(self, file_id: str, category: str) -> CheckReport:
         """Check that the mmCIF file contains the given category."""
         file = self._store.get_file(file_id)
-        return self._check_runner.check_mmcif_category(file, category)
+        return self._mmcif_adapter.presence(file, category)
 
     def check_mmcif_field(self, file_id: str, category: str, field: str) -> CheckReport:
         """Check that the mmCIF file contains the given field in the given category."""
         file = self._store.get_file(file_id)
-        return self._check_runner.check_mmcif_field(file, category, field)
+        return self._mmcif_adapter.presence(file, category, field)
 
     def check_file_type(self, file_id: str, file_type: FileType) -> CheckReport:
         """Check that the file matches the expected FileType."""
         file = self._store.get_file(file_id)
-        return self._check_runner.check_file_type(file, file_type)
+        checker = getattr(self._check_runner, "check_file_type", None)
+        if callable(checker):
+            return checker(file, file_type)
+        issues = (
+            []
+            if file.file_type == file_type
+            else [
+                CheckIssue(
+                    CheckSeverity.ERROR,
+                    "FILE_TYPE_MISMATCH",
+                    "Registered file type does not match",
+                    expected=file_type.value,
+                    actual=file.file_type.value,
+                )
+            ]
+        )
+        return CheckReport(file.file_id, issues)
 
     def deposit(self) -> str:
         """Submit this deposition to the OneDep API.
 
         Creates a remote deposition, uploads all registered files, and triggers
-        processing. Returns immediately without waiting for processing to finish.
+        processing. Runs advisory mmCIF checks first and exposes their reports
+        in metadata_report; validation findings do not prevent submission.
+        Returns immediately without waiting for remote processing to finish.
 
         Returns:
             The remote deposition ID (e.g. "D_8000000001").
@@ -332,6 +417,17 @@ class Deposition:
             raise ValueError(
                 "experiment_type must be set before calling deposit(). "
                 "Use set_experiment_type() or pass experiment_type to deposit_init()."
+            )
+        self.metadata_report = {}
+        for file in self._store.get_all_files():
+            if file.file_type in MMCIF_TYPES:
+                self.check_mmcif_file(file.file_id)
+        issue_count = sum(len(report.issues) for report in self.metadata_report.values())
+        if issue_count:
+            _LOG.warning(
+                "mmCIF validation reported %d issues across %d files; see metadata_report",
+                issue_count,
+                len(self.metadata_report),
             )
         if self._session.remote_dep_id is None:
             experiment = Experiment(

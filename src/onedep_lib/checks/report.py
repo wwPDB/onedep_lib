@@ -1,8 +1,15 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+import json
+import math
+from collections.abc import Mapping
+from dataclasses import dataclass, field, fields, is_dataclass
 from enum import Enum
-from typing import Any
+from types import MappingProxyType
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from onedep_lib.validation.models import ValidationMetadata
 
 
 class CheckSeverity(str, Enum):
@@ -28,6 +35,9 @@ class CifLocation:
     row: int | None = None
     line: int | None = None
     column: int | None = None
+    block_index: int | None = None
+    table_index: int | None = None
+    loop_column: int | None = None
 
 
 @dataclass(frozen=True)
@@ -43,8 +53,14 @@ class CheckIssue:
     location: CifLocation = field(default_factory=CifLocation)
     expected: Any = None
     actual: Any = None
+    check_type: str | None = None
+    rule_id: str | None = None
+    related_locations: tuple[CifLocation, ...] = ()
+    context: Mapping[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
+        object.__setattr__(self, "context", freeze(self.context))
+        object.__setattr__(self, "related_locations", tuple(self.related_locations))
         if not isinstance(self.severity, CheckSeverity):
             object.__setattr__(self, "severity", CheckSeverity(self.severity))
 
@@ -61,6 +77,15 @@ class CheckReport:
 
     source: str
     issues: list[CheckIssue] = field(default_factory=list)
+    validation: ValidationMetadata | None = None
+
+    def to_dict(self) -> dict[str, Any]:
+        """Return a stable JSON-safe representation; unsupported values raise TypeError."""
+        return json_value(self)
+
+    def to_json(self, *, indent: int | None = None) -> str:
+        """Serialize the report without permitting nonfinite numbers or arbitrary reprs."""
+        return json.dumps(self.to_dict(), ensure_ascii=False, allow_nan=False, indent=indent)
 
     @property
     def ok(self) -> bool:
@@ -74,3 +99,33 @@ class CheckReport:
     def warnings(self) -> list[CheckIssue]:
         """Return only the issues with WARNING severity."""
         return [i for i in self.issues if i.severity == CheckSeverity.WARNING]
+
+
+def freeze(value: Any) -> Any:
+    """Defensively freeze nested validation context without altering old report fields."""
+    if isinstance(value, Mapping):
+        return MappingProxyType({k: freeze(v) for k, v in value.items()})
+    if isinstance(value, (tuple, list)):
+        return tuple(freeze(v) for v in value)
+    return value
+
+
+def json_value(value: Any) -> Any:
+    """Convert explicitly supported report values, never arbitrary object reprs."""
+    if isinstance(value, Enum):
+        return json_value(value.value)
+    if value is None or isinstance(value, (str, bool, int)):
+        return value
+    if isinstance(value, float):
+        if not math.isfinite(value):
+            raise TypeError("Nonfinite numbers are not JSON report values")
+        return value
+    if is_dataclass(value) and not isinstance(value, type):
+        return {f.name: json_value(getattr(value, f.name)) for f in fields(value)}
+    if isinstance(value, Mapping):
+        if not all(isinstance(k, str) for k in value):
+            raise TypeError("JSON report mapping keys must be strings")
+        return {k: json_value(v) for k, v in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [json_value(v) for v in value]
+    raise TypeError(f"Unsupported JSON report value of type {type(value).__name__}")

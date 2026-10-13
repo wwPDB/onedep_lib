@@ -69,6 +69,10 @@ class DepositConfig:
         schema_cache_dir: Local directory used to cache remote JSON schemas.
         session_dir: Local directory used to store deposition session state.
         config_path: Path to the TOML config file read and written by this class.
+        mmcif_dictionary_paths: Local PDBx/DDL2 dictionary paths; relative paths
+            resolve against the config-file directory. Empty means unconfigured validation.
+        mmcif_rule_paths: Cross-check CIF paths keyed by co-cif, md-cif or xs-cif.
+            Coordinates default to packaged rules; other unmapped types have dictionary checks only.
     """
 
     access_token: str | None = None
@@ -83,6 +87,31 @@ class DepositConfig:
     schema_cache_dir: Path = field(default_factory=lambda: Path.home() / ".onedep" / "schemas")
     session_dir: Path = field(default_factory=lambda: Path.home() / ".onedep" / "sessions")
     config_path: Path = field(default_factory=lambda: Path.home() / ".config" / "onedep" / "config.toml")
+
+    mmcif_dictionary_paths: tuple[Path, ...] = ()
+    mmcif_rule_paths: dict[str, Path] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        if isinstance(self.mmcif_dictionary_paths, (str, bytes, Path)):
+            raise ConfigError("mmcif_dictionary_paths must be a collection of local paths")
+        self.config_path = Path(self.config_path)
+        base = self.config_path.expanduser().resolve().parent
+
+        def local_path(value) -> Path:
+            if not isinstance(value, (str, Path)) or not str(value):
+                raise ConfigError("mmCIF resource paths must be nonempty local paths")
+            path = Path(value).expanduser()
+            return path.resolve() if path.is_absolute() else (base / path).resolve()
+
+        try:
+            self.mmcif_dictionary_paths = tuple(local_path(p) for p in self.mmcif_dictionary_paths)
+        except TypeError as exc:
+            raise ConfigError("mmcif_dictionary_paths must be a collection of local paths") from exc
+        if not isinstance(self.mmcif_rule_paths, dict) or any(
+            k not in ("co-cif", "md-cif", "xs-cif") for k in self.mmcif_rule_paths
+        ):
+            raise ConfigError("mmcif_rule_paths must map registered mmCIF file-type values to paths")
+        self.mmcif_rule_paths = {k: local_path(v) for k, v in self.mmcif_rule_paths.items()}
 
     @staticmethod
     def _load_toml_file(path: Path) -> dict:

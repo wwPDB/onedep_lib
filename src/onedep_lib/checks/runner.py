@@ -9,13 +9,15 @@ from onedep_lib.enums import EMSubType, ExperimentType, FileType
 from onedep_lib.exceptions import SchemaError
 from onedep_lib.schemas.types import SchemaProvider
 from onedep_lib.session.models import LocalFile
+from onedep_lib.validation.adapter import MmcifAdapter, ValidatorOverride
 
 
 class CheckRunner:
-    """Runs JSON-schema-based checks against deposition files and sessions.
+    """Runs required-file schema checks and delegates mmCIF checks to one adapter.
 
     Uses a SchemaProvider to fetch the JSON schemas checks are validated
-    against, either from a local bundled cache or a remote schema service
+    against. mmCIF checks use the shared validation engine. Schemas come
+    either from a local bundled cache or a remote schema service
     depending on how the provider was constructed.
     """
 
@@ -23,8 +25,9 @@ class CheckRunner:
     validator_specification = jsonschema.Draft202012Validator
     referencing_specification = DRAFT202012
 
-    def __init__(self, schema_provider: SchemaProvider) -> None:
+    def __init__(self, schema_provider: SchemaProvider, mmcif_validator: ValidatorOverride = None) -> None:
         self._schema_provider = schema_provider
+        self._mmcif_adapter = MmcifAdapter(override=mmcif_validator)
 
     def check_required_files(
         self,
@@ -125,7 +128,7 @@ class CheckRunner:
         Returns:
             A CheckReport with source=file.file_id.
         """
-        return self._schema_check(file, "mmcif_base")
+        return self._mmcif_adapter.check_file(file)
 
     def check_mmcif_category(self, file: LocalFile, category: str) -> CheckReport:
         """Check that file's mmCIF content contains the given category.
@@ -137,7 +140,7 @@ class CheckRunner:
         Returns:
             A CheckReport with source=file.file_id.
         """
-        return self._schema_check(file, f"mmcif_category_{category}")
+        return self._mmcif_adapter.presence(file, category)
 
     def check_mmcif_field(self, file: LocalFile, category: str, field: str) -> CheckReport:
         """Check that file's mmCIF content contains the given field in category.
@@ -150,7 +153,7 @@ class CheckRunner:
         Returns:
             A CheckReport with source=file.file_id.
         """
-        return self._schema_check(file, f"mmcif_field_{category}_{field}")
+        return self._mmcif_adapter.presence(file, category, field)
 
     def check_file_type(self, file: LocalFile, file_type: FileType) -> CheckReport:
         """Check that file matches the schema expected for file_type.

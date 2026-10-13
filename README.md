@@ -2,7 +2,7 @@
 
 ![PyPI version](https://img.shields.io/pypi/v/onedep_lib.svg)
 
-Prepares data to be deposited into OneDep system through the Deposition API. JSON schemas served remotelly will be used to check metadata in mmCIF files and also check if the local deposition/session has all required files for the chosen experiment type. Checks will be carried before deposition is created on the server and files are uploaded.
+Prepares data for OneDep through the Deposition API. Required-file checks use experiment-specific JSON schemas. Local mmCIF validation uses Gemmi, caller-supplied dictionaries, and configurable cross-check rule files. Validation is advisory: explicit checks return structured reports, and submission exposes automatic checks through `dep.metadata_report` without rejecting deposition because of validation findings.
 
 ## Installation
 

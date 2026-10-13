@@ -79,7 +79,7 @@ def main() -> None:
 
     with _console.status("[cyan]Initializing deposit…[/cyan]", spinner="dots") as spin:
         # ── 1. Initialization ────────────────────────────────────────────────
-        dep = dsp.deposit_init(email=EMAIL, users=USERS, country=dsp.Country.USA, config=config)
+        dep = dsp.deposit_init(email=EMAIL, users=USERS, country=dsp.Country.UK, config=config)
         ok(f"Deposit initialized  session_id={dep.session_id}")
 
         # ── 2. Set experiment type ────────────────────────────────────────────
