@@ -13,6 +13,7 @@ from urllib.parse import urlsplit, urlunsplit
 import requests
 import urllib3
 
+from onedep_lib._http_errors import error_arguments
 from onedep_lib.apis.deposit.models import (
     DepositedFile,
     DepositError,
@@ -43,12 +44,7 @@ def _user_agent(software_name: str | None = None, software_version: str | None =
     """
     software_name = software_name or os.getenv("onedep_lib_refinement_software_name", default="?")
     software_version = software_version or os.getenv("onedep_lib_refinement_software_version", default="?")
-    return (
-        f"onedep_lib/{_package_version()}; "
-        f"Python/{platform.python_version()}; "
-        f"{software_name}/{software_version}"
-    )
-
+    return f"onedep_lib/{_package_version()}; Python/{platform.python_version()}; {software_name}/{software_version}"
 
 
 def _normalize_site_base_url(url: str) -> str:
@@ -155,8 +151,8 @@ class HttpApiClient:
         if response.status_code == 204:
             return {}
         if not (200 <= response.status_code <= 299):
-            self._logger.error("status=%s reason=%s", response.status_code, response.reason)
-            raise ApiError(response.reason, response.status_code)
+            self._logger.error("status=%s", response.status_code)
+            raise ApiError(status_code=response.status_code, **error_arguments(response, response.reason))
         try:
             return response.json()
         except (ValueError, JSONDecodeError) as e:

@@ -8,6 +8,20 @@ class OneDepError(Exception):
 class AuthError(OneDepError):
     """OIDC flow failure or token expired/invalid."""
 
+    def __init__(
+        self,
+        *args: object,
+        code: str | None = None,
+        extras: dict | list | None = None,
+        details: dict | list | None = None,
+        request_id: str | None = None,
+    ) -> None:
+        super().__init__(*args)
+        self.code = code
+        self.extras = extras
+        self.details = details
+        self.request_id = request_id
+
 
 class ApiError(OneDepError):
     """HTTP error from the OneDep API.
@@ -16,9 +30,22 @@ class ApiError(OneDepError):
     response was received at all -- see ApiUnreachableError.
     """
 
-    def __init__(self, message: str, status_code: int | None) -> None:
+    def __init__(
+        self,
+        message: str,
+        status_code: int | None,
+        *,
+        code: str | None = None,
+        extras: dict | list | None = None,
+        details: dict | list | None = None,
+        request_id: str | None = None,
+    ) -> None:
         super().__init__(message)
         self.status_code = status_code
+        self.code = code
+        self.extras = extras
+        self.details = details
+        self.request_id = request_id
 
 
 class ApiUnreachableError(ApiError):

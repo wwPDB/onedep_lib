@@ -52,6 +52,8 @@ This page documents the public API of `onedep_lib` — the names exported from `
 
 ::: onedep_lib.exceptions.ApiError
 
+::: onedep_lib.exceptions.AuthError
+
 ::: onedep_lib.exceptions.ApiUnreachableError
 
 ::: onedep_lib.exceptions.DepositApiException

@@ -6,6 +6,7 @@ from urllib.parse import urljoin
 import jwt as pyjwt
 import requests
 
+from onedep_lib._http_errors import error_arguments
 from onedep_lib.config import DepositConfig, _hostname_to_fqdn_key
 from onedep_lib.exceptions import ApiError, ApiUnreachableError, AuthError, ConfigError
 
@@ -157,9 +158,16 @@ class TokenStore:
             raise ApiUnreachableError(f"Token revoke failed: {exc}") from exc
 
         if response.status_code in (401, 403):
-            raise AuthError("Token revoke was rejected; credentials are expired, revoked, or invalid.")
+            arguments = error_arguments(
+                response, "Token revoke was rejected; credentials are expired, revoked, or invalid."
+            )
+            message = arguments.pop("message")
+            raise AuthError(message, **arguments)
         if response.status_code != 204:
-            raise ApiError(f"Token revoke failed with status {response.status_code}", response.status_code)
+            raise ApiError(
+                status_code=response.status_code,
+                **error_arguments(response, f"Token revoke failed with status {response.status_code}"),
+            )
         self.clear_tokens()
 
     def clear_tokens(self) -> None:
@@ -226,10 +234,20 @@ class TokenStore:
             raise ApiUnreachableError(f"Token {operation} failed: {exc}") from exc
 
         if response.status_code in (401, 403):
-            raise AuthError("Refresh token is expired, revoked, or invalid; generate and paste a new token pair.")
+            arguments = error_arguments(
+                response, "Refresh token is expired, revoked, or invalid; generate and paste a new token pair."
+            )
+            message = arguments.pop("message")
+            raise AuthError(message, **arguments)
 
         try:
             response.raise_for_status()
+        except requests.HTTPError as exc:
+            raise ApiError(
+                status_code=response.status_code,
+                **error_arguments(response, f"Token {operation} failed: {exc}"),
+            ) from exc
+        try:
             body = response.json()
         except Exception as exc:
             raise ApiError(f"Token {operation} failed: {exc}", response.status_code) from exc

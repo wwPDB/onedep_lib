@@ -19,6 +19,55 @@ def _make_jwt(exp_offset: int = 3600) -> str:
     return f"{header}.{body}."
 
 
+@pytest.mark.parametrize("operation", ["refresh", "exchange", "revoke"])
+@pytest.mark.parametrize("status", [401, 403, 400, 500])
+@pytest.mark.parametrize("improved", [False, True])
+def test_token_http_errors_preserve_classes_storage_and_diagnostics(tmp_path, httpserver, operation, status, improved):
+    config_path = tmp_path / "config.toml"
+    config_path.write_text("[default]\n")
+    config = DepositConfig(hostname=httpserver.url_for("/deposition"), ssl_verify=False, config_path=config_path)
+    store = TokenStore(config)
+    token = _make_jwt()
+    store.store_tokens(token, "stored-refresh")
+    before = config_path.read_text()
+    endpoint = httpserver.expect_oneshot_request(f"/deposition/auth/tokens/{operation}", method="POST")
+    if improved:
+        endpoint.respond_with_json(
+            {
+                "message": "Authentication is temporarily unavailable.",
+                "code": "future_code",
+                "extras": {"keys": ["refresh_token"]},
+            },
+            status=status,
+            headers={"X-Request-ID": "support-id"},
+        )
+    else:
+        endpoint.respond_with_data("<html>private response</html>", status=status)
+    expected_class = AuthError if status in (401, 403) else ApiError
+    with pytest.raises(expected_class) as error:
+        if operation == "exchange":
+            store._request_exchange(config.hostname, "stored-refresh")
+        else:
+            getattr(store, operation)()
+    assert type(error.value) is expected_class
+    if expected_class is ApiError:
+        assert isinstance(error.value, ApiError)
+        assert error.value.status_code == status
+    if improved:
+        assert str(error.value) == "Authentication is temporarily unavailable."
+        assert error.value.code == "future_code"
+        assert error.value.extras == {"keys": ["refresh_token"]}
+        assert error.value.request_id == "support-id"
+    else:
+        assert "private response" not in str(error.value)
+        assert error.value.code is None
+        assert error.value.request_id is None
+    assert config.access_token == token
+    assert config.refresh_token == "stored-refresh"
+    assert config_path.read_text() == before
+    httpserver.check_assertions()
+
+
 @pytest.fixture
 def config_file(tmp_path: Path) -> Path:
     path = tmp_path / "config.toml"
@@ -109,11 +158,11 @@ def test_get_access_token_refreshes_when_only_refresh_token_is_loaded(tmp_path: 
     hostname = httpserver.url_for("/deposition").rstrip("/")
     config_file.write_text(
         "[default]\n"
-        f"hostname = \"{hostname}\"\n"
+        f'hostname = "{hostname}"\n'
         "ssl_verify = false\n"
         "\n"
         "[auths.localhost]\n"
-        "refresh_token = \"bootstrap-refresh\"\n"
+        'refresh_token = "bootstrap-refresh"\n'
     )
     fresh = _make_jwt(3600)
     config = DepositConfig.load(config_path=config_file)
@@ -277,7 +326,7 @@ def test_unwritable_config_is_not_an_auth_failure(tmp_path: Path, httpserver):
 
 def test_malformed_auths_entry_is_a_config_error(tmp_path: Path):
     config_file = tmp_path / "config.toml"
-    config_file.write_text('[default]\n\n[auths.example_org]\nrefresh_token = 42\n')
+    config_file.write_text("[default]\n\n[auths.example_org]\nrefresh_token = 42\n")
     with pytest.raises(ConfigError, match="Malformed token data"):
         TokenStore(config=DepositConfig(hostname="https://example.org", config_path=config_file))
 
