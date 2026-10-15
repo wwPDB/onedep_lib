@@ -48,6 +48,19 @@ def test_api_error_stores_status_code():
     assert str(err) == "Not found"
 
 
+@pytest.mark.parametrize("error", [ApiError("failure", 400), AuthError("failure"), ApiUnreachableError()])
+def test_error_diagnostics_default_to_none(error):
+    assert error.code is None
+    assert error.extras is None
+    assert error.details is None
+    assert error.request_id is None
+
+
+def test_auth_error_preserves_exception_constructor_arguments():
+    assert AuthError().args == ()
+    assert AuthError("first", "second").args == ("first", "second")
+
+
 def test_deposit_api_exception_is_alias_for_api_error():
     assert DepositApiException is ApiError
     err = DepositApiException("Unauthorized", 401)

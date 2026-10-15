@@ -8,7 +8,7 @@ from werkzeug.wrappers import Response
 
 from onedep_lib.apis.deposit import client as client_module
 from onedep_lib.apis.deposit.client import HttpApiClient
-from onedep_lib.apis.deposit.models import DepositedFile, DepositStatus, Experiment, WwPDBDeposition
+from onedep_lib.apis.deposit.models import DepositedFile, DepositError, DepositStatus, Experiment, WwPDBDeposition
 from onedep_lib.config import DepositConfig
 from onedep_lib.enums import Country, ExperimentType, FileType
 from onedep_lib.exceptions import ApiError, ApiUnreachableError
@@ -55,6 +55,84 @@ _STATUS_RESPONSE = {
     "details": "deposited",
     "date": "2024-01-01T00:00:00",
 }
+
+
+@pytest.mark.parametrize(
+    ("body", "expected"),
+    [
+        ({"message": "Incorrect authentication credentials."}, "Incorrect authentication credentials."),
+        (
+            {"message": "Your access token has expired. Refresh it and retry."},
+            "Your access token has expired. Refresh it and retry.",
+        ),
+        ({"error": "Invalid parameters", "details": {"email": ["Invalid email."]}}, "Invalid parameters"),
+        ({"message": [], "error": "Legacy explanation"}, "Legacy explanation"),
+        ({"message": "  "}, "Forbidden"),
+        ({"message": {"private": "submitted value"}, "error": 12}, "Forbidden"),
+        ([], "Forbidden"),
+        (None, "Forbidden"),
+        ("private text", "Forbidden"),
+    ],
+)
+def test_http_error_messages(httpserver, client, body, expected):
+    httpserver.expect_oneshot_request("/api/v1/depositions/").respond_with_json(body, status=403)
+    with pytest.raises(ApiError) as error:
+        client.get_all_depositions()
+    assert type(error.value) is ApiError
+    if expected == "Forbidden":
+        assert str(error.value).lower() == "forbidden"
+    else:
+        assert str(error.value) == expected
+    assert error.value.status_code == 403
+    assert error.value.request_id is None
+    assert error.value.details == (body.get("details") if isinstance(body, dict) else None)
+    httpserver.check_assertions()
+
+
+@pytest.mark.parametrize("body", ["", "<html>private error</html>", "{bad json"])
+def test_non_json_http_error_retains_request_id(httpserver, client, body):
+    httpserver.expect_oneshot_request("/api/v1/depositions/").respond_with_data(
+        body, status=502, headers={"X-Request-ID": "support-id"}
+    )
+    with pytest.raises(ApiError) as error:
+        client.get_all_depositions()
+    assert str(error.value).lower() == "bad gateway"
+    assert error.value.request_id == "support-id"
+    assert error.value.code is None
+
+
+def test_http_error_diagnostics_are_separate_from_message(httpserver, client, caplog):
+    body = {
+        "code": "unknown_future_code",
+        "message": "Check the request payload.",
+        "extras": {"keys": ["email"]},
+        "details": {"email": ["private submitted value"]},
+    }
+    httpserver.expect_oneshot_request("/api/v1/depositions/").respond_with_json(
+        body, status=400, headers={"x-request-id": "support-id"}
+    )
+    with pytest.raises(ApiError) as error:
+        client.get_all_depositions()
+    assert str(error.value) == body["message"]
+    assert error.value.code == body["code"]
+    assert error.value.extras == body["extras"]
+    assert error.value.details == body["details"]
+    assert error.value.request_id == "support-id"
+    assert "private submitted value" not in caplog.text
+    assert body["message"] not in caplog.text
+
+
+@pytest.mark.parametrize("operation", ["status", "process"])
+def test_http_200_errors_remain_returned_models(httpserver, client, operation):
+    body = {"code": "processing", "message": "Processing has not finished.", "extras": {"keys": []}}
+    httpserver.expect_oneshot_request(
+        f"/api/v1/depositions/D_1/{operation}", method="GET" if operation == "status" else "POST"
+    ).respond_with_json(body, headers={"X-Request-ID": "support-id"})
+    result = client.get_status("D_1") if operation == "status" else client.process("D_1")
+    assert isinstance(result, DepositError)
+    assert result.code == body["code"]
+    assert result.message == body["message"]
+    assert result.extras == body["extras"]
 
 
 def test_client_derives_api_base_from_site_root(api_config):

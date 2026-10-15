@@ -173,3 +173,26 @@ dsp.list_sessions(base_dir=Path("/custom/session/dir"))
 ## Error handling
 
 All exceptions inherit from `onedep_lib.exceptions.OneDepError`. See the [API Reference](api.md#exceptions) for the full hierarchy, or [Authentication Flow](auth_flow.md) for auth-specific error handling.
+
+HTTP failures from the deposition API raise `ApiError`, with the original HTTP `status_code`.
+Token refresh, exchange, and revoke rejections with status 401 or 403 raise `AuthError`;
+other token HTTP failures raise `ApiError`. Transport failures raise `ApiUnreachableError`,
+whose `status_code` is `None`. A 403 can mean denied deposition access, so refreshing
+credentials is not a universal remedy. The client does not add retries based on error messages.
+
+For HTTP failures, the exception text uses a nonempty server `message`, or the legacy
+user endpoint's `error` string. If these are unavailable or malformed, the client uses
+its existing HTTP reason or operation-specific fallback. HTML and arbitrary response
+bodies are not displayed. Message wording can change; use status and public codes for
+control flow.
+
+`ApiError` and `AuthError` expose optional `code`, `extras`, `details`, and `request_id`
+attributes, defaulting to `None`. `extras` retains existing structured data, and `details`
+retains structured field errors from legacy user responses. `request_id` comes from the
+optional `X-Request-ID` response header and can be provided to support. Avoid logging
+structured diagnostics, which may contain submitted values.
+
+HTTP 200 deposition-state failures remain returned `DepositError` objects. Nested upload
+errors and warnings, successful responses, and wrong-site switching retain their existing
+behavior. Successful revocation still accepts an empty 204 response and clears stored tokens;
+a failed request leaves credentials in place.
