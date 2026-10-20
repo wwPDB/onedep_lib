@@ -177,6 +177,9 @@ API, authentication, schema and configuration exceptions inherit from `onedep_li
 
 ## Local mmCIF validation
 
+See the [validation guide](validation.md) for architecture, resource and object
+lifetimes, and standalone file-validation examples.
+
 Gemmi is installed as a normal dependency. Configure local dictionary paths to enable dictionary-backed validation; the library does not download dictionaries. Relative resource paths resolve against the directory containing `config_path`.
 
 ```toml
@@ -293,6 +296,9 @@ Reload with `MmCifValidator.load(...)` after changing a resource. Existing engin
 
 
 ### Comparing validation engines from the CLI
+
+Use `--profile` for per-rule cross-check timings and a slowest-first ranking; see
+[Time cross checks](validation.md#time-cross-checks) for CLI and Python examples.
 
 Run both implementations on the same input:
 

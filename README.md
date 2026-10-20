@@ -41,6 +41,9 @@ with dsp.deposit_init(
 
 Full documentation — configuration, authentication, the complete deposition workflow, and API reference — is at **https://wwPDB.github.io/onedep_lib/**.
 
+See the [mmCIF validation guide](docs/validation.md) for dictionary and cross-check
+architecture, resource reuse, and file-validation examples.
+
 * **Preview locally:** `just docs-serve` (serves at http://localhost:8000)
 * **Build:** `just docs-build`
 

@@ -20,13 +20,16 @@ def state(raw: str | None) -> str:
         return "unknown"
     if raw == ".":
         return "not_applicable"
-    if not gemmi.cif.as_string(raw).strip():
-        return "empty"
-    return "present"
+    return "present" if gemmi.cif.as_string(raw).strip() else "empty"
 
 
 def text(raw: str | None) -> str | None:
-    return gemmi.cif.as_string(raw) if raw is not None and state(raw) == "present" else None
+    # Inlined rather than built on state(): on hot per-cell paths over million-row
+    # tables, a second decode of the same raw token is a measurable cost.
+    if raw is None or raw == "?" or raw == ".":
+        return None
+    value = gemmi.cif.as_string(raw)
+    return value if value.strip() else None
 
 
 def key(raw: str | None) -> str | None:
@@ -34,29 +37,38 @@ def key(raw: str | None) -> str | None:
     return value.strip() if value is not None else None
 
 
+def parse_number(value: str, *, uncertainty: bool = True) -> float:
+    """Parse an already-decoded (`text()`-produced) CIF numeric token."""
+    if not _NUMBER.fullmatch(value) or ("(" in value and not uncertainty):
+        raise ValueError("Not a finite CIF number")
+    cleaned = re.sub(r"\([0-9]+\)", "", value)
+    parsed = float(cleaned)
+    if not math.isfinite(parsed):
+        raise ValueError("Not a finite CIF number")
+    return parsed
+
+
 def number(raw: str | None, *, uncertainty: bool = True) -> float | None:
     value = text(raw)
     if value is None:
         return None
-    value = value.strip()
-    if not _NUMBER.fullmatch(value) or ("(" in value and not uncertainty):
-        raise ValueError("Not a finite CIF number")
-    value = re.sub(r"\([0-9]+\)", "", value)
-    parsed = float(value)
-    if not math.isfinite(parsed):
-        raise ValueError("Not a finite CIF number")
-    return parsed
+    return parse_number(value.strip(), uncertainty=uncertainty)
+
+
+def parse_date(value: str) -> datetime:
+    """Parse an already-decoded (`text()`-produced) CIF date/time token."""
+    match = _DATE.fullmatch(value.strip())
+    if match is None:
+        raise ValueError("Not a supported CIF date")
+    y, m, d, h, minute = match.groups()
+    return datetime(int(y), int(m), int(d), int(h or 0), int(minute or 0))
 
 
 def date(raw: str | None) -> datetime | None:
     value = text(raw)
     if value is None:
         return None
-    match = _DATE.fullmatch(value.strip())
-    if match is None:
-        raise ValueError("Not a supported CIF date")
-    y, m, d, h, minute = match.groups()
-    return datetime(int(y), int(m), int(d), int(h or 0), int(minute or 0))
+    return parse_date(value)
 
 
 def render(template: str, **values: object) -> str:

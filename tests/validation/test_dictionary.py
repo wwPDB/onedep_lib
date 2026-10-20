@@ -227,7 +227,11 @@ save_
         gemmi.cif.read_string("data_invalid\n_child.a 1\n_child.b 2\n_parent.a 1\n_parent.b 3\n"),
         source="invalid",
     )
-    assert any(i.code == "DICTIONARY_FOREIGN_KEY" and i.context.get("supplement") for i in invalid.issues)
+    # Every tag here is spelled in its canonical (lowercase) case, so Gemmi's own linked-group
+    # checker is trusted for this one (see test_composite_parent_tuple_is_checked_with_case_insensitive_tags
+    # for the mixed-case fallback the Python supplement still owns); this still exercises tuple
+    # validation surviving a repeated composite-link operand declaration, just via the native path.
+    assert any(i.code == "DICTIONARY_FOREIGN_KEY" for i in invalid.issues)
 
 
 def test_shared_definitions_with_alias_metadata_allow_canonical_cross_checks(tmp_path):

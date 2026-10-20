@@ -65,3 +65,14 @@ This page documents the public API of `onedep_lib` — the names exported from `
 ## Protocols
 
 ::: onedep_lib.apis.deposit.types.ApiClient
+
+
+## mmCIF validation
+
+::: onedep_lib.validation.MmCifValidator
+
+::: onedep_lib.validation.ValidationOptions
+
+::: onedep_lib.validation.ValidationContext
+
+::: onedep_lib.validation.PreparedRules

@@ -24,20 +24,37 @@ class Table:
     loop: gemmi.cif.Loop | None = None
     columns: dict[str, int] = field(default_factory=dict)
     pairs: dict[str, str] = field(default_factory=dict)
+    # True while every tag seen for this table was spelled exactly as its canonical lowercase
+    # form (the convention real PDBx dictionaries and files both follow). Gemmi's native parent
+    # checker matches dictionary-declared tag spelling case-sensitively against the input's
+    # original spelling, so an exact-case table is one the native backend can be trusted to
+    # check correctly; a mixed-case table needs the Python foreign-key supplement instead.
+    exact_case: bool = True
+    _canonical_cache: dict[str, str] = field(default_factory=dict, repr=False, compare=False)
 
     @property
     def row_count(self) -> int:
         return self.loop.length() if self.loop is not None else 1
 
+    def _canonical(self, item: str) -> str:
+        # item names are reused across every row of a table (often million-row
+        # loops), so memoize the lower()/format() work instead of repeating it
+        # per call.
+        canonical = self._canonical_cache.get(item)
+        if canonical is None:
+            canonical = item.lower() if item.startswith("_") else tag(self.category, item).lower()
+            self._canonical_cache[item] = canonical
+        return canonical
+
     def raw(self, item: str, row: int) -> str | None:
-        canonical = item.lower() if item.startswith("_") else tag(self.category, item).lower()
+        canonical = self._canonical(item)
         if self.loop is not None:
             col = self.columns.get(canonical)
             return self.loop[row, col] if col is not None else None
         return self.pairs.get(canonical)
 
     def has(self, item: str) -> bool:
-        canonical = item.lower() if item.startswith("_") else tag(self.category, item).lower()
+        canonical = self._canonical(item)
         return canonical in self.columns or canonical in self.pairs
 
     def location(self, item: str | None = None, row: int | None = None) -> CifLocation:
@@ -98,6 +115,7 @@ class BlockView:
                     item.line_number,
                     loop,
                     {t.lower(): c for c, t in enumerate(loop.tags)},
+                    exact_case=all(t == t.lower() for t in loop.tags),
                 )
                 self._add(category, table)
             elif item.pair is not None:
@@ -122,6 +140,7 @@ class BlockView:
                     )
                 else:
                     table.pairs[name.lower()] = raw
+                    table.exact_case = table.exact_case and name == name.lower()
 
     def _add(self, category: str, table: Table):
         if category in self.tables:
