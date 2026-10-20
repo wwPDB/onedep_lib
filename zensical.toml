@@ -8,6 +8,7 @@ nav = [
   { "Home" = "index.md" },
   { "Installation" = "installation.md" },
   { "Usage" = "usage.md" },
+  { "mmCIF Validation" = "validation.md" },
   { "Authentication Flow" = "auth_flow.md" },
   { "API Reference" = "api.md" },
 ]

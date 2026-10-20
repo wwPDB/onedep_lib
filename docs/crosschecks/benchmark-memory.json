@@ -1,0 +1,26 @@
+[
+  {
+    "backend": "new",
+    "count": 100000,
+    "parse_seconds": 0.04573484600405209,
+    "evaluate_seconds": 2.310737591003999,
+    "baseline_rss_kib": 110632,
+    "peak_rss_kib": 215608,
+    "auxiliary_peak_delta_kib": 104976,
+    "issues": 0,
+    "fixture_digest": "435936bf3d8bc4df3889b95ce33742ea54aeac9fed81778881932a633e476d8c",
+    "gemmi_version": "0.7.5"
+  },
+  {
+    "backend": "legacy",
+    "count": 100000,
+    "parse_seconds": 1.107378835993586,
+    "evaluate_seconds": 1.3933013919886434,
+    "baseline_rss_kib": 170508,
+    "peak_rss_kib": 320508,
+    "auxiliary_peak_delta_kib": 150000,
+    "issues": 0,
+    "fixture_digest": "435936bf3d8bc4df3889b95ce33742ea54aeac9fed81778881932a633e476d8c",
+    "gemmi_version": "0.7.5"
+  }
+]

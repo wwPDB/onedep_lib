@@ -5,6 +5,8 @@ from __future__ import annotations
 import hashlib
 import math
 import re
+import sys
+import time
 from collections import defaultdict
 from dataclasses import dataclass, replace
 from importlib.metadata import version
@@ -15,7 +17,9 @@ import gemmi
 
 from onedep_lib.checks.report import CheckIssue, CheckSeverity, CifLocation
 from onedep_lib.validation.models import ValidationConfigurationError
-from onedep_lib.validation.values import date, key, number, text
+from onedep_lib.validation.values import key, parse_date, parse_number, text
+
+_INT = re.compile(r"[+-]?[0-9]+")
 
 
 @dataclass(frozen=True)
@@ -373,37 +377,58 @@ class Dictionary:
         ), view
 
     def supplements(self, view, collector, date_tags, categories=None):
+        profile = self.options.profile
+        start = time.perf_counter() if profile else None
         for table in view.tables.values():
             if categories is not None and table.category not in categories:
                 continue
-            for item in table.tags:
-                definition = self.definitions.get(item)
-                if definition is None:
-                    continue
+            # Skip items the dictionary defines but that need no row-level supplement: avoids
+            # parsing every cell of free-text, non-mandatory columns that Gemmi already owns.
+            checked_items = [
+                (item, definition)
+                for item in table.tags
+                for definition in (self.definitions.get(item),)
+                if definition is not None
+                and (
+                    definition.mandatory
+                    or definition.type_code == "int"
+                    or definition.numeric
+                    or item in date_tags
+                    or definition.advisory_ranges
+                )
+            ]
+            for item, definition in checked_items:
+                # item comes straight from table.tags, i.e. table.columns'/table.pairs' own
+                # canonical keys, so the column index can be resolved once per item instead
+                # of recomputed by table.raw() on every one of the (possibly millions of) rows.
+                loop = table.loop
+                col = table.columns.get(item) if loop is not None else None
                 for row in range(table.row_count):
                     if row % 4096 == 0 and not collector.poll():
                         return
-                    raw = table.raw(item, row)
+                    raw = loop[row, col] if loop is not None else table.raw(item, row)
                     value = text(raw)
                     code, message = None, None
                     sev = CheckSeverity.ERROR
+                    parsed = None
                     if definition.mandatory and value is None:
                         code, message = "DICTIONARY_MANDATORY", "No value present for this mandatory item."
-                    elif value is not None and definition.type_code == "int" and not re.fullmatch(r"[+-]?[0-9]+", raw):
+                    elif value is not None and definition.type_code == "int" and not _INT.fullmatch(raw):
                         code, message = "DICTIONARY_TYPE", "Expected an unquoted ASCII integer"
                     elif value is not None and definition.numeric:
                         try:
-                            number(raw)
+                            parsed = parse_number(value.strip())
                         except ValueError:
                             code, message = "DICTIONARY_TYPE", "Expected a finite dictionary numeric value"
                     if value is not None and item in date_tags:
                         try:
-                            date(raw)
+                            parse_date(value)
                         except ValueError:
                             code, message = "DICTIONARY_TYPE", "Invalid calendar date or time"
                     if value is not None and definition.advisory_ranges and code is None:
                         try:
-                            parsed = number(raw)
+                            if parsed is None:
+                                parsed = parse_number(value.strip())
                             assert parsed is not None
                             allowed = False
                             for minimum, maximum in definition.advisory_ranges:
@@ -447,49 +472,130 @@ class Dictionary:
                         )
                         if collector.stopped:
                             return
+        if profile:
+            print(f"PROFILE cell-loop={time.perf_counter() - start:.3f}s", file=sys.stderr, flush=True)
         if not self.options.dictionary_parent_checks:
             return
+        applicable_links = []
         for link in self.links:
             if categories is not None and link.child[0].split(".")[0].lstrip("_") not in categories:
                 continue
             child = view.table(link.child[0].split(".")[0])
             if child is None or any(not child.has(t) for t in link.child):
                 continue
-            parent = view.table(link.parent[0].split(".")[0])
+            if categories is None:
+                # native_backend(category_scope=False) -- the unscoped `self.ddl` used for a
+                # full-document validation -- already runs Gemmi's own linked-group/parent
+                # checking over the whole input. That native check is correct as long as every
+                # tag involved is spelled exactly in its canonical (lowercase) case; Gemmi
+                # matches dictionary-declared relation tags case-sensitively against the input's
+                # original spelling, so a mixed-case tag makes it silently miss the check (see
+                # docs/crosschecks/gemmi-validation-research.md, "Parent tag-case defect").
+                # Re-verify with this supplement only the exact-case-sensitive links that native
+                # cannot be trusted on; rescanning an already-exact-case table here would just
+                # duplicate the native check that already covered it correctly.
+                parent = view.table(link.parent[0].split(".")[0])
+                if child.exact_case and (parent is None or parent.exact_case):
+                    continue
+            applicable_links.append((link, child))
+        # Dozens of distinct, often-overlapping parent/child tag tuples (e.g. auth_asym_id,
+        # label_asym_id, auth_seq_id) can all source from the same large table (typically
+        # atom_site, with hundreds of thousands of rows). Scan each involved table once,
+        # fetching every needed column once per row, instead of once per tag tuple that
+        # happens to reuse it.
+        missing_by_parent_table = defaultdict(set)
+        for link, _ in applicable_links:
             signature = ("dictionary_link", link.parent)
             if signature not in view.indexes:
-                membership = set()
-                if parent:
+                missing_by_parent_table[link.parent[0].split(".")[0]].add(link.parent)
+        for parent_category, tag_sets in missing_by_parent_table.items():
+            parent = view.table(parent_category)
+            builders = {tags: set() for tags in tag_sets}
+            if parent:
+                # Resolve each needed tag's column once, then read every row positionally
+                # (tuple, not dict) instead of re-resolving tag -> column per cell: on a
+                # million-row table this per-row dict/string overhead dominates the scan.
+                needed_tags = tuple({t for tags in tag_sets for t in tags})
+                tag_pos = {t: i for i, t in enumerate(needed_tags)}
+                tag_groups = [(tags, tuple(tag_pos[t] for t in tags)) for tags in tag_sets]
+                loop = parent.loop
+                if loop is not None:
+                    cols = tuple(parent.columns.get(t) for t in needed_tags)
                     for row in range(parent.row_count):
                         if row % 4096 == 0 and not collector.poll():
                             return
-                        parts = tuple(key(parent.raw(t, row)) for t in link.parent)
-                        if all(p is not None for p in parts):
-                            membership.add(parts)
-                view.indexes[signature] = membership
-                view.index_builds += 1
-            membership = view.indexes[signature]
-            for row in range(child.row_count):
-                if row % 4096 == 0 and not collector.poll():
-                    return
-                parts = tuple(key(child.raw(t, row)) for t in link.child)
-                if all(p is not None for p in parts) and parts not in membership:
-                    collector.add(
-                        CheckIssue(
-                            CheckSeverity.ERROR,
-                            "DICTIONARY_FOREIGN_KEY",
-                            "Populated child key has no corresponding parent key",
-                            child.location(link.child[0], row),
-                            actual=parts,
-                            check_type="dictionary",
-                            context={
-                                "definition_tag": link.child[0],
-                                "link_group": link.group,
-                                "child_tags": link.child,
-                                "parent_tags": link.parent,
-                                "supplement": True,
-                            },
-                        )
-                    )
-                    if collector.stopped:
+                        row_values = tuple(key(loop[row, c]) if c is not None else None for c in cols)
+                        for tags, positions in tag_groups:
+                            parts = tuple(row_values[p] for p in positions)
+                            if all(p is not None for p in parts):
+                                builders[tags].add(parts)
+                else:
+                    if not collector.poll():
                         return
+                    row_values = tuple(key(parent.pairs.get(t)) for t in needed_tags)
+                    for tags, positions in tag_groups:
+                        parts = tuple(row_values[p] for p in positions)
+                        if all(p is not None for p in parts):
+                            builders[tags].add(parts)
+            for tags, membership in builders.items():
+                view.indexes[("dictionary_link", tags)] = membership
+                view.index_builds += 1
+        by_child_table = defaultdict(list)
+        for link, child in applicable_links:
+            by_child_table[child.category].append((link, child))
+
+        def _flag_foreign_key(child_table, link, row, parts):
+            collector.add(
+                CheckIssue(
+                    CheckSeverity.ERROR,
+                    "DICTIONARY_FOREIGN_KEY",
+                    "Populated child key has no corresponding parent key",
+                    child_table.location(link.child[0], row),
+                    actual=parts,
+                    check_type="dictionary",
+                    context={
+                        "definition_tag": link.child[0],
+                        "link_group": link.group,
+                        "child_tags": link.child,
+                        "parent_tags": link.parent,
+                        "supplement": True,
+                    },
+                )
+            )
+
+        for links_for_table in by_child_table.values():
+            child = links_for_table[0][1]
+            # Every link.child tag is already confirmed present on this table (see
+            # applicable_links above), so column resolution is safe to hoist unconditionally.
+            needed_tags = tuple({t for link, _ in links_for_table for t in link.child})
+            tag_pos = {t: i for i, t in enumerate(needed_tags)}
+            link_positions = [(link, tuple(tag_pos[t] for t in link.child)) for link, _ in links_for_table]
+            loop = child.loop
+            if loop is not None:
+                cols = tuple(child.columns[t] for t in needed_tags)
+                for row in range(child.row_count):
+                    if row % 4096 == 0 and not collector.poll():
+                        return
+                    row_values = tuple(key(loop[row, c]) for c in cols)
+                    for link, positions in link_positions:
+                        parts = tuple(row_values[p] for p in positions)
+                        if all(p is not None for p in parts):
+                            membership = view.indexes[("dictionary_link", link.parent)]
+                            if parts not in membership:
+                                _flag_foreign_key(child, link, row, parts)
+                                if collector.stopped:
+                                    return
+            else:
+                if not collector.poll():
+                    return
+                row_values = tuple(key(child.pairs[t]) for t in needed_tags)
+                for link, positions in link_positions:
+                    parts = tuple(row_values[p] for p in positions)
+                    if all(p is not None for p in parts):
+                        membership = view.indexes[("dictionary_link", link.parent)]
+                        if parts not in membership:
+                            _flag_foreign_key(child, link, 0, parts)
+                            if collector.stopped:
+                                return
+        if profile:
+            print(f"PROFILE total-supplements={time.perf_counter() - start:.3f}s", file=sys.stderr, flush=True)

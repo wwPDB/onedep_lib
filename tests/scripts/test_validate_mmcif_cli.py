@@ -3,10 +3,13 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
 SCRIPT = Path(__file__).resolve().parents[2] / "scripts" / "validate_mmcif.py"
 
 
-def test_cli_compares_new_and_legacy_results_and_timings(tmp_path):
+@pytest.mark.parametrize("profile", [False, True])
+def test_cli_compares_new_and_legacy_results_and_timings(tmp_path, profile):
     dictionary = tmp_path / "dictionary.dic"
     dictionary.write_text("""data_test
 _dictionary.title test
@@ -38,7 +41,7 @@ _validator_rule_pairwise.extra
 comparison cat x cat y 'x exceeds y' '>' hard .
 """)
     model = tmp_path / "model.cif"
-    model.write_text("data_model\n_cat.x 2\n_cat.y 1\n")
+    model.write_text("data_model\n_cat.x 2\n_cat.y 1\ndata_second\n_cat.x 3\n_cat.y 1\n")
     legacy = tmp_path / "validate_mmcif.py"
     legacy.write_text("""from dataclasses import dataclass
 from pathlib import Path
@@ -65,6 +68,7 @@ def validate(dictionary, model):
             str(legacy),
             "-o",
             str(output),
+            *(["--profile"] if profile else []),
         ],
         capture_output=True,
         text=True,
@@ -79,6 +83,20 @@ def validate(dictionary, model):
         assert record["validation_seconds"] >= 0
         assert record["total_seconds"] >= record["validation_seconds"]
         assert name in result.stdout
+
+    executions = engines["onedep"]["report"]["validation"]["rule_execution"]
+    if profile:
+        assert all(row["duration"] >= 0 for row in executions)
+        timings = engines["onedep"]["cross_check_timings"]
+        assert [row["rule_id"] for row in timings] == ["comparison"]
+        assert timings[0]["total_seconds"] == sum(row["duration"] for row in executions)
+        assert timings[0]["executions"] == 2
+        assert "slowest first" in result.stdout
+        assert "comparison" in result.stdout
+        assert "cross_check_timings" not in engines["legacy"]
+    else:
+        assert all("duration" not in row for row in executions)
+        assert "cross_check_timings" not in engines["onedep"]
 
 
 def test_third_engine_runs_and_reports_after_another_engine_fails():
@@ -120,3 +138,85 @@ def test_validation_failure_retains_timing_and_does_not_abort_other_engines():
     assert results["broken"]["failure_stage"] == "validation"
     assert results["broken"]["validation_seconds"] >= 0
     assert results["working"]["status"] == "completed"
+
+
+def test_cross_check_timings_sum_blocks_and_rank_only_executed_rules():
+    from scripts.validate_mmcif import cross_check_timings
+
+    def execution(rule_id, duration, block_index):
+        return {
+            "rule_id": rule_id,
+            "family": "pairwise",
+            "block_index": block_index,
+            "duration": duration,
+            "rows_examined": 2,
+            "findings_emitted": 1,
+        }
+
+    report = {
+        "validation": {
+            "rule_execution": [
+                execution("slow", 0.2, 0),
+                execution("fast", 0.3, 0),
+                execution("slow", 0.2, 1),
+                {"rule_id": "blocked", "status": "blocked"},
+                {"rule_id": "excluded", "status": "excluded"},
+            ]
+        }
+    }
+    timings = cross_check_timings(report)
+    assert [row["rule_id"] for row in timings] == ["slow", "fast"]
+    assert timings[0] == {
+        "rule_id": "slow",
+        "family": "pairwise",
+        "total_seconds": pytest.approx(0.4),
+        "executions": 2,
+        "rows_examined": 4,
+        "findings_emitted": 2,
+    }
+    assert cross_check_timings({"validation": {"rule_execution": []}}) == []
+
+
+@pytest.mark.parametrize("arguments", [("--native",), ("--engines", "legacy")])
+def test_profile_rejects_engines_without_cross_check_instrumentation(arguments, capsys):
+    from scripts.validate_mmcif import main
+
+    with pytest.raises(SystemExit) as exc:
+        main(["dictionary.dic", "model.cif", "--profile", *arguments])
+    assert exc.value.code == 2
+    assert "--profile requires" in capsys.readouterr().err
+
+
+def test_profile_handles_input_failure_without_rule_timings(tmp_path, capsys):
+    from unittest.mock import patch
+
+    from scripts.validate_mmcif import PreparedEngine, main
+
+    report = {"validation": {"rule_execution": []}}
+    engine = PreparedEngine(lambda: report, lambda value: value, "input failed")
+    output = tmp_path / "report.json"
+    with patch.dict("scripts.validate_mmcif.ENGINE_FACTORIES", {"onedep": lambda args: engine}, clear=True):
+        assert main(["dictionary.dic", "missing.cif", "--profile", "-o", str(output)]) == 0
+    assert json.loads(output.read_text())["engines"]["onedep"]["cross_check_timings"] == []
+    assert "No cross-checks were executed" in capsys.readouterr().out
+
+
+def test_profile_explains_dictionary_blocking(tmp_path, capsys):
+    from unittest.mock import patch
+
+    from scripts.validate_mmcif import PreparedEngine, main
+
+    report = {
+        "validation": {
+            "rule_execution": [
+                {"rule_id": "comparison", "status": "blocked", "skip_reasons": {"blocked_dictionary": 1}}
+            ],
+        }
+    }
+    engine = PreparedEngine(lambda: report, lambda value: value, "dictionary and cross-checks")
+    output = tmp_path / "report.json"
+    with patch.dict("scripts.validate_mmcif.ENGINE_FACTORIES", {"onedep": lambda args: engine}, clear=True):
+        assert main(["dictionary.dic", "model.cif", "--profile", "-o", str(output)]) == 0
+    console = capsys.readouterr().out
+    assert "Cross-checks blocked by dictionary errors: 1" in console
+    assert "--cross-only" in console

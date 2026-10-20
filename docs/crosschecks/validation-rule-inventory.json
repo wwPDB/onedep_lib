@@ -1,0 +1,6220 @@
+{
+  "artifact_role": "audit inventory; not a runtime rule source",
+  "source_path": "vscode-extension/python-script/rules/data/cross_checks.cif",
+  "source_sha256": "a377cc2fe60a6848fc3634e7fd4ba45d75fa766958ec115b4bd902bfdc9d1b7e",
+  "source_revision": "9357faf06ac722eac15d5a827a4716763cfe1fd9",
+  "gemmi_version": "0.7.4",
+  "root_rule_count": 149,
+  "table_count": 26,
+  "tables": [
+    {
+      "category": "_validator_rule_pairwise.",
+      "columns": [
+        "id",
+        "source_category",
+        "source_item",
+        "target_category",
+        "target_item",
+        "message",
+        "operator",
+        "severity",
+        "extra"
+      ],
+      "row_count": 13,
+      "rows": [
+        {
+          "id": "pairwise_em_3d_reconstruction_resolution_1",
+          "source_category": "em_3d_reconstruction",
+          "source_item": "resolution",
+          "target_category": "em_diffraction_stats",
+          "target_item": "high_resolution",
+          "message": "3D reconstruction resolution is higher than diffraction-statistics high-resolution limit [{item2CrossValue}].",
+          "operator": "<",
+          "severity": "hard",
+          "extra": "."
+        },
+        {
+          "id": "pairwise_em_diffraction_shell_high_resolution_1",
+          "source_category": "em_diffraction_shell",
+          "source_item": "high_resolution",
+          "target_category": "em_diffraction_stats",
+          "target_item": "high_resolution",
+          "message": "Diffraction-shell high-resolution limit is higher than diffraction-statistics high-resolution limit [{item2CrossValue}].",
+          "operator": "<",
+          "severity": "hard",
+          "extra": "."
+        },
+        {
+          "id": "pairwise_em_diffraction_shell_num_structure_factors_1",
+          "source_category": "em_diffraction_shell",
+          "source_item": "num_structure_factors",
+          "target_category": "em_diffraction_stats",
+          "target_item": "num_structure_factors",
+          "message": "Number of shell structure factors is higher than total collected structure factors [{item2CrossValue}].",
+          "operator": ">",
+          "severity": "hard",
+          "extra": "."
+        },
+        {
+          "id": "pairwise_em_focused_ion_beam_final_thickness_1",
+          "source_category": "em_focused_ion_beam",
+          "source_item": "final_thickness",
+          "target_category": "em_focused_ion_beam",
+          "target_item": "initial_thickness",
+          "message": "Final thickness is larger than initial thickness [{item2CrossValue}].",
+          "operator": ">",
+          "severity": "hard",
+          "extra": "."
+        },
+        {
+          "id": "pairwise_em_imaging_recording_temperature_maximum_1",
+          "source_category": "em_imaging",
+          "source_item": "recording_temperature_maximum",
+          "target_category": "em_imaging",
+          "target_item": "recording_temperature_minimum",
+          "message": "Maximum recording temperature is lower than minimum recording temperature [{item2CrossValue}].",
+          "operator": "<",
+          "severity": "hard",
+          "extra": "."
+        },
+        {
+          "id": "pairwise_em_imaging_recording_temperature_minimum_1",
+          "source_category": "em_imaging",
+          "source_item": "recording_temperature_minimum",
+          "target_category": "em_imaging",
+          "target_item": "recording_temperature_maximum",
+          "message": "Minimum recording temperature is higher than maximum recording temperature [{item2CrossValue}].",
+          "operator": ">",
+          "severity": "hard",
+          "extra": "."
+        },
+        {
+          "id": "pairwise_pdbx_nmr_ensemble_conformers_submitted_total_number_1",
+          "source_category": "pdbx_nmr_ensemble",
+          "source_item": "conformers_submitted_total_number",
+          "target_category": "pdbx_nmr_ensemble",
+          "target_item": "conformers_calculated_total_number",
+          "message": "Submitted conformer count is higher than calculated conformer count [{item2CrossValue}].",
+          "operator": ">",
+          "severity": "hard",
+          "extra": "."
+        },
+        {
+          "id": "pairwise_pdbx_nmr_representative_conformer_id_1",
+          "source_category": "pdbx_nmr_representative",
+          "source_item": "conformer_id",
+          "target_category": "pdbx_nmr_ensemble",
+          "target_item": "conformers_submitted_total_number",
+          "message": "Representative conformer identifier is higher than submitted conformer count [{item2CrossValue}].",
+          "operator": ">",
+          "severity": "hard",
+          "extra": "."
+        },
+        {
+          "id": "pairwise_refine_ls_shell_r_factor_r_work_1",
+          "source_category": "refine_ls_shell",
+          "source_item": "R_factor_R_work",
+          "target_category": "refine_ls_shell",
+          "target_item": "R_factor_R_free",
+          "message": "Shell R_work is higher than shell R_free [{item2CrossValue}].",
+          "operator": ">",
+          "severity": "soft",
+          "extra": "."
+        },
+        {
+          "id": "pairwise_refine_ls_shell_d_res_high_1",
+          "source_category": "refine_ls_shell",
+          "source_item": "d_res_high",
+          "target_category": "refine_ls_shell",
+          "target_item": "d_res_low",
+          "message": "Shell high-resolution limit is lower than shell low-resolution limit [{item2CrossValue}].",
+          "operator": ">",
+          "severity": "hard",
+          "extra": "."
+        },
+        {
+          "id": "pairwise_refine_ls_shell_d_res_low_1",
+          "source_category": "refine_ls_shell",
+          "source_item": "d_res_low",
+          "target_category": "refine_ls_shell",
+          "target_item": "d_res_high",
+          "message": "Shell low-resolution limit is higher than shell high-resolution limit [{item2CrossValue}].",
+          "operator": "<",
+          "severity": "hard",
+          "extra": "."
+        },
+        {
+          "id": "pairwise_reflns_shell_d_res_high_1",
+          "source_category": "reflns_shell",
+          "source_item": "d_res_high",
+          "target_category": "reflns_shell",
+          "target_item": "d_res_low",
+          "message": "Shell high-resolution limit is lower than shell low-resolution limit [{item2CrossValue}].",
+          "operator": ">",
+          "severity": "hard",
+          "extra": "."
+        },
+        {
+          "id": "pairwise_reflns_shell_d_res_low_1",
+          "source_category": "reflns_shell",
+          "source_item": "d_res_low",
+          "target_category": "reflns_shell",
+          "target_item": "d_res_high",
+          "message": "Shell low-resolution limit is higher than shell high-resolution limit [{item2CrossValue}].",
+          "operator": "<",
+          "severity": "hard",
+          "extra": "."
+        }
+      ],
+      "raw_rows": [
+        [
+          "pairwise_em_3d_reconstruction_resolution_1",
+          "em_3d_reconstruction",
+          "resolution",
+          "em_diffraction_stats",
+          "high_resolution",
+          ";3D reconstruction resolution is higher than diffraction-statistics high-resolution limit [{item2CrossValue}].\n;",
+          "<",
+          "hard",
+          "."
+        ],
+        [
+          "pairwise_em_diffraction_shell_high_resolution_1",
+          "em_diffraction_shell",
+          "high_resolution",
+          "em_diffraction_stats",
+          "high_resolution",
+          ";Diffraction-shell high-resolution limit is higher than diffraction-statistics high-resolution limit [{item2CrossValue}].\n;",
+          "<",
+          "hard",
+          "."
+        ],
+        [
+          "pairwise_em_diffraction_shell_num_structure_factors_1",
+          "em_diffraction_shell",
+          "num_structure_factors",
+          "em_diffraction_stats",
+          "num_structure_factors",
+          ";Number of shell structure factors is higher than total collected structure factors [{item2CrossValue}].\n;",
+          ">",
+          "hard",
+          "."
+        ],
+        [
+          "pairwise_em_focused_ion_beam_final_thickness_1",
+          "em_focused_ion_beam",
+          "final_thickness",
+          "em_focused_ion_beam",
+          "initial_thickness",
+          ";Final thickness is larger than initial thickness [{item2CrossValue}].\n;",
+          ">",
+          "hard",
+          "."
+        ],
+        [
+          "pairwise_em_imaging_recording_temperature_maximum_1",
+          "em_imaging",
+          "recording_temperature_maximum",
+          "em_imaging",
+          "recording_temperature_minimum",
+          ";Maximum recording temperature is lower than minimum recording temperature [{item2CrossValue}].\n;",
+          "<",
+          "hard",
+          "."
+        ],
+        [
+          "pairwise_em_imaging_recording_temperature_minimum_1",
+          "em_imaging",
+          "recording_temperature_minimum",
+          "em_imaging",
+          "recording_temperature_maximum",
+          ";Minimum recording temperature is higher than maximum recording temperature [{item2CrossValue}].\n;",
+          ">",
+          "hard",
+          "."
+        ],
+        [
+          "pairwise_pdbx_nmr_ensemble_conformers_submitted_total_number_1",
+          "pdbx_nmr_ensemble",
+          "conformers_submitted_total_number",
+          "pdbx_nmr_ensemble",
+          "conformers_calculated_total_number",
+          ";Submitted conformer count is higher than calculated conformer count [{item2CrossValue}].\n;",
+          ">",
+          "hard",
+          "."
+        ],
+        [
+          "pairwise_pdbx_nmr_representative_conformer_id_1",
+          "pdbx_nmr_representative",
+          "conformer_id",
+          "pdbx_nmr_ensemble",
+          "conformers_submitted_total_number",
+          ";Representative conformer identifier is higher than submitted conformer count [{item2CrossValue}].\n;",
+          ">",
+          "hard",
+          "."
+        ],
+        [
+          "pairwise_refine_ls_shell_r_factor_r_work_1",
+          "refine_ls_shell",
+          "R_factor_R_work",
+          "refine_ls_shell",
+          "R_factor_R_free",
+          ";Shell R_work is higher than shell R_free [{item2CrossValue}].\n;",
+          ">",
+          "soft",
+          "."
+        ],
+        [
+          "pairwise_refine_ls_shell_d_res_high_1",
+          "refine_ls_shell",
+          "d_res_high",
+          "refine_ls_shell",
+          "d_res_low",
+          ";Shell high-resolution limit is lower than shell low-resolution limit [{item2CrossValue}].\n;",
+          ">",
+          "hard",
+          "."
+        ],
+        [
+          "pairwise_refine_ls_shell_d_res_low_1",
+          "refine_ls_shell",
+          "d_res_low",
+          "refine_ls_shell",
+          "d_res_high",
+          ";Shell low-resolution limit is higher than shell high-resolution limit [{item2CrossValue}].\n;",
+          "<",
+          "hard",
+          "."
+        ],
+        [
+          "pairwise_reflns_shell_d_res_high_1",
+          "reflns_shell",
+          "d_res_high",
+          "reflns_shell",
+          "d_res_low",
+          ";Shell high-resolution limit is lower than shell low-resolution limit [{item2CrossValue}].\n;",
+          ">",
+          "hard",
+          "."
+        ],
+        [
+          "pairwise_reflns_shell_d_res_low_1",
+          "reflns_shell",
+          "d_res_low",
+          "reflns_shell",
+          "d_res_high",
+          ";Shell low-resolution limit is higher than shell high-resolution limit [{item2CrossValue}].\n;",
+          "<",
+          "hard",
+          "."
+        ]
+      ]
+    },
+    {
+      "category": "_validator_rule_date_order.",
+      "columns": [
+        "id",
+        "category",
+        "left_item",
+        "right_item",
+        "op",
+        "severity",
+        "message"
+      ],
+      "row_count": 4,
+      "rows": [
+        {
+          "id": "date_pdbx_database_status_recvd_initial_deposition_date_1",
+          "category": "pdbx_database_status",
+          "left_item": "recvd_initial_deposition_date",
+          "right_item": "date_coordinates",
+          "op": "<=",
+          "severity": "hard",
+          "message": "Initial deposition date must not be after the date coordinates were received (coordinates date: [{right_value}])."
+        },
+        {
+          "id": "date_pdbx_database_status_recvd_initial_deposition_date_2",
+          "category": "pdbx_database_status",
+          "left_item": "recvd_initial_deposition_date",
+          "right_item": "date_author_release_request",
+          "op": "<=",
+          "severity": "hard",
+          "message": "Initial deposition date must not be after the author release request date (release request date: [{right_value}])."
+        },
+        {
+          "id": "date_pdbx_database_status_date_deposition_form_3",
+          "category": "pdbx_database_status",
+          "left_item": "date_deposition_form",
+          "right_item": "recvd_initial_deposition_date",
+          "op": "<=",
+          "severity": "hard",
+          "message": "Deposition form date must not be after the initial deposition received date (initial deposition date: [{right_value}])."
+        },
+        {
+          "id": "date_pdbx_database_status_date_begin_deposition_4",
+          "category": "pdbx_database_status",
+          "left_item": "date_begin_deposition",
+          "right_item": "date_end_processing",
+          "op": "<=",
+          "severity": "hard",
+          "message": "Begin processing date must not be after end processing date (end processing date: [{right_value}])."
+        }
+      ],
+      "raw_rows": [
+        [
+          "date_pdbx_database_status_recvd_initial_deposition_date_1",
+          "pdbx_database_status",
+          "recvd_initial_deposition_date",
+          "date_coordinates",
+          "<=",
+          "hard",
+          ";Initial deposition date must not be after the date coordinates were received (coordinates date: [{right_value}]).\n;"
+        ],
+        [
+          "date_pdbx_database_status_recvd_initial_deposition_date_2",
+          "pdbx_database_status",
+          "recvd_initial_deposition_date",
+          "date_author_release_request",
+          "<=",
+          "hard",
+          ";Initial deposition date must not be after the author release request date (release request date: [{right_value}]).\n;"
+        ],
+        [
+          "date_pdbx_database_status_date_deposition_form_3",
+          "pdbx_database_status",
+          "date_deposition_form",
+          "recvd_initial_deposition_date",
+          "<=",
+          "hard",
+          ";Deposition form date must not be after the initial deposition received date (initial deposition date: [{right_value}]).\n;"
+        ],
+        [
+          "date_pdbx_database_status_date_begin_deposition_4",
+          "pdbx_database_status",
+          "date_begin_deposition",
+          "date_end_processing",
+          "<=",
+          "hard",
+          ";Begin processing date must not be after end processing date (end processing date: [{right_value}]).\n;"
+        ]
+      ]
+    },
+    {
+      "category": "_validator_rule_uniqueness.",
+      "columns": [
+        "id",
+        "category",
+        "severity",
+        "message"
+      ],
+      "row_count": 3,
+      "rows": [
+        {
+          "id": "uniq_entity_1",
+          "category": "entity",
+          "severity": "hard",
+          "message": "Duplicate _entity.id in this file: [{duplicate_display}]. Each entity id must appear at most once."
+        },
+        {
+          "id": "uniq_struct_asym_2",
+          "category": "struct_asym",
+          "severity": "hard",
+          "message": "Duplicate _struct_asym.id in this file: [{duplicate_display}]. Each chain (asym) id must appear at most once."
+        },
+        {
+          "id": "uniq_entity_poly_3",
+          "category": "entity_poly",
+          "severity": "hard",
+          "message": "Duplicate _entity_poly.entity_id in this file: [{duplicate_display}]. Each polymer entity must have at most one entity_poly row."
+        }
+      ],
+      "raw_rows": [
+        [
+          "uniq_entity_1",
+          "entity",
+          "hard",
+          ";Duplicate _entity.id in this file: [{duplicate_display}]. Each entity id must appear at most once.\n;"
+        ],
+        [
+          "uniq_struct_asym_2",
+          "struct_asym",
+          "hard",
+          ";Duplicate _struct_asym.id in this file: [{duplicate_display}]. Each chain (asym) id must appear at most once.\n;"
+        ],
+        [
+          "uniq_entity_poly_3",
+          "entity_poly",
+          "hard",
+          ";Duplicate _entity_poly.entity_id in this file: [{duplicate_display}]. Each polymer entity must have at most one entity_poly row.\n;"
+        ]
+      ]
+    },
+    {
+      "category": "_validator_rule_uniqueness_key.",
+      "columns": [
+        "rule_id",
+        "ordinal",
+        "item"
+      ],
+      "row_count": 3,
+      "rows": [
+        {
+          "rule_id": "uniq_entity_1",
+          "ordinal": "1",
+          "item": "id"
+        },
+        {
+          "rule_id": "uniq_struct_asym_2",
+          "ordinal": "1",
+          "item": "id"
+        },
+        {
+          "rule_id": "uniq_entity_poly_3",
+          "ordinal": "1",
+          "item": "entity_id"
+        }
+      ],
+      "raw_rows": [
+        [
+          "uniq_entity_1",
+          "1",
+          "id"
+        ],
+        [
+          "uniq_struct_asym_2",
+          "1",
+          "id"
+        ],
+        [
+          "uniq_entity_poly_3",
+          "1",
+          "entity_id"
+        ]
+      ]
+    },
+    {
+      "category": "_validator_rule_linked.",
+      "columns": [
+        "id",
+        "source_category",
+        "source_item",
+        "target_category",
+        "target_item",
+        "cross",
+        "cross2",
+        "operator",
+        "fallback",
+        "break_flag",
+        "warning",
+        "absolute",
+        "text"
+      ],
+      "row_count": 46,
+      "rows": [
+        {
+          "id": "linked_em_3d_fitting_list_source_name_1",
+          "source_category": "em_3d_fitting_list",
+          "source_item": "source_name",
+          "target_category": "em_3d_fitting_list",
+          "target_item": "type",
+          "cross": "id",
+          "cross2": ".",
+          "operator": "exists",
+          "fallback": ".",
+          "break_flag": "yes",
+          "warning": ".",
+          "absolute": ".",
+          "text": "Source name must be provided."
+        },
+        {
+          "id": "linked_em_3d_fitting_list_source_name_2",
+          "source_category": "em_3d_fitting_list",
+          "source_item": "source_name",
+          "target_category": "em_3d_fitting_list",
+          "target_item": "accession_code",
+          "cross": "id",
+          "cross2": ".",
+          "operator": "exists",
+          "fallback": ".",
+          "break_flag": "yes",
+          "warning": ".",
+          "absolute": ".",
+          "text": "Source name must be provided."
+        },
+        {
+          "id": "linked_em_3d_fitting_list_source_name_3",
+          "source_category": "em_3d_fitting_list",
+          "source_item": "source_name",
+          "target_category": "em_3d_fitting_list",
+          "target_item": "details",
+          "cross": "id",
+          "cross2": ".",
+          "operator": "exists",
+          "fallback": ".",
+          "break_flag": "yes",
+          "warning": ".",
+          "absolute": ".",
+          "text": "Source name must be provided."
+        },
+        {
+          "id": "linked_em_3d_fitting_list_source_name_4",
+          "source_category": "em_3d_fitting_list",
+          "source_item": "source_name",
+          "target_category": "em_3d_fitting_list",
+          "target_item": "chain_id",
+          "cross": "id",
+          "cross2": ".",
+          "operator": "exists",
+          "fallback": ".",
+          "break_flag": "yes",
+          "warning": ".",
+          "absolute": ".",
+          "text": "Source name must be provided."
+        },
+        {
+          "id": "linked_em_3d_fitting_list_source_name_5",
+          "source_category": "em_3d_fitting_list",
+          "source_item": "source_name",
+          "target_category": "em_3d_fitting_list",
+          "target_item": "chain_residue_range",
+          "cross": "id",
+          "cross2": ".",
+          "operator": "exists",
+          "fallback": ".",
+          "break_flag": "yes",
+          "warning": ".",
+          "absolute": ".",
+          "text": "Source name must be provided."
+        },
+        {
+          "id": "linked_em_3d_fitting_list_type_1",
+          "source_category": "em_3d_fitting_list",
+          "source_item": "type",
+          "target_category": "em_3d_fitting_list",
+          "target_item": "source_name",
+          "cross": "id",
+          "cross2": ".",
+          "operator": "exists",
+          "fallback": ".",
+          "break_flag": "yes",
+          "warning": ".",
+          "absolute": ".",
+          "text": "Type must be provided."
+        },
+        {
+          "id": "linked_em_3d_fitting_list_type_2",
+          "source_category": "em_3d_fitting_list",
+          "source_item": "type",
+          "target_category": "em_3d_fitting_list",
+          "target_item": "accession_code",
+          "cross": "id",
+          "cross2": ".",
+          "operator": "exists",
+          "fallback": ".",
+          "break_flag": "yes",
+          "warning": ".",
+          "absolute": ".",
+          "text": "Type must be provided."
+        },
+        {
+          "id": "linked_em_3d_fitting_list_type_3",
+          "source_category": "em_3d_fitting_list",
+          "source_item": "type",
+          "target_category": "em_3d_fitting_list",
+          "target_item": "details",
+          "cross": "id",
+          "cross2": ".",
+          "operator": "exists",
+          "fallback": ".",
+          "break_flag": "yes",
+          "warning": ".",
+          "absolute": ".",
+          "text": "Type must be provided."
+        },
+        {
+          "id": "linked_em_3d_fitting_list_type_4",
+          "source_category": "em_3d_fitting_list",
+          "source_item": "type",
+          "target_category": "em_3d_fitting_list",
+          "target_item": "chain_id",
+          "cross": "id",
+          "cross2": ".",
+          "operator": "exists",
+          "fallback": ".",
+          "break_flag": "yes",
+          "warning": ".",
+          "absolute": ".",
+          "text": "Type must be provided."
+        },
+        {
+          "id": "linked_em_3d_fitting_list_type_5",
+          "source_category": "em_3d_fitting_list",
+          "source_item": "type",
+          "target_category": "em_3d_fitting_list",
+          "target_item": "chain_residue_range",
+          "cross": "id",
+          "cross2": ".",
+          "operator": "exists",
+          "fallback": ".",
+          "break_flag": "yes",
+          "warning": ".",
+          "absolute": ".",
+          "text": "Type must be provided."
+        },
+        {
+          "id": "linked_em_buffer_component_concentration_1",
+          "source_category": "em_buffer_component",
+          "source_item": "concentration",
+          "target_category": "em_buffer_component",
+          "target_item": "name",
+          "cross": "id",
+          "cross2": ".",
+          "operator": "exists",
+          "fallback": ".",
+          "break_flag": "yes",
+          "warning": ".",
+          "absolute": ".",
+          "text": "Concentration must be provided when a buffer name is given."
+        },
+        {
+          "id": "linked_em_buffer_component_concentration_2",
+          "source_category": "em_buffer_component",
+          "source_item": "concentration",
+          "target_category": "em_buffer_component",
+          "target_item": "concentration_units",
+          "cross": "id",
+          "cross2": ".",
+          "operator": "exists",
+          "fallback": ".",
+          "break_flag": "yes",
+          "warning": ".",
+          "absolute": ".",
+          "text": "Concentration must be provided when buffer concentration units are given."
+        },
+        {
+          "id": "linked_em_buffer_component_concentration_3",
+          "source_category": "em_buffer_component",
+          "source_item": "concentration",
+          "target_category": "em_buffer_component",
+          "target_item": "formula",
+          "cross": "id",
+          "cross2": ".",
+          "operator": "exists",
+          "fallback": ".",
+          "break_flag": "yes",
+          "warning": ".",
+          "absolute": ".",
+          "text": "Concentration must be provided when a buffer formula is given."
+        },
+        {
+          "id": "linked_em_buffer_component_concentration_units_1",
+          "source_category": "em_buffer_component",
+          "source_item": "concentration_units",
+          "target_category": "em_buffer_component",
+          "target_item": "name",
+          "cross": "id",
+          "cross2": ".",
+          "operator": "exists",
+          "fallback": ".",
+          "break_flag": "yes",
+          "warning": ".",
+          "absolute": ".",
+          "text": "Concentration units must be provided when a buffer name is given."
+        },
+        {
+          "id": "linked_em_buffer_component_concentration_units_2",
+          "source_category": "em_buffer_component",
+          "source_item": "concentration_units",
+          "target_category": "em_buffer_component",
+          "target_item": "concentration",
+          "cross": "id",
+          "cross2": ".",
+          "operator": "exists",
+          "fallback": ".",
+          "break_flag": "yes",
+          "warning": ".",
+          "absolute": ".",
+          "text": "Concentration units must be provided when a buffer concentration is given."
+        },
+        {
+          "id": "linked_em_buffer_component_concentration_units_3",
+          "source_category": "em_buffer_component",
+          "source_item": "concentration_units",
+          "target_category": "em_buffer_component",
+          "target_item": "formula",
+          "cross": "id",
+          "cross2": ".",
+          "operator": "exists",
+          "fallback": ".",
+          "break_flag": "yes",
+          "warning": ".",
+          "absolute": ".",
+          "text": "Concentration units must be provided when a buffer formula is given."
+        },
+        {
+          "id": "linked_em_buffer_component_name_1",
+          "source_category": "em_buffer_component",
+          "source_item": "name",
+          "target_category": "em_buffer_component",
+          "target_item": "concentration",
+          "cross": "id",
+          "cross2": ".",
+          "operator": "exists",
+          "fallback": ".",
+          "break_flag": "yes",
+          "warning": ".",
+          "absolute": ".",
+          "text": "Name must be provided when a buffer concentration is given."
+        },
+        {
+          "id": "linked_em_buffer_component_name_2",
+          "source_category": "em_buffer_component",
+          "source_item": "name",
+          "target_category": "em_buffer_component",
+          "target_item": "concentration_units",
+          "cross": "id",
+          "cross2": ".",
+          "operator": "exists",
+          "fallback": ".",
+          "break_flag": "yes",
+          "warning": ".",
+          "absolute": ".",
+          "text": "Name must be provided when buffer concentration units are given."
+        },
+        {
+          "id": "linked_em_buffer_component_name_3",
+          "source_category": "em_buffer_component",
+          "source_item": "name",
+          "target_category": "em_buffer_component",
+          "target_item": "formula",
+          "cross": "id",
+          "cross2": ".",
+          "operator": "exists",
+          "fallback": ".",
+          "break_flag": "yes",
+          "warning": ".",
+          "absolute": ".",
+          "text": "Name must be provided when a buffer formula is given."
+        },
+        {
+          "id": "linked_em_entity_assembly_molwt_experimental_flag_1",
+          "source_category": "em_entity_assembly_molwt",
+          "source_item": "experimental_flag",
+          "target_category": "em_entity_assembly_molwt",
+          "target_item": "value",
+          "cross": "id",
+          "cross2": ".",
+          "operator": "exists",
+          "fallback": ".",
+          "break_flag": "yes",
+          "warning": ".",
+          "absolute": ".",
+          "text": "Molecular weight value must be provided when related fields are present."
+        },
+        {
+          "id": "linked_em_entity_assembly_molwt_experimental_flag_2",
+          "source_category": "em_entity_assembly_molwt",
+          "source_item": "experimental_flag",
+          "target_category": "em_entity_assembly_molwt",
+          "target_item": "units",
+          "cross": "id",
+          "cross2": ".",
+          "operator": "exists",
+          "fallback": ".",
+          "break_flag": "yes",
+          "warning": ".",
+          "absolute": ".",
+          "text": "Experimental flag must be provided when molecular weight units are given."
+        },
+        {
+          "id": "linked_em_entity_assembly_molwt_units_1",
+          "source_category": "em_entity_assembly_molwt",
+          "source_item": "units",
+          "target_category": "em_entity_assembly_molwt",
+          "target_item": "value",
+          "cross": "id",
+          "cross2": ".",
+          "operator": "exists",
+          "fallback": ".",
+          "break_flag": "yes",
+          "warning": ".",
+          "absolute": ".",
+          "text": "Molecular weight units must be provided when molecular weight value is given."
+        },
+        {
+          "id": "linked_em_entity_assembly_molwt_value_1",
+          "source_category": "em_entity_assembly_molwt",
+          "source_item": "value",
+          "target_category": "em_entity_assembly_molwt",
+          "target_item": "units",
+          "cross": "id",
+          "cross2": ".",
+          "operator": "exists",
+          "fallback": ".",
+          "break_flag": "yes",
+          "warning": ".",
+          "absolute": ".",
+          "text": "Molecular weight value must be provided when molecular weight units are given."
+        },
+        {
+          "id": "linked_em_imaging_calibrated_defocus_max_1",
+          "source_category": "em_imaging",
+          "source_item": "calibrated_defocus_max",
+          "target_category": "em_imaging",
+          "target_item": "calibrated_defocus_min",
+          "cross": "id",
+          "cross2": ".",
+          "operator": "<",
+          "fallback": ".",
+          "break_flag": ".",
+          "warning": ".",
+          "absolute": "yes",
+          "text": "Absolute minimum calibrated defocus is greater than absolute maximum calibrated defocus."
+        },
+        {
+          "id": "linked_em_imaging_calibrated_defocus_min_1",
+          "source_category": "em_imaging",
+          "source_item": "calibrated_defocus_min",
+          "target_category": "em_imaging",
+          "target_item": "calibrated_defocus_max",
+          "cross": "id",
+          "cross2": ".",
+          "operator": ">",
+          "fallback": ".",
+          "break_flag": ".",
+          "warning": ".",
+          "absolute": "yes",
+          "text": "Absolute minimum calibrated defocus is greater than absolute maximum calibrated defocus."
+        },
+        {
+          "id": "linked_em_imaging_nominal_defocus_max_1",
+          "source_category": "em_imaging",
+          "source_item": "nominal_defocus_max",
+          "target_category": "em_imaging",
+          "target_item": "nominal_defocus_min",
+          "cross": "id",
+          "cross2": ".",
+          "operator": "<",
+          "fallback": ".",
+          "break_flag": ".",
+          "warning": ".",
+          "absolute": "yes",
+          "text": "Absolute minimum nominal defocus is greater than absolute maximum nominal defocus."
+        },
+        {
+          "id": "linked_em_imaging_nominal_defocus_min_1",
+          "source_category": "em_imaging",
+          "source_item": "nominal_defocus_min",
+          "target_category": "em_imaging",
+          "target_item": "nominal_defocus_max",
+          "cross": "id",
+          "cross2": ".",
+          "operator": ">",
+          "fallback": ".",
+          "break_flag": ".",
+          "warning": ".",
+          "absolute": "yes",
+          "text": "Absolute minimum nominal defocus is greater than absolute maximum nominal defocus."
+        },
+        {
+          "id": "linked_em_sample_support_grid_type_1",
+          "source_category": "em_sample_support",
+          "source_item": "grid_type",
+          "target_category": "em_support_film",
+          "target_item": "material",
+          "cross": "id",
+          "cross2": "sample_support_id",
+          "operator": "exists",
+          "fallback": ".",
+          "break_flag": "yes",
+          "warning": ".",
+          "absolute": ".",
+          "text": "Grid information must be provided when support film information is present."
+        },
+        {
+          "id": "linked_em_sample_support_grid_type_2",
+          "source_category": "em_sample_support",
+          "source_item": "grid_type",
+          "target_category": "em_support_film",
+          "target_item": "topology",
+          "cross": "id",
+          "cross2": "sample_support_id",
+          "operator": "exists",
+          "fallback": ".",
+          "break_flag": "yes",
+          "warning": ".",
+          "absolute": ".",
+          "text": "Grid information must be provided when support film information is present."
+        },
+        {
+          "id": "linked_em_sample_support_grid_type_3",
+          "source_category": "em_sample_support",
+          "source_item": "grid_type",
+          "target_category": "em_support_film",
+          "target_item": "thickness",
+          "cross": "id",
+          "cross2": "sample_support_id",
+          "operator": "exists",
+          "fallback": ".",
+          "break_flag": "yes",
+          "warning": ".",
+          "absolute": ".",
+          "text": "Grid information must be provided when support film information is present."
+        },
+        {
+          "id": "linked_em_sample_support_grid_type_4",
+          "source_category": "em_sample_support",
+          "source_item": "grid_type",
+          "target_category": "em_grid_pretreatment",
+          "target_item": "atmosphere",
+          "cross": "id",
+          "cross2": "sample_support_id",
+          "operator": "exists",
+          "fallback": ".",
+          "break_flag": "yes",
+          "warning": ".",
+          "absolute": ".",
+          "text": "Grid information must be provided when grid pretreatment information is present."
+        },
+        {
+          "id": "linked_em_sample_support_grid_type_5",
+          "source_category": "em_sample_support",
+          "source_item": "grid_type",
+          "target_category": "em_grid_pretreatment",
+          "target_item": "pressure",
+          "cross": "id",
+          "cross2": "sample_support_id",
+          "operator": "exists",
+          "fallback": ".",
+          "break_flag": "yes",
+          "warning": ".",
+          "absolute": ".",
+          "text": "Grid information must be provided when grid pretreatment information is present."
+        },
+        {
+          "id": "linked_em_sample_support_grid_type_6",
+          "source_category": "em_sample_support",
+          "source_item": "grid_type",
+          "target_category": "em_grid_pretreatment",
+          "target_item": "time",
+          "cross": "id",
+          "cross2": "sample_support_id",
+          "operator": "exists",
+          "fallback": ".",
+          "break_flag": "yes",
+          "warning": ".",
+          "absolute": ".",
+          "text": "Grid information must be provided when grid pretreatment information is present."
+        },
+        {
+          "id": "linked_em_sample_support_grid_type_7",
+          "source_category": "em_sample_support",
+          "source_item": "grid_type",
+          "target_category": "em_grid_pretreatment",
+          "target_item": "type",
+          "cross": "id",
+          "cross2": "sample_support_id",
+          "operator": "exists",
+          "fallback": ".",
+          "break_flag": "yes",
+          "warning": ".",
+          "absolute": ".",
+          "text": "Grid information must be provided when grid pretreatment information is present."
+        },
+        {
+          "id": "linked_refine_ls_r_factor_r_work_1",
+          "source_category": "refine",
+          "source_item": "ls_R_factor_R_work",
+          "target_category": "refine",
+          "target_item": "ls_R_factor_R_free",
+          "cross": "pdbx_diffrn_id",
+          "cross2": ".",
+          "operator": ">",
+          "fallback": "single_row_if_key_missing",
+          "break_flag": ".",
+          "warning": "yes",
+          "absolute": ".",
+          "text": "R_work is higher than R_free [{item2CrossValue}]"
+        },
+        {
+          "id": "linked_refine_ls_d_res_high_1",
+          "source_category": "refine",
+          "source_item": "ls_d_res_high",
+          "target_category": "reflns",
+          "target_item": "d_resolution_high",
+          "cross": "pdbx_diffrn_id",
+          "cross2": ".",
+          "operator": "<",
+          "fallback": "single_row_if_key_missing",
+          "break_flag": ".",
+          "warning": ".",
+          "absolute": ".",
+          "text": "Refined high-resolution limit is higher than collected data high-resolution limit [{item2CrossValue}]"
+        },
+        {
+          "id": "linked_refine_ls_d_res_high_2",
+          "source_category": "refine",
+          "source_item": "ls_d_res_high",
+          "target_category": "refine",
+          "target_item": "ls_d_res_low",
+          "cross": "pdbx_diffrn_id",
+          "cross2": ".",
+          "operator": ">",
+          "fallback": "single_row_if_key_missing",
+          "break_flag": ".",
+          "warning": ".",
+          "absolute": ".",
+          "text": "Refined high-resolution limit is lower than refined low-resolution limit [{item2CrossValue}]"
+        },
+        {
+          "id": "linked_refine_ls_d_res_low_1",
+          "source_category": "refine",
+          "source_item": "ls_d_res_low",
+          "target_category": "reflns",
+          "target_item": "d_resolution_low",
+          "cross": "pdbx_diffrn_id",
+          "cross2": ".",
+          "operator": ">",
+          "fallback": "single_row_if_key_missing",
+          "break_flag": ".",
+          "warning": ".",
+          "absolute": ".",
+          "text": "Refined low-resolution limit is lower than collected data low-resolution limit [{item2CrossValue}]"
+        },
+        {
+          "id": "linked_refine_ls_d_res_low_2",
+          "source_category": "refine",
+          "source_item": "ls_d_res_low",
+          "target_category": "refine",
+          "target_item": "ls_d_res_high",
+          "cross": "pdbx_refine_id",
+          "cross2": ".",
+          "operator": "<",
+          "fallback": ".",
+          "break_flag": ".",
+          "warning": ".",
+          "absolute": ".",
+          "text": "Refined low-resolution limit is higher than refined high-resolution limit [{item2CrossValue}]"
+        },
+        {
+          "id": "linked_refine_ls_shell_d_res_high_1",
+          "source_category": "refine_ls_shell",
+          "source_item": "d_res_high",
+          "target_category": "refine",
+          "target_item": "ls_d_res_high",
+          "cross": "pdbx_refine_id",
+          "cross2": ".",
+          "operator": "<",
+          "fallback": ".",
+          "break_flag": ".",
+          "warning": ".",
+          "absolute": ".",
+          "text": "Shell high-resolution limit is higher than overall refined high-resolution limit [{item2CrossValue}]"
+        },
+        {
+          "id": "linked_refine_ls_shell_d_res_low_1",
+          "source_category": "refine_ls_shell",
+          "source_item": "d_res_low",
+          "target_category": "refine",
+          "target_item": "ls_d_res_low",
+          "cross": "pdbx_refine_id",
+          "cross2": ".",
+          "operator": ">",
+          "fallback": ".",
+          "break_flag": ".",
+          "warning": ".",
+          "absolute": ".",
+          "text": "Shell low-resolution limit is lower than overall refined low-resolution limit [{item2CrossValue}]"
+        },
+        {
+          "id": "linked_reflns_d_resolution_high_1",
+          "source_category": "reflns",
+          "source_item": "d_resolution_high",
+          "target_category": "refine",
+          "target_item": "ls_d_res_high",
+          "cross": "pdbx_diffrn_id",
+          "cross2": ".",
+          "operator": ">",
+          "fallback": "single_row_if_key_missing",
+          "break_flag": ".",
+          "warning": ".",
+          "absolute": ".",
+          "text": "Collected data high-resolution limit is lower than high-resolution limit used in refinement [{item2CrossValue}]"
+        },
+        {
+          "id": "linked_reflns_d_resolution_low_1",
+          "source_category": "reflns",
+          "source_item": "d_resolution_low",
+          "target_category": "refine",
+          "target_item": "ls_d_res_low",
+          "cross": "pdbx_diffrn_id",
+          "cross2": ".",
+          "operator": "<",
+          "fallback": "single_row_if_key_missing",
+          "break_flag": ".",
+          "warning": ".",
+          "absolute": ".",
+          "text": "Collected data low-resolution limit is higher than low-resolution limit used in refinement [{item2CrossValue}]"
+        },
+        {
+          "id": "linked_reflns_number_all_1",
+          "source_category": "reflns",
+          "source_item": "number_all",
+          "target_category": "refine",
+          "target_item": "ls_number_reflns_obs",
+          "cross": "pdbx_diffrn_id",
+          "cross2": ".",
+          "operator": "<",
+          "fallback": "single_row_if_key_missing",
+          "break_flag": ".",
+          "warning": ".",
+          "absolute": ".",
+          "text": "Total collected reflections is lower than total reflections used in refinement [{item2CrossValue}]"
+        },
+        {
+          "id": "linked_reflns_number_obs_1",
+          "source_category": "reflns",
+          "source_item": "number_obs",
+          "target_category": "refine",
+          "target_item": "ls_number_reflns_obs",
+          "cross": "pdbx_diffrn_id",
+          "cross2": ".",
+          "operator": "<",
+          "fallback": "single_row_if_key_missing",
+          "break_flag": ".",
+          "warning": ".",
+          "absolute": ".",
+          "text": "Observed reflections is lower than total reflections used in refinement [{item2CrossValue}]"
+        },
+        {
+          "id": "linked_reflns_shell_d_res_high_1",
+          "source_category": "reflns_shell",
+          "source_item": "d_res_high",
+          "target_category": "reflns",
+          "target_item": "d_resolution_high",
+          "cross": "pdbx_diffrn_id",
+          "cross2": ".",
+          "operator": "<",
+          "fallback": "single_row_if_key_missing",
+          "break_flag": ".",
+          "warning": ".",
+          "absolute": ".",
+          "text": "Shell high-resolution limit is higher than overall collected data high-resolution limit [{item2CrossValue}]"
+        }
+      ],
+      "raw_rows": [
+        [
+          "linked_em_3d_fitting_list_source_name_1",
+          "em_3d_fitting_list",
+          "source_name",
+          "em_3d_fitting_list",
+          "type",
+          "id",
+          ".",
+          "exists",
+          ".",
+          "yes",
+          ".",
+          ".",
+          ";Source name must be provided.\n;"
+        ],
+        [
+          "linked_em_3d_fitting_list_source_name_2",
+          "em_3d_fitting_list",
+          "source_name",
+          "em_3d_fitting_list",
+          "accession_code",
+          "id",
+          ".",
+          "exists",
+          ".",
+          "yes",
+          ".",
+          ".",
+          ";Source name must be provided.\n;"
+        ],
+        [
+          "linked_em_3d_fitting_list_source_name_3",
+          "em_3d_fitting_list",
+          "source_name",
+          "em_3d_fitting_list",
+          "details",
+          "id",
+          ".",
+          "exists",
+          ".",
+          "yes",
+          ".",
+          ".",
+          ";Source name must be provided.\n;"
+        ],
+        [
+          "linked_em_3d_fitting_list_source_name_4",
+          "em_3d_fitting_list",
+          "source_name",
+          "em_3d_fitting_list",
+          "chain_id",
+          "id",
+          ".",
+          "exists",
+          ".",
+          "yes",
+          ".",
+          ".",
+          ";Source name must be provided.\n;"
+        ],
+        [
+          "linked_em_3d_fitting_list_source_name_5",
+          "em_3d_fitting_list",
+          "source_name",
+          "em_3d_fitting_list",
+          "chain_residue_range",
+          "id",
+          ".",
+          "exists",
+          ".",
+          "yes",
+          ".",
+          ".",
+          ";Source name must be provided.\n;"
+        ],
+        [
+          "linked_em_3d_fitting_list_type_1",
+          "em_3d_fitting_list",
+          "type",
+          "em_3d_fitting_list",
+          "source_name",
+          "id",
+          ".",
+          "exists",
+          ".",
+          "yes",
+          ".",
+          ".",
+          ";Type must be provided.\n;"
+        ],
+        [
+          "linked_em_3d_fitting_list_type_2",
+          "em_3d_fitting_list",
+          "type",
+          "em_3d_fitting_list",
+          "accession_code",
+          "id",
+          ".",
+          "exists",
+          ".",
+          "yes",
+          ".",
+          ".",
+          ";Type must be provided.\n;"
+        ],
+        [
+          "linked_em_3d_fitting_list_type_3",
+          "em_3d_fitting_list",
+          "type",
+          "em_3d_fitting_list",
+          "details",
+          "id",
+          ".",
+          "exists",
+          ".",
+          "yes",
+          ".",
+          ".",
+          ";Type must be provided.\n;"
+        ],
+        [
+          "linked_em_3d_fitting_list_type_4",
+          "em_3d_fitting_list",
+          "type",
+          "em_3d_fitting_list",
+          "chain_id",
+          "id",
+          ".",
+          "exists",
+          ".",
+          "yes",
+          ".",
+          ".",
+          ";Type must be provided.\n;"
+        ],
+        [
+          "linked_em_3d_fitting_list_type_5",
+          "em_3d_fitting_list",
+          "type",
+          "em_3d_fitting_list",
+          "chain_residue_range",
+          "id",
+          ".",
+          "exists",
+          ".",
+          "yes",
+          ".",
+          ".",
+          ";Type must be provided.\n;"
+        ],
+        [
+          "linked_em_buffer_component_concentration_1",
+          "em_buffer_component",
+          "concentration",
+          "em_buffer_component",
+          "name",
+          "id",
+          ".",
+          "exists",
+          ".",
+          "yes",
+          ".",
+          ".",
+          ";Concentration must be provided when a buffer name is given.\n;"
+        ],
+        [
+          "linked_em_buffer_component_concentration_2",
+          "em_buffer_component",
+          "concentration",
+          "em_buffer_component",
+          "concentration_units",
+          "id",
+          ".",
+          "exists",
+          ".",
+          "yes",
+          ".",
+          ".",
+          ";Concentration must be provided when buffer concentration units are given.\n;"
+        ],
+        [
+          "linked_em_buffer_component_concentration_3",
+          "em_buffer_component",
+          "concentration",
+          "em_buffer_component",
+          "formula",
+          "id",
+          ".",
+          "exists",
+          ".",
+          "yes",
+          ".",
+          ".",
+          ";Concentration must be provided when a buffer formula is given.\n;"
+        ],
+        [
+          "linked_em_buffer_component_concentration_units_1",
+          "em_buffer_component",
+          "concentration_units",
+          "em_buffer_component",
+          "name",
+          "id",
+          ".",
+          "exists",
+          ".",
+          "yes",
+          ".",
+          ".",
+          ";Concentration units must be provided when a buffer name is given.\n;"
+        ],
+        [
+          "linked_em_buffer_component_concentration_units_2",
+          "em_buffer_component",
+          "concentration_units",
+          "em_buffer_component",
+          "concentration",
+          "id",
+          ".",
+          "exists",
+          ".",
+          "yes",
+          ".",
+          ".",
+          ";Concentration units must be provided when a buffer concentration is given.\n;"
+        ],
+        [
+          "linked_em_buffer_component_concentration_units_3",
+          "em_buffer_component",
+          "concentration_units",
+          "em_buffer_component",
+          "formula",
+          "id",
+          ".",
+          "exists",
+          ".",
+          "yes",
+          ".",
+          ".",
+          ";Concentration units must be provided when a buffer formula is given.\n;"
+        ],
+        [
+          "linked_em_buffer_component_name_1",
+          "em_buffer_component",
+          "name",
+          "em_buffer_component",
+          "concentration",
+          "id",
+          ".",
+          "exists",
+          ".",
+          "yes",
+          ".",
+          ".",
+          ";Name must be provided when a buffer concentration is given.\n;"
+        ],
+        [
+          "linked_em_buffer_component_name_2",
+          "em_buffer_component",
+          "name",
+          "em_buffer_component",
+          "concentration_units",
+          "id",
+          ".",
+          "exists",
+          ".",
+          "yes",
+          ".",
+          ".",
+          ";Name must be provided when buffer concentration units are given.\n;"
+        ],
+        [
+          "linked_em_buffer_component_name_3",
+          "em_buffer_component",
+          "name",
+          "em_buffer_component",
+          "formula",
+          "id",
+          ".",
+          "exists",
+          ".",
+          "yes",
+          ".",
+          ".",
+          ";Name must be provided when a buffer formula is given.\n;"
+        ],
+        [
+          "linked_em_entity_assembly_molwt_experimental_flag_1",
+          "em_entity_assembly_molwt",
+          "experimental_flag",
+          "em_entity_assembly_molwt",
+          "value",
+          "id",
+          ".",
+          "exists",
+          ".",
+          "yes",
+          ".",
+          ".",
+          ";Molecular weight value must be provided when related fields are present.\n;"
+        ],
+        [
+          "linked_em_entity_assembly_molwt_experimental_flag_2",
+          "em_entity_assembly_molwt",
+          "experimental_flag",
+          "em_entity_assembly_molwt",
+          "units",
+          "id",
+          ".",
+          "exists",
+          ".",
+          "yes",
+          ".",
+          ".",
+          ";Experimental flag must be provided when molecular weight units are given.\n;"
+        ],
+        [
+          "linked_em_entity_assembly_molwt_units_1",
+          "em_entity_assembly_molwt",
+          "units",
+          "em_entity_assembly_molwt",
+          "value",
+          "id",
+          ".",
+          "exists",
+          ".",
+          "yes",
+          ".",
+          ".",
+          ";Molecular weight units must be provided when molecular weight value is given.\n;"
+        ],
+        [
+          "linked_em_entity_assembly_molwt_value_1",
+          "em_entity_assembly_molwt",
+          "value",
+          "em_entity_assembly_molwt",
+          "units",
+          "id",
+          ".",
+          "exists",
+          ".",
+          "yes",
+          ".",
+          ".",
+          ";Molecular weight value must be provided when molecular weight units are given.\n;"
+        ],
+        [
+          "linked_em_imaging_calibrated_defocus_max_1",
+          "em_imaging",
+          "calibrated_defocus_max",
+          "em_imaging",
+          "calibrated_defocus_min",
+          "id",
+          ".",
+          "<",
+          ".",
+          ".",
+          ".",
+          "yes",
+          ";Absolute minimum calibrated defocus is greater than absolute maximum calibrated defocus.\n;"
+        ],
+        [
+          "linked_em_imaging_calibrated_defocus_min_1",
+          "em_imaging",
+          "calibrated_defocus_min",
+          "em_imaging",
+          "calibrated_defocus_max",
+          "id",
+          ".",
+          ">",
+          ".",
+          ".",
+          ".",
+          "yes",
+          ";Absolute minimum calibrated defocus is greater than absolute maximum calibrated defocus.\n;"
+        ],
+        [
+          "linked_em_imaging_nominal_defocus_max_1",
+          "em_imaging",
+          "nominal_defocus_max",
+          "em_imaging",
+          "nominal_defocus_min",
+          "id",
+          ".",
+          "<",
+          ".",
+          ".",
+          ".",
+          "yes",
+          ";Absolute minimum nominal defocus is greater than absolute maximum nominal defocus.\n;"
+        ],
+        [
+          "linked_em_imaging_nominal_defocus_min_1",
+          "em_imaging",
+          "nominal_defocus_min",
+          "em_imaging",
+          "nominal_defocus_max",
+          "id",
+          ".",
+          ">",
+          ".",
+          ".",
+          ".",
+          "yes",
+          ";Absolute minimum nominal defocus is greater than absolute maximum nominal defocus.\n;"
+        ],
+        [
+          "linked_em_sample_support_grid_type_1",
+          "em_sample_support",
+          "grid_type",
+          "em_support_film",
+          "material",
+          "id",
+          "sample_support_id",
+          "exists",
+          ".",
+          "yes",
+          ".",
+          ".",
+          ";Grid information must be provided when support film information is present.\n;"
+        ],
+        [
+          "linked_em_sample_support_grid_type_2",
+          "em_sample_support",
+          "grid_type",
+          "em_support_film",
+          "topology",
+          "id",
+          "sample_support_id",
+          "exists",
+          ".",
+          "yes",
+          ".",
+          ".",
+          ";Grid information must be provided when support film information is present.\n;"
+        ],
+        [
+          "linked_em_sample_support_grid_type_3",
+          "em_sample_support",
+          "grid_type",
+          "em_support_film",
+          "thickness",
+          "id",
+          "sample_support_id",
+          "exists",
+          ".",
+          "yes",
+          ".",
+          ".",
+          ";Grid information must be provided when support film information is present.\n;"
+        ],
+        [
+          "linked_em_sample_support_grid_type_4",
+          "em_sample_support",
+          "grid_type",
+          "em_grid_pretreatment",
+          "atmosphere",
+          "id",
+          "sample_support_id",
+          "exists",
+          ".",
+          "yes",
+          ".",
+          ".",
+          ";Grid information must be provided when grid pretreatment information is present.\n;"
+        ],
+        [
+          "linked_em_sample_support_grid_type_5",
+          "em_sample_support",
+          "grid_type",
+          "em_grid_pretreatment",
+          "pressure",
+          "id",
+          "sample_support_id",
+          "exists",
+          ".",
+          "yes",
+          ".",
+          ".",
+          ";Grid information must be provided when grid pretreatment information is present.\n;"
+        ],
+        [
+          "linked_em_sample_support_grid_type_6",
+          "em_sample_support",
+          "grid_type",
+          "em_grid_pretreatment",
+          "time",
+          "id",
+          "sample_support_id",
+          "exists",
+          ".",
+          "yes",
+          ".",
+          ".",
+          ";Grid information must be provided when grid pretreatment information is present.\n;"
+        ],
+        [
+          "linked_em_sample_support_grid_type_7",
+          "em_sample_support",
+          "grid_type",
+          "em_grid_pretreatment",
+          "type",
+          "id",
+          "sample_support_id",
+          "exists",
+          ".",
+          "yes",
+          ".",
+          ".",
+          ";Grid information must be provided when grid pretreatment information is present.\n;"
+        ],
+        [
+          "linked_refine_ls_r_factor_r_work_1",
+          "refine",
+          "ls_R_factor_R_work",
+          "refine",
+          "ls_R_factor_R_free",
+          "pdbx_diffrn_id",
+          ".",
+          ">",
+          "single_row_if_key_missing",
+          ".",
+          "yes",
+          ".",
+          ";R_work is higher than R_free [{item2CrossValue}]\n;"
+        ],
+        [
+          "linked_refine_ls_d_res_high_1",
+          "refine",
+          "ls_d_res_high",
+          "reflns",
+          "d_resolution_high",
+          "pdbx_diffrn_id",
+          ".",
+          "<",
+          "single_row_if_key_missing",
+          ".",
+          ".",
+          ".",
+          ";Refined high-resolution limit is higher than collected data high-resolution limit [{item2CrossValue}]\n;"
+        ],
+        [
+          "linked_refine_ls_d_res_high_2",
+          "refine",
+          "ls_d_res_high",
+          "refine",
+          "ls_d_res_low",
+          "pdbx_diffrn_id",
+          ".",
+          ">",
+          "single_row_if_key_missing",
+          ".",
+          ".",
+          ".",
+          ";Refined high-resolution limit is lower than refined low-resolution limit [{item2CrossValue}]\n;"
+        ],
+        [
+          "linked_refine_ls_d_res_low_1",
+          "refine",
+          "ls_d_res_low",
+          "reflns",
+          "d_resolution_low",
+          "pdbx_diffrn_id",
+          ".",
+          ">",
+          "single_row_if_key_missing",
+          ".",
+          ".",
+          ".",
+          ";Refined low-resolution limit is lower than collected data low-resolution limit [{item2CrossValue}]\n;"
+        ],
+        [
+          "linked_refine_ls_d_res_low_2",
+          "refine",
+          "ls_d_res_low",
+          "refine",
+          "ls_d_res_high",
+          "pdbx_refine_id",
+          ".",
+          "<",
+          ".",
+          ".",
+          ".",
+          ".",
+          ";Refined low-resolution limit is higher than refined high-resolution limit [{item2CrossValue}]\n;"
+        ],
+        [
+          "linked_refine_ls_shell_d_res_high_1",
+          "refine_ls_shell",
+          "d_res_high",
+          "refine",
+          "ls_d_res_high",
+          "pdbx_refine_id",
+          ".",
+          "<",
+          ".",
+          ".",
+          ".",
+          ".",
+          ";Shell high-resolution limit is higher than overall refined high-resolution limit [{item2CrossValue}]\n;"
+        ],
+        [
+          "linked_refine_ls_shell_d_res_low_1",
+          "refine_ls_shell",
+          "d_res_low",
+          "refine",
+          "ls_d_res_low",
+          "pdbx_refine_id",
+          ".",
+          ">",
+          ".",
+          ".",
+          ".",
+          ".",
+          ";Shell low-resolution limit is lower than overall refined low-resolution limit [{item2CrossValue}]\n;"
+        ],
+        [
+          "linked_reflns_d_resolution_high_1",
+          "reflns",
+          "d_resolution_high",
+          "refine",
+          "ls_d_res_high",
+          "pdbx_diffrn_id",
+          ".",
+          ">",
+          "single_row_if_key_missing",
+          ".",
+          ".",
+          ".",
+          ";Collected data high-resolution limit is lower than high-resolution limit used in refinement [{item2CrossValue}]\n;"
+        ],
+        [
+          "linked_reflns_d_resolution_low_1",
+          "reflns",
+          "d_resolution_low",
+          "refine",
+          "ls_d_res_low",
+          "pdbx_diffrn_id",
+          ".",
+          "<",
+          "single_row_if_key_missing",
+          ".",
+          ".",
+          ".",
+          ";Collected data low-resolution limit is higher than low-resolution limit used in refinement [{item2CrossValue}]\n;"
+        ],
+        [
+          "linked_reflns_number_all_1",
+          "reflns",
+          "number_all",
+          "refine",
+          "ls_number_reflns_obs",
+          "pdbx_diffrn_id",
+          ".",
+          "<",
+          "single_row_if_key_missing",
+          ".",
+          ".",
+          ".",
+          ";Total collected reflections is lower than total reflections used in refinement [{item2CrossValue}]\n;"
+        ],
+        [
+          "linked_reflns_number_obs_1",
+          "reflns",
+          "number_obs",
+          "refine",
+          "ls_number_reflns_obs",
+          "pdbx_diffrn_id",
+          ".",
+          "<",
+          "single_row_if_key_missing",
+          ".",
+          ".",
+          ".",
+          ";Observed reflections is lower than total reflections used in refinement [{item2CrossValue}]\n;"
+        ],
+        [
+          "linked_reflns_shell_d_res_high_1",
+          "reflns_shell",
+          "d_res_high",
+          "reflns",
+          "d_resolution_high",
+          "pdbx_diffrn_id",
+          ".",
+          "<",
+          "single_row_if_key_missing",
+          ".",
+          ".",
+          ".",
+          ";Shell high-resolution limit is higher than overall collected data high-resolution limit [{item2CrossValue}]\n;"
+        ]
+      ]
+    },
+    {
+      "category": "_validator_rule_conditional_required.",
+      "columns": [
+        "id",
+        "category",
+        "error",
+        "error_text",
+        "warning_text"
+      ],
+      "row_count": 23,
+      "rows": [
+        {
+          "id": "condreq_em_3d_fitting_list_1",
+          "category": "em_3d_fitting_list",
+          "error": "yes",
+          "error_text": "Details must be provided.",
+          "warning_text": "."
+        },
+        {
+          "id": "condreq_em_3d_fitting_list_2",
+          "category": "em_3d_fitting_list",
+          "error": "yes",
+          "error_text": "Details must be provided.",
+          "warning_text": "."
+        },
+        {
+          "id": "condreq_em_3d_fitting_list_3",
+          "category": "em_3d_fitting_list",
+          "error": "yes",
+          "error_text": "PDB accession code must be provided.",
+          "warning_text": "."
+        },
+        {
+          "id": "condreq_em_3d_reconstruction_1",
+          "category": "em_3d_reconstruction",
+          "error": "yes",
+          "error_text": "FSC type must be provided when an FSC resolution method is selected.",
+          "warning_text": "."
+        },
+        {
+          "id": "condreq_em_entity_assembly_molwt_1",
+          "category": "em_entity_assembly_molwt",
+          "error": "yes",
+          "error_text": "Must be supplied when experimentally measured.",
+          "warning_text": "."
+        },
+        {
+          "id": "condreq_em_software_1",
+          "category": "em_software",
+          "error": "yes",
+          "error_text": "Software name must be provided.",
+          "warning_text": "."
+        },
+        {
+          "id": "condreq_em_software_2",
+          "category": "em_software",
+          "error": "yes",
+          "error_text": "Software name must be provided.",
+          "warning_text": "."
+        },
+        {
+          "id": "condreq_em_software_3",
+          "category": "em_software",
+          "error": "yes",
+          "error_text": "Software name must be provided.",
+          "warning_text": "."
+        },
+        {
+          "id": "condreq_em_software_4",
+          "category": "em_software",
+          "error": "yes",
+          "error_text": "Software name must be provided.",
+          "warning_text": "."
+        },
+        {
+          "id": "condreq_em_software_5",
+          "category": "em_software",
+          "error": "yes",
+          "error_text": "RELION software version must be provided.",
+          "warning_text": "."
+        },
+        {
+          "id": "condreq_em_start_model_1",
+          "category": "em_start_model",
+          "error": "yes",
+          "error_text": "Must be supplied when EMDB map selected.",
+          "warning_text": "."
+        },
+        {
+          "id": "condreq_em_start_model_2",
+          "category": "em_start_model",
+          "error": "yes",
+          "error_text": "Must be supplied when PDB entry selected.",
+          "warning_text": "."
+        },
+        {
+          "id": "condreq_em_start_model_3",
+          "category": "em_start_model",
+          "error": "yes",
+          "error_text": "Must be supplied when orthogonal tilt selected.",
+          "warning_text": "."
+        },
+        {
+          "id": "condreq_em_start_model_4",
+          "category": "em_start_model",
+          "error": "yes",
+          "error_text": "Must be supplied when orthogonal tilt selected.",
+          "warning_text": "."
+        },
+        {
+          "id": "condreq_em_start_model_5",
+          "category": "em_start_model",
+          "error": "yes",
+          "error_text": "Must be supplied when orthogonal tilt selected.",
+          "warning_text": "."
+        },
+        {
+          "id": "condreq_em_start_model_6",
+          "category": "em_start_model",
+          "error": "yes",
+          "error_text": "Must be supplied when random conical tilt selected.",
+          "warning_text": "."
+        },
+        {
+          "id": "condreq_em_start_model_7",
+          "category": "em_start_model",
+          "error": "yes",
+          "error_text": "Must be supplied when random conical tilt selected.",
+          "warning_text": "."
+        },
+        {
+          "id": "condreq_pdbx_audit_support_1",
+          "category": "pdbx_audit_support",
+          "error": "yes",
+          "error_text": "Country must be provided when funding organization is \"Other government\" or \"Other private\".",
+          "warning_text": "."
+        },
+        {
+          "id": "condreq_pdbx_audit_support_2",
+          "category": "pdbx_audit_support",
+          "error": "yes",
+          "error_text": "Funding organization details must be provided when funding organization is \"Other government\" or \"Other private\".",
+          "warning_text": "."
+        },
+        {
+          "id": "condreq_pdbx_initial_refinement_model_1",
+          "category": "pdbx_initial_refinement_model",
+          "error": "yes",
+          "error_text": "Initial refinement model details must be provided.",
+          "warning_text": "."
+        },
+        {
+          "id": "condreq_pdbx_initial_refinement_model_2",
+          "category": "pdbx_initial_refinement_model",
+          "error": "yes",
+          "error_text": "Initial refinement model details must be provided.",
+          "warning_text": "."
+        },
+        {
+          "id": "condreq_refine_1",
+          "category": "refine",
+          "error": "yes",
+          "error_text": "No value present for this mandatory item.",
+          "warning_text": "."
+        },
+        {
+          "id": "condreq_software_1",
+          "category": "software",
+          "error": "yes",
+          "error_text": "Refinement software version must be provided.",
+          "warning_text": "."
+        }
+      ],
+      "raw_rows": [
+        [
+          "condreq_em_3d_fitting_list_1",
+          "em_3d_fitting_list",
+          "yes",
+          ";Details must be provided.\n;",
+          "."
+        ],
+        [
+          "condreq_em_3d_fitting_list_2",
+          "em_3d_fitting_list",
+          "yes",
+          ";Details must be provided.\n;",
+          "."
+        ],
+        [
+          "condreq_em_3d_fitting_list_3",
+          "em_3d_fitting_list",
+          "yes",
+          ";PDB accession code must be provided.\n;",
+          "."
+        ],
+        [
+          "condreq_em_3d_reconstruction_1",
+          "em_3d_reconstruction",
+          "yes",
+          ";FSC type must be provided when an FSC resolution method is selected.\n;",
+          "."
+        ],
+        [
+          "condreq_em_entity_assembly_molwt_1",
+          "em_entity_assembly_molwt",
+          "yes",
+          ";Must be supplied when experimentally measured.\n;",
+          "."
+        ],
+        [
+          "condreq_em_software_1",
+          "em_software",
+          "yes",
+          ";Software name must be provided.\n;",
+          "."
+        ],
+        [
+          "condreq_em_software_2",
+          "em_software",
+          "yes",
+          ";Software name must be provided.\n;",
+          "."
+        ],
+        [
+          "condreq_em_software_3",
+          "em_software",
+          "yes",
+          ";Software name must be provided.\n;",
+          "."
+        ],
+        [
+          "condreq_em_software_4",
+          "em_software",
+          "yes",
+          ";Software name must be provided.\n;",
+          "."
+        ],
+        [
+          "condreq_em_software_5",
+          "em_software",
+          "yes",
+          ";RELION software version must be provided.\n;",
+          "."
+        ],
+        [
+          "condreq_em_start_model_1",
+          "em_start_model",
+          "yes",
+          ";Must be supplied when EMDB map selected.\n;",
+          "."
+        ],
+        [
+          "condreq_em_start_model_2",
+          "em_start_model",
+          "yes",
+          ";Must be supplied when PDB entry selected.\n;",
+          "."
+        ],
+        [
+          "condreq_em_start_model_3",
+          "em_start_model",
+          "yes",
+          ";Must be supplied when orthogonal tilt selected.\n;",
+          "."
+        ],
+        [
+          "condreq_em_start_model_4",
+          "em_start_model",
+          "yes",
+          ";Must be supplied when orthogonal tilt selected.\n;",
+          "."
+        ],
+        [
+          "condreq_em_start_model_5",
+          "em_start_model",
+          "yes",
+          ";Must be supplied when orthogonal tilt selected.\n;",
+          "."
+        ],
+        [
+          "condreq_em_start_model_6",
+          "em_start_model",
+          "yes",
+          ";Must be supplied when random conical tilt selected.\n;",
+          "."
+        ],
+        [
+          "condreq_em_start_model_7",
+          "em_start_model",
+          "yes",
+          ";Must be supplied when random conical tilt selected.\n;",
+          "."
+        ],
+        [
+          "condreq_pdbx_audit_support_1",
+          "pdbx_audit_support",
+          "yes",
+          ";Country must be provided when funding organization is \"Other government\" or \"Other private\".\n;",
+          "."
+        ],
+        [
+          "condreq_pdbx_audit_support_2",
+          "pdbx_audit_support",
+          "yes",
+          ";Funding organization details must be provided when funding organization is \"Other government\" or \"Other private\".\n;",
+          "."
+        ],
+        [
+          "condreq_pdbx_initial_refinement_model_1",
+          "pdbx_initial_refinement_model",
+          "yes",
+          ";Initial refinement model details must be provided.\n;",
+          "."
+        ],
+        [
+          "condreq_pdbx_initial_refinement_model_2",
+          "pdbx_initial_refinement_model",
+          "yes",
+          ";Initial refinement model details must be provided.\n;",
+          "."
+        ],
+        [
+          "condreq_refine_1",
+          "refine",
+          "yes",
+          ";No value present for this mandatory item.\n;",
+          "."
+        ],
+        [
+          "condreq_software_1",
+          "software",
+          "yes",
+          ";Refinement software version must be provided.\n;",
+          "."
+        ]
+      ]
+    },
+    {
+      "category": "_validator_rule_conditional_required_item.",
+      "columns": [
+        "rule_id",
+        "ordinal",
+        "item"
+      ],
+      "row_count": 24,
+      "rows": [
+        {
+          "rule_id": "condreq_em_3d_fitting_list_1",
+          "ordinal": "1",
+          "item": "details"
+        },
+        {
+          "rule_id": "condreq_em_3d_fitting_list_2",
+          "ordinal": "1",
+          "item": "details"
+        },
+        {
+          "rule_id": "condreq_em_3d_fitting_list_3",
+          "ordinal": "1",
+          "item": "accession_code"
+        },
+        {
+          "rule_id": "condreq_em_3d_reconstruction_1",
+          "ordinal": "1",
+          "item": "fsc_type"
+        },
+        {
+          "rule_id": "condreq_em_entity_assembly_molwt_1",
+          "ordinal": "1",
+          "item": "units"
+        },
+        {
+          "rule_id": "condreq_em_entity_assembly_molwt_1",
+          "ordinal": "2",
+          "item": "value"
+        },
+        {
+          "rule_id": "condreq_em_software_1",
+          "ordinal": "1",
+          "item": "name"
+        },
+        {
+          "rule_id": "condreq_em_software_2",
+          "ordinal": "1",
+          "item": "name"
+        },
+        {
+          "rule_id": "condreq_em_software_3",
+          "ordinal": "1",
+          "item": "name"
+        },
+        {
+          "rule_id": "condreq_em_software_4",
+          "ordinal": "1",
+          "item": "name"
+        },
+        {
+          "rule_id": "condreq_em_software_5",
+          "ordinal": "1",
+          "item": "version"
+        },
+        {
+          "rule_id": "condreq_em_start_model_1",
+          "ordinal": "1",
+          "item": "emdb_id"
+        },
+        {
+          "rule_id": "condreq_em_start_model_2",
+          "ordinal": "1",
+          "item": "pdb_id"
+        },
+        {
+          "rule_id": "condreq_em_start_model_3",
+          "ordinal": "1",
+          "item": "orthogonal_tilt_num_images"
+        },
+        {
+          "rule_id": "condreq_em_start_model_4",
+          "ordinal": "1",
+          "item": "orthogonal_tilt_angle1"
+        },
+        {
+          "rule_id": "condreq_em_start_model_5",
+          "ordinal": "1",
+          "item": "orthogonal_tilt_angle2"
+        },
+        {
+          "rule_id": "condreq_em_start_model_6",
+          "ordinal": "1",
+          "item": "random_conical_tilt_num_images"
+        },
+        {
+          "rule_id": "condreq_em_start_model_7",
+          "ordinal": "1",
+          "item": "random_conical_tilt_angle"
+        },
+        {
+          "rule_id": "condreq_pdbx_audit_support_1",
+          "ordinal": "1",
+          "item": "country"
+        },
+        {
+          "rule_id": "condreq_pdbx_audit_support_2",
+          "ordinal": "1",
+          "item": "details"
+        },
+        {
+          "rule_id": "condreq_pdbx_initial_refinement_model_1",
+          "ordinal": "1",
+          "item": "details"
+        },
+        {
+          "rule_id": "condreq_pdbx_initial_refinement_model_2",
+          "ordinal": "1",
+          "item": "details"
+        },
+        {
+          "rule_id": "condreq_refine_1",
+          "ordinal": "1",
+          "item": "pdbx_starting_model"
+        },
+        {
+          "rule_id": "condreq_software_1",
+          "ordinal": "1",
+          "item": "version"
+        }
+      ],
+      "raw_rows": [
+        [
+          "condreq_em_3d_fitting_list_1",
+          "1",
+          "details"
+        ],
+        [
+          "condreq_em_3d_fitting_list_2",
+          "1",
+          "details"
+        ],
+        [
+          "condreq_em_3d_fitting_list_3",
+          "1",
+          "accession_code"
+        ],
+        [
+          "condreq_em_3d_reconstruction_1",
+          "1",
+          "fsc_type"
+        ],
+        [
+          "condreq_em_entity_assembly_molwt_1",
+          "1",
+          "units"
+        ],
+        [
+          "condreq_em_entity_assembly_molwt_1",
+          "2",
+          "value"
+        ],
+        [
+          "condreq_em_software_1",
+          "1",
+          "name"
+        ],
+        [
+          "condreq_em_software_2",
+          "1",
+          "name"
+        ],
+        [
+          "condreq_em_software_3",
+          "1",
+          "name"
+        ],
+        [
+          "condreq_em_software_4",
+          "1",
+          "name"
+        ],
+        [
+          "condreq_em_software_5",
+          "1",
+          "version"
+        ],
+        [
+          "condreq_em_start_model_1",
+          "1",
+          "emdb_id"
+        ],
+        [
+          "condreq_em_start_model_2",
+          "1",
+          "pdb_id"
+        ],
+        [
+          "condreq_em_start_model_3",
+          "1",
+          "orthogonal_tilt_num_images"
+        ],
+        [
+          "condreq_em_start_model_4",
+          "1",
+          "orthogonal_tilt_angle1"
+        ],
+        [
+          "condreq_em_start_model_5",
+          "1",
+          "orthogonal_tilt_angle2"
+        ],
+        [
+          "condreq_em_start_model_6",
+          "1",
+          "random_conical_tilt_num_images"
+        ],
+        [
+          "condreq_em_start_model_7",
+          "1",
+          "random_conical_tilt_angle"
+        ],
+        [
+          "condreq_pdbx_audit_support_1",
+          "1",
+          "country"
+        ],
+        [
+          "condreq_pdbx_audit_support_2",
+          "1",
+          "details"
+        ],
+        [
+          "condreq_pdbx_initial_refinement_model_1",
+          "1",
+          "details"
+        ],
+        [
+          "condreq_pdbx_initial_refinement_model_2",
+          "1",
+          "details"
+        ],
+        [
+          "condreq_refine_1",
+          "1",
+          "pdbx_starting_model"
+        ],
+        [
+          "condreq_software_1",
+          "1",
+          "version"
+        ]
+      ]
+    },
+    {
+      "category": "_validator_rule_condition.",
+      "columns": [
+        "owner",
+        "rule_id",
+        "branch_ordinal",
+        "item",
+        "ordinal",
+        "value",
+        "value_form"
+      ],
+      "row_count": 40,
+      "rows": [
+        {
+          "owner": "conditional_required",
+          "rule_id": "condreq_em_3d_fitting_list_1",
+          "branch_ordinal": "1",
+          "item": "type",
+          "ordinal": "1",
+          "value": "other",
+          "value_form": "list"
+        },
+        {
+          "owner": "conditional_required",
+          "rule_id": "condreq_em_3d_fitting_list_2",
+          "branch_ordinal": "1",
+          "item": "source_name",
+          "ordinal": "1",
+          "value": "Other",
+          "value_form": "list"
+        },
+        {
+          "owner": "conditional_required",
+          "rule_id": "condreq_em_3d_fitting_list_3",
+          "branch_ordinal": "1",
+          "item": "source_name",
+          "ordinal": "1",
+          "value": "PDB",
+          "value_form": "list"
+        },
+        {
+          "owner": "conditional_required",
+          "rule_id": "condreq_em_3d_reconstruction_1",
+          "branch_ordinal": "1",
+          "item": "resolution_method",
+          "ordinal": "1",
+          "value": "FSC 0.5 CUT-OFF",
+          "value_form": "list"
+        },
+        {
+          "owner": "conditional_required",
+          "rule_id": "condreq_em_3d_reconstruction_1",
+          "branch_ordinal": "1",
+          "item": "resolution_method",
+          "ordinal": "2",
+          "value": "FSC 0.33 CUT-OFF",
+          "value_form": "list"
+        },
+        {
+          "owner": "conditional_required",
+          "rule_id": "condreq_em_3d_reconstruction_1",
+          "branch_ordinal": "1",
+          "item": "resolution_method",
+          "ordinal": "3",
+          "value": "FSC 0.143 CUT-OFF",
+          "value_form": "list"
+        },
+        {
+          "owner": "conditional_required",
+          "rule_id": "condreq_em_3d_reconstruction_1",
+          "branch_ordinal": "1",
+          "item": "resolution_method",
+          "ordinal": "4",
+          "value": "FSC 3 SIGMA CUT-OFF",
+          "value_form": "list"
+        },
+        {
+          "owner": "conditional_required",
+          "rule_id": "condreq_em_3d_reconstruction_1",
+          "branch_ordinal": "1",
+          "item": "resolution_method",
+          "ordinal": "5",
+          "value": "FSC 1/2 BIT CUT-OFF",
+          "value_form": "list"
+        },
+        {
+          "owner": "conditional_required",
+          "rule_id": "condreq_em_entity_assembly_molwt_1",
+          "branch_ordinal": "1",
+          "item": "experimental_flag",
+          "ordinal": "1",
+          "value": "YES",
+          "value_form": "list"
+        },
+        {
+          "owner": "conditional_required",
+          "rule_id": "condreq_em_software_1",
+          "branch_ordinal": "1",
+          "item": "category",
+          "ordinal": "1",
+          "value": "RECONSTRUCTION",
+          "value_form": "list"
+        },
+        {
+          "owner": "conditional_required",
+          "rule_id": "condreq_em_software_2",
+          "branch_ordinal": "1",
+          "item": "category",
+          "ordinal": "1",
+          "value": "PARTICLE SELECTION",
+          "value_form": "list"
+        },
+        {
+          "owner": "conditional_required",
+          "rule_id": "condreq_em_software_3",
+          "branch_ordinal": "1",
+          "item": "category",
+          "ordinal": "1",
+          "value": "VOLUME SELECTION",
+          "value_form": "list"
+        },
+        {
+          "owner": "conditional_required",
+          "rule_id": "condreq_em_software_4",
+          "branch_ordinal": "1",
+          "item": "category",
+          "ordinal": "1",
+          "value": "SERIES ALIGNMENT",
+          "value_form": "list"
+        },
+        {
+          "owner": "conditional_required",
+          "rule_id": "condreq_em_software_5",
+          "branch_ordinal": "1",
+          "item": "name",
+          "ordinal": "1",
+          "value": "RELION",
+          "value_form": "list"
+        },
+        {
+          "owner": "conditional_required",
+          "rule_id": "condreq_em_start_model_1",
+          "branch_ordinal": "1",
+          "item": "type",
+          "ordinal": "1",
+          "value": "EMDB MAP",
+          "value_form": "list"
+        },
+        {
+          "owner": "conditional_required",
+          "rule_id": "condreq_em_start_model_2",
+          "branch_ordinal": "1",
+          "item": "type",
+          "ordinal": "1",
+          "value": "PDB ENTRY",
+          "value_form": "list"
+        },
+        {
+          "owner": "conditional_required",
+          "rule_id": "condreq_em_start_model_3",
+          "branch_ordinal": "1",
+          "item": "type",
+          "ordinal": "1",
+          "value": "ORTHOGONAL TILT",
+          "value_form": "list"
+        },
+        {
+          "owner": "conditional_required",
+          "rule_id": "condreq_em_start_model_4",
+          "branch_ordinal": "1",
+          "item": "type",
+          "ordinal": "1",
+          "value": "ORTHOGONAL TILT",
+          "value_form": "list"
+        },
+        {
+          "owner": "conditional_required",
+          "rule_id": "condreq_em_start_model_5",
+          "branch_ordinal": "1",
+          "item": "type",
+          "ordinal": "1",
+          "value": "ORTHOGONAL TILT",
+          "value_form": "list"
+        },
+        {
+          "owner": "conditional_required",
+          "rule_id": "condreq_em_start_model_6",
+          "branch_ordinal": "1",
+          "item": "type",
+          "ordinal": "1",
+          "value": "RANDOM CONICAL TILT",
+          "value_form": "list"
+        },
+        {
+          "owner": "conditional_required",
+          "rule_id": "condreq_em_start_model_7",
+          "branch_ordinal": "1",
+          "item": "type",
+          "ordinal": "1",
+          "value": "RANDOM CONICAL TILT",
+          "value_form": "list"
+        },
+        {
+          "owner": "conditional_required",
+          "rule_id": "condreq_pdbx_audit_support_1",
+          "branch_ordinal": "1",
+          "item": "funding_organization",
+          "ordinal": "1",
+          "value": "Other government",
+          "value_form": "list"
+        },
+        {
+          "owner": "conditional_required",
+          "rule_id": "condreq_pdbx_audit_support_1",
+          "branch_ordinal": "1",
+          "item": "funding_organization",
+          "ordinal": "2",
+          "value": "Other private",
+          "value_form": "list"
+        },
+        {
+          "owner": "conditional_required",
+          "rule_id": "condreq_pdbx_audit_support_2",
+          "branch_ordinal": "1",
+          "item": "funding_organization",
+          "ordinal": "1",
+          "value": "Other government",
+          "value_form": "list"
+        },
+        {
+          "owner": "conditional_required",
+          "rule_id": "condreq_pdbx_audit_support_2",
+          "branch_ordinal": "1",
+          "item": "funding_organization",
+          "ordinal": "2",
+          "value": "Other private",
+          "value_form": "list"
+        },
+        {
+          "owner": "conditional_required",
+          "rule_id": "condreq_pdbx_initial_refinement_model_1",
+          "branch_ordinal": "1",
+          "item": "source_name",
+          "ordinal": "1",
+          "value": "Other",
+          "value_form": "list"
+        },
+        {
+          "owner": "conditional_required",
+          "rule_id": "condreq_pdbx_initial_refinement_model_2",
+          "branch_ordinal": "1",
+          "item": "type",
+          "ordinal": "1",
+          "value": "other",
+          "value_form": "list"
+        },
+        {
+          "owner": "conditional_required",
+          "rule_id": "condreq_refine_1",
+          "branch_ordinal": "1",
+          "item": "pdbx_method_to_determine_struct",
+          "ordinal": "1",
+          "value": "MOLECULAR REPLACEMENT",
+          "value_form": "list"
+        },
+        {
+          "owner": "conditional_required",
+          "rule_id": "condreq_software_1",
+          "branch_ordinal": "1",
+          "item": "classification",
+          "ordinal": "1",
+          "value": "refinement",
+          "value_form": "list"
+        },
+        {
+          "owner": "conditional_required",
+          "rule_id": "condreq_software_1",
+          "branch_ordinal": "1",
+          "item": "name",
+          "ordinal": "1",
+          "value": "PHENIX",
+          "value_form": "list"
+        },
+        {
+          "owner": "conditional_required",
+          "rule_id": "condreq_software_1",
+          "branch_ordinal": "1",
+          "item": "name",
+          "ordinal": "2",
+          "value": "REFMAC",
+          "value_form": "list"
+        },
+        {
+          "owner": "procedural",
+          "rule_id": "pdbx_initial_refinement_model_accession_code",
+          "branch_ordinal": "1",
+          "item": "type",
+          "ordinal": "1",
+          "value": "experimental model",
+          "value_form": "scalar"
+        },
+        {
+          "owner": "procedural",
+          "rule_id": "pdbx_initial_refinement_model_accession_code",
+          "branch_ordinal": "1",
+          "item": "source_name",
+          "ordinal": "1",
+          "value": "PDB",
+          "value_form": "scalar"
+        },
+        {
+          "owner": "procedural",
+          "rule_id": "pdbx_initial_refinement_model_accession_code",
+          "branch_ordinal": "2",
+          "item": "type",
+          "ordinal": "1",
+          "value": "integrative model",
+          "value_form": "scalar"
+        },
+        {
+          "owner": "procedural",
+          "rule_id": "pdbx_initial_refinement_model_accession_code",
+          "branch_ordinal": "2",
+          "item": "source_name",
+          "ordinal": "1",
+          "value": "PDB-Dev",
+          "value_form": "scalar"
+        },
+        {
+          "owner": "procedural",
+          "rule_id": "pdbx_initial_refinement_model_accession_code",
+          "branch_ordinal": "3",
+          "item": "type",
+          "ordinal": "1",
+          "value": "in silico model",
+          "value_form": "scalar"
+        },
+        {
+          "owner": "procedural",
+          "rule_id": "pdbx_initial_refinement_model_accession_code",
+          "branch_ordinal": "3",
+          "item": "source_name",
+          "ordinal": "1",
+          "value": "AlphaFold",
+          "value_form": "scalar"
+        },
+        {
+          "owner": "procedural",
+          "rule_id": "pdbx_initial_refinement_model_accession_code",
+          "branch_ordinal": "4",
+          "item": "type",
+          "ordinal": "1",
+          "value": "in silico model",
+          "value_form": "scalar"
+        },
+        {
+          "owner": "procedural",
+          "rule_id": "pdbx_initial_refinement_model_accession_code",
+          "branch_ordinal": "4",
+          "item": "source_name",
+          "ordinal": "1",
+          "value": "ModelArchive",
+          "value_form": "scalar"
+        },
+        {
+          "owner": "procedural",
+          "rule_id": "pdbx_initial_refinement_model_integrative_source_name",
+          "branch_ordinal": "1",
+          "item": "type",
+          "ordinal": "1",
+          "value": "integrative model",
+          "value_form": "scalar"
+        }
+      ],
+      "raw_rows": [
+        [
+          "conditional_required",
+          "condreq_em_3d_fitting_list_1",
+          "1",
+          "type",
+          "1",
+          "other",
+          "list"
+        ],
+        [
+          "conditional_required",
+          "condreq_em_3d_fitting_list_2",
+          "1",
+          "source_name",
+          "1",
+          "Other",
+          "list"
+        ],
+        [
+          "conditional_required",
+          "condreq_em_3d_fitting_list_3",
+          "1",
+          "source_name",
+          "1",
+          "PDB",
+          "list"
+        ],
+        [
+          "conditional_required",
+          "condreq_em_3d_reconstruction_1",
+          "1",
+          "resolution_method",
+          "1",
+          ";FSC 0.5 CUT-OFF\n;",
+          "list"
+        ],
+        [
+          "conditional_required",
+          "condreq_em_3d_reconstruction_1",
+          "1",
+          "resolution_method",
+          "2",
+          ";FSC 0.33 CUT-OFF\n;",
+          "list"
+        ],
+        [
+          "conditional_required",
+          "condreq_em_3d_reconstruction_1",
+          "1",
+          "resolution_method",
+          "3",
+          ";FSC 0.143 CUT-OFF\n;",
+          "list"
+        ],
+        [
+          "conditional_required",
+          "condreq_em_3d_reconstruction_1",
+          "1",
+          "resolution_method",
+          "4",
+          ";FSC 3 SIGMA CUT-OFF\n;",
+          "list"
+        ],
+        [
+          "conditional_required",
+          "condreq_em_3d_reconstruction_1",
+          "1",
+          "resolution_method",
+          "5",
+          ";FSC 1/2 BIT CUT-OFF\n;",
+          "list"
+        ],
+        [
+          "conditional_required",
+          "condreq_em_entity_assembly_molwt_1",
+          "1",
+          "experimental_flag",
+          "1",
+          "YES",
+          "list"
+        ],
+        [
+          "conditional_required",
+          "condreq_em_software_1",
+          "1",
+          "category",
+          "1",
+          "RECONSTRUCTION",
+          "list"
+        ],
+        [
+          "conditional_required",
+          "condreq_em_software_2",
+          "1",
+          "category",
+          "1",
+          ";PARTICLE SELECTION\n;",
+          "list"
+        ],
+        [
+          "conditional_required",
+          "condreq_em_software_3",
+          "1",
+          "category",
+          "1",
+          ";VOLUME SELECTION\n;",
+          "list"
+        ],
+        [
+          "conditional_required",
+          "condreq_em_software_4",
+          "1",
+          "category",
+          "1",
+          ";SERIES ALIGNMENT\n;",
+          "list"
+        ],
+        [
+          "conditional_required",
+          "condreq_em_software_5",
+          "1",
+          "name",
+          "1",
+          "RELION",
+          "list"
+        ],
+        [
+          "conditional_required",
+          "condreq_em_start_model_1",
+          "1",
+          "type",
+          "1",
+          ";EMDB MAP\n;",
+          "list"
+        ],
+        [
+          "conditional_required",
+          "condreq_em_start_model_2",
+          "1",
+          "type",
+          "1",
+          ";PDB ENTRY\n;",
+          "list"
+        ],
+        [
+          "conditional_required",
+          "condreq_em_start_model_3",
+          "1",
+          "type",
+          "1",
+          ";ORTHOGONAL TILT\n;",
+          "list"
+        ],
+        [
+          "conditional_required",
+          "condreq_em_start_model_4",
+          "1",
+          "type",
+          "1",
+          ";ORTHOGONAL TILT\n;",
+          "list"
+        ],
+        [
+          "conditional_required",
+          "condreq_em_start_model_5",
+          "1",
+          "type",
+          "1",
+          ";ORTHOGONAL TILT\n;",
+          "list"
+        ],
+        [
+          "conditional_required",
+          "condreq_em_start_model_6",
+          "1",
+          "type",
+          "1",
+          ";RANDOM CONICAL TILT\n;",
+          "list"
+        ],
+        [
+          "conditional_required",
+          "condreq_em_start_model_7",
+          "1",
+          "type",
+          "1",
+          ";RANDOM CONICAL TILT\n;",
+          "list"
+        ],
+        [
+          "conditional_required",
+          "condreq_pdbx_audit_support_1",
+          "1",
+          "funding_organization",
+          "1",
+          ";Other government\n;",
+          "list"
+        ],
+        [
+          "conditional_required",
+          "condreq_pdbx_audit_support_1",
+          "1",
+          "funding_organization",
+          "2",
+          ";Other private\n;",
+          "list"
+        ],
+        [
+          "conditional_required",
+          "condreq_pdbx_audit_support_2",
+          "1",
+          "funding_organization",
+          "1",
+          ";Other government\n;",
+          "list"
+        ],
+        [
+          "conditional_required",
+          "condreq_pdbx_audit_support_2",
+          "1",
+          "funding_organization",
+          "2",
+          ";Other private\n;",
+          "list"
+        ],
+        [
+          "conditional_required",
+          "condreq_pdbx_initial_refinement_model_1",
+          "1",
+          "source_name",
+          "1",
+          "Other",
+          "list"
+        ],
+        [
+          "conditional_required",
+          "condreq_pdbx_initial_refinement_model_2",
+          "1",
+          "type",
+          "1",
+          "other",
+          "list"
+        ],
+        [
+          "conditional_required",
+          "condreq_refine_1",
+          "1",
+          "pdbx_method_to_determine_struct",
+          "1",
+          ";MOLECULAR REPLACEMENT\n;",
+          "list"
+        ],
+        [
+          "conditional_required",
+          "condreq_software_1",
+          "1",
+          "classification",
+          "1",
+          "refinement",
+          "list"
+        ],
+        [
+          "conditional_required",
+          "condreq_software_1",
+          "1",
+          "name",
+          "1",
+          "PHENIX",
+          "list"
+        ],
+        [
+          "conditional_required",
+          "condreq_software_1",
+          "1",
+          "name",
+          "2",
+          "REFMAC",
+          "list"
+        ],
+        [
+          "procedural",
+          "pdbx_initial_refinement_model_accession_code",
+          "1",
+          "type",
+          "1",
+          ";experimental model\n;",
+          "scalar"
+        ],
+        [
+          "procedural",
+          "pdbx_initial_refinement_model_accession_code",
+          "1",
+          "source_name",
+          "1",
+          "PDB",
+          "scalar"
+        ],
+        [
+          "procedural",
+          "pdbx_initial_refinement_model_accession_code",
+          "2",
+          "type",
+          "1",
+          ";integrative model\n;",
+          "scalar"
+        ],
+        [
+          "procedural",
+          "pdbx_initial_refinement_model_accession_code",
+          "2",
+          "source_name",
+          "1",
+          "PDB-Dev",
+          "scalar"
+        ],
+        [
+          "procedural",
+          "pdbx_initial_refinement_model_accession_code",
+          "3",
+          "type",
+          "1",
+          ";in silico model\n;",
+          "scalar"
+        ],
+        [
+          "procedural",
+          "pdbx_initial_refinement_model_accession_code",
+          "3",
+          "source_name",
+          "1",
+          "AlphaFold",
+          "scalar"
+        ],
+        [
+          "procedural",
+          "pdbx_initial_refinement_model_accession_code",
+          "4",
+          "type",
+          "1",
+          ";in silico model\n;",
+          "scalar"
+        ],
+        [
+          "procedural",
+          "pdbx_initial_refinement_model_accession_code",
+          "4",
+          "source_name",
+          "1",
+          "ModelArchive",
+          "scalar"
+        ],
+        [
+          "procedural",
+          "pdbx_initial_refinement_model_integrative_source_name",
+          "1",
+          "type",
+          "1",
+          ";integrative model\n;",
+          "scalar"
+        ]
+      ]
+    },
+    {
+      "category": "_validator_rule_skip_category.",
+      "columns": [
+        "rule_id",
+        "ordinal",
+        "category"
+      ],
+      "row_count": 1,
+      "rows": [
+        {
+          "rule_id": "condreq_refine_1",
+          "ordinal": "1",
+          "category": "pdbx_initial_refinement_model"
+        }
+      ],
+      "raw_rows": [
+        [
+          "condreq_refine_1",
+          "1",
+          "pdbx_initial_refinement_model"
+        ]
+      ]
+    },
+    {
+      "category": "_validator_rule_conditional_regex.",
+      "columns": [
+        "id",
+        "category",
+        "item",
+        "regex",
+        "error",
+        "error_text",
+        "condition_item",
+        "condition_value"
+      ],
+      "row_count": 1,
+      "rows": [
+        {
+          "id": "regex_em_3d_fitting_list_accession_code_1",
+          "category": "em_3d_fitting_list",
+          "item": "accession_code",
+          "regex": "^(pdb_0000)?[\\w\\d]{4}$",
+          "error": "yes",
+          "error_text": "Please provide a valid PDB accession code e.g. 1csb, pdb_00001csb",
+          "condition_item": "source_name",
+          "condition_value": "PDB"
+        }
+      ],
+      "raw_rows": [
+        [
+          "regex_em_3d_fitting_list_accession_code_1",
+          "em_3d_fitting_list",
+          "accession_code",
+          ";^(pdb_0000)?[\\w\\d]{4}$\n;",
+          "yes",
+          ";Please provide a valid PDB accession code e.g. 1csb, pdb_00001csb\n;",
+          "source_name",
+          "PDB"
+        ]
+      ]
+    },
+    {
+      "category": "_validator_rule_conditional_enum.",
+      "columns": [
+        "id",
+        "category",
+        "driver_item",
+        "affected_item"
+      ],
+      "row_count": 4,
+      "rows": [
+        {
+          "id": "enum_em_3d_fitting_list_type_1",
+          "category": "em_3d_fitting_list",
+          "driver_item": "type",
+          "affected_item": "source_name"
+        },
+        {
+          "id": "enum_em_3d_fitting_list_source_name_2",
+          "category": "em_3d_fitting_list",
+          "driver_item": "source_name",
+          "affected_item": "type"
+        },
+        {
+          "id": "enum_pdbx_initial_refinement_model_type_1",
+          "category": "pdbx_initial_refinement_model",
+          "driver_item": "type",
+          "affected_item": "source_name"
+        },
+        {
+          "id": "enum_pdbx_initial_refinement_model_source_name_2",
+          "category": "pdbx_initial_refinement_model",
+          "driver_item": "source_name",
+          "affected_item": "type"
+        }
+      ],
+      "raw_rows": [
+        [
+          "enum_em_3d_fitting_list_type_1",
+          "em_3d_fitting_list",
+          "type",
+          "source_name"
+        ],
+        [
+          "enum_em_3d_fitting_list_source_name_2",
+          "em_3d_fitting_list",
+          "source_name",
+          "type"
+        ],
+        [
+          "enum_pdbx_initial_refinement_model_type_1",
+          "pdbx_initial_refinement_model",
+          "type",
+          "source_name"
+        ],
+        [
+          "enum_pdbx_initial_refinement_model_source_name_2",
+          "pdbx_initial_refinement_model",
+          "source_name",
+          "type"
+        ]
+      ]
+    },
+    {
+      "category": "_validator_rule_conditional_enum_value.",
+      "columns": [
+        "rule_id",
+        "branch_ordinal",
+        "driver_value",
+        "error_text",
+        "ordinal",
+        "allowed_value"
+      ],
+      "row_count": 9,
+      "rows": [
+        {
+          "rule_id": "enum_em_3d_fitting_list_type_1",
+          "branch_ordinal": "1",
+          "driver_value": "experimental model",
+          "error_text": "For type \"experimental model\", source name must be PDB or Other.",
+          "ordinal": "1",
+          "allowed_value": "PDB"
+        },
+        {
+          "rule_id": "enum_em_3d_fitting_list_type_1",
+          "branch_ordinal": "1",
+          "driver_value": "experimental model",
+          "error_text": "For type \"experimental model\", source name must be PDB or Other.",
+          "ordinal": "2",
+          "allowed_value": "Other"
+        },
+        {
+          "rule_id": "enum_em_3d_fitting_list_type_1",
+          "branch_ordinal": "2",
+          "driver_value": "integrative model",
+          "error_text": "For type \"integrative model\", source name must be Other.",
+          "ordinal": "1",
+          "allowed_value": "Other"
+        },
+        {
+          "rule_id": "enum_em_3d_fitting_list_type_1",
+          "branch_ordinal": "3",
+          "driver_value": "other",
+          "error_text": "For type \"other\", source name must be Other.",
+          "ordinal": "1",
+          "allowed_value": "Other"
+        },
+        {
+          "rule_id": "enum_em_3d_fitting_list_source_name_2",
+          "branch_ordinal": "1",
+          "driver_value": "PDB",
+          "error_text": "For source name \"PDB\", type must be \"experimental model\".",
+          "ordinal": "1",
+          "allowed_value": "experimental model"
+        },
+        {
+          "rule_id": "enum_pdbx_initial_refinement_model_type_1",
+          "branch_ordinal": "1",
+          "driver_value": "experimental model",
+          "error_text": "For type \"experimental model\", source name must be PDB or Other.",
+          "ordinal": "1",
+          "allowed_value": "PDB"
+        },
+        {
+          "rule_id": "enum_pdbx_initial_refinement_model_type_1",
+          "branch_ordinal": "1",
+          "driver_value": "experimental model",
+          "error_text": "For type \"experimental model\", source name must be PDB or Other.",
+          "ordinal": "2",
+          "allowed_value": "Other"
+        },
+        {
+          "rule_id": "enum_pdbx_initial_refinement_model_type_1",
+          "branch_ordinal": "2",
+          "driver_value": "other",
+          "error_text": "For type \"other\", source name must be Other.",
+          "ordinal": "1",
+          "allowed_value": "Other"
+        },
+        {
+          "rule_id": "enum_pdbx_initial_refinement_model_source_name_2",
+          "branch_ordinal": "1",
+          "driver_value": "PDB",
+          "error_text": "For source name \"PDB\", type must be \"experimental model\".",
+          "ordinal": "1",
+          "allowed_value": "experimental model"
+        }
+      ],
+      "raw_rows": [
+        [
+          "enum_em_3d_fitting_list_type_1",
+          "1",
+          ";experimental model\n;",
+          ";For type \"experimental model\", source name must be PDB or Other.\n;",
+          "1",
+          "PDB"
+        ],
+        [
+          "enum_em_3d_fitting_list_type_1",
+          "1",
+          ";experimental model\n;",
+          ";For type \"experimental model\", source name must be PDB or Other.\n;",
+          "2",
+          "Other"
+        ],
+        [
+          "enum_em_3d_fitting_list_type_1",
+          "2",
+          ";integrative model\n;",
+          ";For type \"integrative model\", source name must be Other.\n;",
+          "1",
+          "Other"
+        ],
+        [
+          "enum_em_3d_fitting_list_type_1",
+          "3",
+          "other",
+          ";For type \"other\", source name must be Other.\n;",
+          "1",
+          "Other"
+        ],
+        [
+          "enum_em_3d_fitting_list_source_name_2",
+          "1",
+          "PDB",
+          ";For source name \"PDB\", type must be \"experimental model\".\n;",
+          "1",
+          ";experimental model\n;"
+        ],
+        [
+          "enum_pdbx_initial_refinement_model_type_1",
+          "1",
+          ";experimental model\n;",
+          ";For type \"experimental model\", source name must be PDB or Other.\n;",
+          "1",
+          "PDB"
+        ],
+        [
+          "enum_pdbx_initial_refinement_model_type_1",
+          "1",
+          ";experimental model\n;",
+          ";For type \"experimental model\", source name must be PDB or Other.\n;",
+          "2",
+          "Other"
+        ],
+        [
+          "enum_pdbx_initial_refinement_model_type_1",
+          "2",
+          "other",
+          ";For type \"other\", source name must be Other.\n;",
+          "1",
+          "Other"
+        ],
+        [
+          "enum_pdbx_initial_refinement_model_source_name_2",
+          "1",
+          "PDB",
+          ";For source name \"PDB\", type must be \"experimental model\".\n;",
+          "1",
+          ";experimental model\n;"
+        ]
+      ]
+    },
+    {
+      "category": "_validator_rule_conditional_category_item.",
+      "columns": [
+        "id",
+        "category",
+        "item",
+        "regex",
+        "error",
+        "error_text",
+        "condition_category",
+        "condition_item",
+        "condition_value"
+      ],
+      "row_count": 2,
+      "rows": [
+        {
+          "id": "catitem_pdbx_initial_refinement_model_type_1",
+          "category": "pdbx_initial_refinement_model",
+          "item": "type",
+          "regex": "^.+$",
+          "error": "yes",
+          "error_text": "This field cannot be empty when \"MOLECULAR REPLACEMENT\" is selected.",
+          "condition_category": "refine",
+          "condition_item": "pdbx_method_to_determine_struct",
+          "condition_value": "MOLECULAR REPLACEMENT"
+        },
+        {
+          "id": "catitem_pdbx_initial_refinement_model_source_name_2",
+          "category": "pdbx_initial_refinement_model",
+          "item": "source_name",
+          "regex": "^.+$",
+          "error": "yes",
+          "error_text": "This field cannot be empty when \"MOLECULAR REPLACEMENT\" is selected.",
+          "condition_category": "refine",
+          "condition_item": "pdbx_method_to_determine_struct",
+          "condition_value": "MOLECULAR REPLACEMENT"
+        }
+      ],
+      "raw_rows": [
+        [
+          "catitem_pdbx_initial_refinement_model_type_1",
+          "pdbx_initial_refinement_model",
+          "type",
+          ";^.+$\n;",
+          "yes",
+          ";This field cannot be empty when \"MOLECULAR REPLACEMENT\" is selected.\n;",
+          "refine",
+          "pdbx_method_to_determine_struct",
+          ";MOLECULAR REPLACEMENT\n;"
+        ],
+        [
+          "catitem_pdbx_initial_refinement_model_source_name_2",
+          "pdbx_initial_refinement_model",
+          "source_name",
+          ";^.+$\n;",
+          "yes",
+          ";This field cannot be empty when \"MOLECULAR REPLACEMENT\" is selected.\n;",
+          "refine",
+          "pdbx_method_to_determine_struct",
+          ";MOLECULAR REPLACEMENT\n;"
+        ]
+      ]
+    },
+    {
+      "category": "_validator_rule_dictionary_enum.",
+      "columns": [
+        "id",
+        "category",
+        "source_item",
+        "cross_item"
+      ],
+      "row_count": 4,
+      "rows": [
+        {
+          "id": "dictenum_diffrn_detector_type",
+          "category": "diffrn_detector",
+          "source_item": "type",
+          "cross_item": "detector"
+        },
+        {
+          "id": "dictenum_diffrn_source_type",
+          "category": "diffrn_source",
+          "source_item": "type",
+          "cross_item": "source"
+        },
+        {
+          "id": "dictenum_pdbx_database_related_db_name",
+          "category": "pdbx_database_related",
+          "source_item": "db_name",
+          "cross_item": "content_type"
+        },
+        {
+          "id": "dictenum_software_name",
+          "category": "software",
+          "source_item": "name",
+          "cross_item": "classification"
+        }
+      ],
+      "raw_rows": [
+        [
+          "dictenum_diffrn_detector_type",
+          "diffrn_detector",
+          "type",
+          "detector"
+        ],
+        [
+          "dictenum_diffrn_source_type",
+          "diffrn_source",
+          "type",
+          "source"
+        ],
+        [
+          "dictenum_pdbx_database_related_db_name",
+          "pdbx_database_related",
+          "db_name",
+          "content_type"
+        ],
+        [
+          "dictenum_software_name",
+          "software",
+          "name",
+          "classification"
+        ]
+      ]
+    },
+    {
+      "category": "_validator_rule_cross_reference.",
+      "columns": [
+        "id",
+        "category",
+        "item",
+        "cross_category",
+        "cross_item",
+        "expt",
+        "code",
+        "subtype",
+        "type"
+      ],
+      "row_count": 30,
+      "rows": [
+        {
+          "id": "xref_entity_poly_entity_src_gen_1",
+          "category": "entity_poly",
+          "item": "entity_id",
+          "cross_category": "entity_src_gen",
+          "cross_item": "entity_id",
+          "expt": "all",
+          "code": ".",
+          "subtype": "full",
+          "type": "cross"
+        },
+        {
+          "id": "xref_entity_poly_entity_src_nat_2",
+          "category": "entity_poly",
+          "item": "entity_id",
+          "cross_category": "entity_src_nat",
+          "cross_item": "entity_id",
+          "expt": "all",
+          "code": ".",
+          "subtype": "full",
+          "type": "cross"
+        },
+        {
+          "id": "xref_entity_poly_pdbx_entity_src_syn_3",
+          "category": "entity_poly",
+          "item": "entity_id",
+          "cross_category": "pdbx_entity_src_syn",
+          "cross_item": "entity_id",
+          "expt": "all",
+          "code": ".",
+          "subtype": "full",
+          "type": "cross"
+        },
+        {
+          "id": "xref_exptl_crystal_grow_exptl_crystal_4",
+          "category": "exptl_crystal_grow",
+          "item": "crystal_id",
+          "cross_category": "exptl_crystal",
+          "cross_item": "id",
+          "expt": ".",
+          "code": ".",
+          "subtype": "full",
+          "type": "cross"
+        },
+        {
+          "id": "xref_diffrn_exptl_crystal_5",
+          "category": "diffrn",
+          "item": "crystal_id",
+          "cross_category": "exptl_crystal",
+          "cross_item": "id",
+          "expt": ".",
+          "code": ".",
+          "subtype": "full",
+          "type": "cross"
+        },
+        {
+          "id": "xref_diffrn_detector_diffrn_6",
+          "category": "diffrn_detector",
+          "item": "diffrn_id",
+          "cross_category": "diffrn",
+          "cross_item": "id",
+          "expt": ".",
+          "code": ".",
+          "subtype": "full",
+          "type": "cross"
+        },
+        {
+          "id": "xref_diffrn_radiation_diffrn_7",
+          "category": "diffrn_radiation",
+          "item": "diffrn_id",
+          "cross_category": "diffrn",
+          "cross_item": "id",
+          "expt": ".",
+          "code": ".",
+          "subtype": "full",
+          "type": "cross"
+        },
+        {
+          "id": "xref_diffrn_source_diffrn_8",
+          "category": "diffrn_source",
+          "item": "diffrn_id",
+          "cross_category": "diffrn",
+          "cross_item": "id",
+          "expt": ".",
+          "code": ".",
+          "subtype": "full",
+          "type": "cross"
+        },
+        {
+          "id": "xref_pdbx_serial_crystallography_measurement_diffrn_9",
+          "category": "pdbx_serial_crystallography_measurement",
+          "item": "diffrn_id",
+          "cross_category": "diffrn",
+          "cross_item": "id",
+          "expt": ".",
+          "code": ".",
+          "subtype": "full",
+          "type": "cross"
+        },
+        {
+          "id": "xref_pdbx_serial_crystallography_sample_delivery_diffrn_10",
+          "category": "pdbx_serial_crystallography_sample_delivery",
+          "item": "diffrn_id",
+          "cross_category": "diffrn",
+          "cross_item": "id",
+          "expt": ".",
+          "code": ".",
+          "subtype": "full",
+          "type": "cross"
+        },
+        {
+          "id": "xref_pdbx_serial_crystallography_sample_delivery_injection_diffrn_11",
+          "category": "pdbx_serial_crystallography_sample_delivery_injection",
+          "item": "diffrn_id",
+          "cross_category": "diffrn",
+          "cross_item": "id",
+          "expt": ".",
+          "code": ".",
+          "subtype": "full",
+          "type": "cross"
+        },
+        {
+          "id": "xref_pdbx_serial_crystallography_sample_delivery_fixed_target_diffrn_1",
+          "category": "pdbx_serial_crystallography_sample_delivery_fixed_target",
+          "item": "diffrn_id",
+          "cross_category": "diffrn",
+          "cross_item": "id",
+          "expt": ".",
+          "code": ".",
+          "subtype": "full",
+          "type": "cross"
+        },
+        {
+          "id": "xref_pdbx_serial_crystallography_data_reduction_diffrn_13",
+          "category": "pdbx_serial_crystallography_data_reduction",
+          "item": "diffrn_id",
+          "cross_category": "diffrn",
+          "cross_item": "id",
+          "expt": ".",
+          "code": ".",
+          "subtype": "full",
+          "type": "cross"
+        },
+        {
+          "id": "xref_pdbx_struct_assembly_depositor_info_pdbx_struct_assembly_auth_evi",
+          "category": "pdbx_struct_assembly_depositor_info",
+          "item": "id",
+          "cross_category": "pdbx_struct_assembly_auth_evidence_depositor_info",
+          "cross_item": "assembly_id",
+          "expt": "coded",
+          "code": "PDB",
+          "subtype": "full",
+          "type": "cross"
+        },
+        {
+          "id": "xref_pdbx_struct_assembly_depositor_info_pdbx_struct_assembly_gen_depo",
+          "category": "pdbx_struct_assembly_depositor_info",
+          "item": "id",
+          "cross_category": "pdbx_struct_assembly_gen_depositor_info",
+          "cross_item": "assembly_id",
+          "expt": "coded",
+          "code": "PDB",
+          "subtype": "full",
+          "type": "cross"
+        },
+        {
+          "id": "xref_pdbx_nmr_exptl_sample_pdbx_nmr_sample_details_16",
+          "category": "pdbx_nmr_exptl_sample",
+          "item": "solution_id",
+          "cross_category": "pdbx_nmr_sample_details",
+          "cross_item": "solution_id",
+          "expt": ".",
+          "code": ".",
+          "subtype": "full",
+          "type": "cross"
+        },
+        {
+          "id": "xref_pdbx_nmr_chem_shift_reference_pdbx_nmr_chem_shift_ref_17",
+          "category": "pdbx_nmr_chem_shift_reference",
+          "item": "id",
+          "cross_category": "pdbx_nmr_chem_shift_ref",
+          "cross_item": "chem_shift_reference_id",
+          "expt": ".",
+          "code": ".",
+          "subtype": "full",
+          "type": "cross"
+        },
+        {
+          "id": "xref_pdbx_nmr_assigned_chem_shift_list_pdbx_nmr_chem_shift_experiment_",
+          "category": "pdbx_nmr_assigned_chem_shift_list",
+          "item": "id",
+          "cross_category": "pdbx_nmr_chem_shift_experiment",
+          "cross_item": "assigned_chem_shift_list_id",
+          "expt": ".",
+          "code": ".",
+          "subtype": "full",
+          "type": "cross"
+        },
+        {
+          "id": "xref_pdbx_nmr_assigned_chem_shift_list_pdbx_nmr_chem_shift_software_19",
+          "category": "pdbx_nmr_assigned_chem_shift_list",
+          "item": "id",
+          "cross_category": "pdbx_nmr_chem_shift_software",
+          "cross_item": "assigned_chem_shift_list_id",
+          "expt": ".",
+          "code": ".",
+          "subtype": "full",
+          "type": "cross"
+        },
+        {
+          "id": "xref_pdbx_nmr_assigned_chem_shift_list_pdbx_nmr_systematic_chem_shift_",
+          "category": "pdbx_nmr_assigned_chem_shift_list",
+          "item": "id",
+          "cross_category": "pdbx_nmr_systematic_chem_shift_offset",
+          "cross_item": "assigned_chem_shift_list_id",
+          "expt": ".",
+          "code": ".",
+          "subtype": "full",
+          "type": "cross"
+        },
+        {
+          "id": "xref_em_specimen_em_experiment_21",
+          "category": "em_specimen",
+          "item": "experiment_id",
+          "cross_category": "em_experiment",
+          "cross_item": "id",
+          "expt": ".",
+          "code": ".",
+          "subtype": "full",
+          "type": "cross"
+        },
+        {
+          "id": "xref_em_imaging_optics_em_imaging_22",
+          "category": "em_imaging_optics",
+          "item": "imaging_id",
+          "cross_category": "em_imaging",
+          "cross_item": "id",
+          "expt": ".",
+          "code": ".",
+          "subtype": "full",
+          "type": "cross"
+        },
+        {
+          "id": "xref_em_image_scans_em_image_recording_23",
+          "category": "em_image_scans",
+          "item": "image_recording_id",
+          "cross_category": "em_image_recording",
+          "cross_item": "id",
+          "expt": ".",
+          "code": ".",
+          "subtype": "full",
+          "type": "cross"
+        },
+        {
+          "id": "xref_em_particle_selection_em_image_processing_24",
+          "category": "em_particle_selection",
+          "item": "image_processing_id",
+          "cross_category": "em_image_processing",
+          "cross_item": "id",
+          "expt": ".",
+          "code": ".",
+          "subtype": "full",
+          "type": "cross"
+        },
+        {
+          "id": "xref_em_volume_selection_em_image_processing_25",
+          "category": "em_volume_selection",
+          "item": "image_processing_id",
+          "cross_category": "em_image_processing",
+          "cross_item": "id",
+          "expt": ".",
+          "code": ".",
+          "subtype": "full",
+          "type": "cross"
+        },
+        {
+          "id": "xref_em_ctf_correction_em_image_processing_26",
+          "category": "em_ctf_correction",
+          "item": "em_image_processing_id",
+          "cross_category": "em_image_processing",
+          "cross_item": "id",
+          "expt": ".",
+          "code": ".",
+          "subtype": "full",
+          "type": "cross"
+        },
+        {
+          "id": "xref_em_start_model_em_image_processing_27",
+          "category": "em_start_model",
+          "item": "image_processing_id",
+          "cross_category": "em_image_processing",
+          "cross_item": "id",
+          "expt": ".",
+          "code": ".",
+          "subtype": "full",
+          "type": "cross"
+        },
+        {
+          "id": "xref_em_3d_reconstruction_em_image_processing_28",
+          "category": "em_3d_reconstruction",
+          "item": "image_processing_id",
+          "cross_category": "em_image_processing",
+          "cross_item": "id",
+          "expt": ".",
+          "code": ".",
+          "subtype": "full",
+          "type": "cross"
+        },
+        {
+          "id": "xref_em_final_classification_em_image_processing_29",
+          "category": "em_final_classification",
+          "item": "image_processing_id",
+          "cross_category": "em_image_processing",
+          "cross_item": "id",
+          "expt": ".",
+          "code": ".",
+          "subtype": "full",
+          "type": "cross"
+        },
+        {
+          "id": "xref_em_3d_fitting_list_em_3d_fitting_30",
+          "category": "em_3d_fitting_list",
+          "item": "3d_fitting_id",
+          "cross_category": "em_3d_fitting",
+          "cross_item": "id",
+          "expt": ".",
+          "code": ".",
+          "subtype": "full",
+          "type": "cross"
+        }
+      ],
+      "raw_rows": [
+        [
+          "xref_entity_poly_entity_src_gen_1",
+          "entity_poly",
+          "entity_id",
+          "entity_src_gen",
+          "entity_id",
+          "all",
+          ".",
+          "full",
+          "cross"
+        ],
+        [
+          "xref_entity_poly_entity_src_nat_2",
+          "entity_poly",
+          "entity_id",
+          "entity_src_nat",
+          "entity_id",
+          "all",
+          ".",
+          "full",
+          "cross"
+        ],
+        [
+          "xref_entity_poly_pdbx_entity_src_syn_3",
+          "entity_poly",
+          "entity_id",
+          "pdbx_entity_src_syn",
+          "entity_id",
+          "all",
+          ".",
+          "full",
+          "cross"
+        ],
+        [
+          "xref_exptl_crystal_grow_exptl_crystal_4",
+          "exptl_crystal_grow",
+          "crystal_id",
+          "exptl_crystal",
+          "id",
+          ".",
+          ".",
+          "full",
+          "cross"
+        ],
+        [
+          "xref_diffrn_exptl_crystal_5",
+          "diffrn",
+          "crystal_id",
+          "exptl_crystal",
+          "id",
+          ".",
+          ".",
+          "full",
+          "cross"
+        ],
+        [
+          "xref_diffrn_detector_diffrn_6",
+          "diffrn_detector",
+          "diffrn_id",
+          "diffrn",
+          "id",
+          ".",
+          ".",
+          "full",
+          "cross"
+        ],
+        [
+          "xref_diffrn_radiation_diffrn_7",
+          "diffrn_radiation",
+          "diffrn_id",
+          "diffrn",
+          "id",
+          ".",
+          ".",
+          "full",
+          "cross"
+        ],
+        [
+          "xref_diffrn_source_diffrn_8",
+          "diffrn_source",
+          "diffrn_id",
+          "diffrn",
+          "id",
+          ".",
+          ".",
+          "full",
+          "cross"
+        ],
+        [
+          "xref_pdbx_serial_crystallography_measurement_diffrn_9",
+          "pdbx_serial_crystallography_measurement",
+          "diffrn_id",
+          "diffrn",
+          "id",
+          ".",
+          ".",
+          "full",
+          "cross"
+        ],
+        [
+          "xref_pdbx_serial_crystallography_sample_delivery_diffrn_10",
+          "pdbx_serial_crystallography_sample_delivery",
+          "diffrn_id",
+          "diffrn",
+          "id",
+          ".",
+          ".",
+          "full",
+          "cross"
+        ],
+        [
+          "xref_pdbx_serial_crystallography_sample_delivery_injection_diffrn_11",
+          "pdbx_serial_crystallography_sample_delivery_injection",
+          "diffrn_id",
+          "diffrn",
+          "id",
+          ".",
+          ".",
+          "full",
+          "cross"
+        ],
+        [
+          "xref_pdbx_serial_crystallography_sample_delivery_fixed_target_diffrn_1",
+          "pdbx_serial_crystallography_sample_delivery_fixed_target",
+          "diffrn_id",
+          "diffrn",
+          "id",
+          ".",
+          ".",
+          "full",
+          "cross"
+        ],
+        [
+          "xref_pdbx_serial_crystallography_data_reduction_diffrn_13",
+          "pdbx_serial_crystallography_data_reduction",
+          "diffrn_id",
+          "diffrn",
+          "id",
+          ".",
+          ".",
+          "full",
+          "cross"
+        ],
+        [
+          "xref_pdbx_struct_assembly_depositor_info_pdbx_struct_assembly_auth_evi",
+          "pdbx_struct_assembly_depositor_info",
+          "id",
+          "pdbx_struct_assembly_auth_evidence_depositor_info",
+          "assembly_id",
+          "coded",
+          "PDB",
+          "full",
+          "cross"
+        ],
+        [
+          "xref_pdbx_struct_assembly_depositor_info_pdbx_struct_assembly_gen_depo",
+          "pdbx_struct_assembly_depositor_info",
+          "id",
+          "pdbx_struct_assembly_gen_depositor_info",
+          "assembly_id",
+          "coded",
+          "PDB",
+          "full",
+          "cross"
+        ],
+        [
+          "xref_pdbx_nmr_exptl_sample_pdbx_nmr_sample_details_16",
+          "pdbx_nmr_exptl_sample",
+          "solution_id",
+          "pdbx_nmr_sample_details",
+          "solution_id",
+          ".",
+          ".",
+          "full",
+          "cross"
+        ],
+        [
+          "xref_pdbx_nmr_chem_shift_reference_pdbx_nmr_chem_shift_ref_17",
+          "pdbx_nmr_chem_shift_reference",
+          "id",
+          "pdbx_nmr_chem_shift_ref",
+          "chem_shift_reference_id",
+          ".",
+          ".",
+          "full",
+          "cross"
+        ],
+        [
+          "xref_pdbx_nmr_assigned_chem_shift_list_pdbx_nmr_chem_shift_experiment_",
+          "pdbx_nmr_assigned_chem_shift_list",
+          "id",
+          "pdbx_nmr_chem_shift_experiment",
+          "assigned_chem_shift_list_id",
+          ".",
+          ".",
+          "full",
+          "cross"
+        ],
+        [
+          "xref_pdbx_nmr_assigned_chem_shift_list_pdbx_nmr_chem_shift_software_19",
+          "pdbx_nmr_assigned_chem_shift_list",
+          "id",
+          "pdbx_nmr_chem_shift_software",
+          "assigned_chem_shift_list_id",
+          ".",
+          ".",
+          "full",
+          "cross"
+        ],
+        [
+          "xref_pdbx_nmr_assigned_chem_shift_list_pdbx_nmr_systematic_chem_shift_",
+          "pdbx_nmr_assigned_chem_shift_list",
+          "id",
+          "pdbx_nmr_systematic_chem_shift_offset",
+          "assigned_chem_shift_list_id",
+          ".",
+          ".",
+          "full",
+          "cross"
+        ],
+        [
+          "xref_em_specimen_em_experiment_21",
+          "em_specimen",
+          "experiment_id",
+          "em_experiment",
+          "id",
+          ".",
+          ".",
+          "full",
+          "cross"
+        ],
+        [
+          "xref_em_imaging_optics_em_imaging_22",
+          "em_imaging_optics",
+          "imaging_id",
+          "em_imaging",
+          "id",
+          ".",
+          ".",
+          "full",
+          "cross"
+        ],
+        [
+          "xref_em_image_scans_em_image_recording_23",
+          "em_image_scans",
+          "image_recording_id",
+          "em_image_recording",
+          "id",
+          ".",
+          ".",
+          "full",
+          "cross"
+        ],
+        [
+          "xref_em_particle_selection_em_image_processing_24",
+          "em_particle_selection",
+          "image_processing_id",
+          "em_image_processing",
+          "id",
+          ".",
+          ".",
+          "full",
+          "cross"
+        ],
+        [
+          "xref_em_volume_selection_em_image_processing_25",
+          "em_volume_selection",
+          "image_processing_id",
+          "em_image_processing",
+          "id",
+          ".",
+          ".",
+          "full",
+          "cross"
+        ],
+        [
+          "xref_em_ctf_correction_em_image_processing_26",
+          "em_ctf_correction",
+          "em_image_processing_id",
+          "em_image_processing",
+          "id",
+          ".",
+          ".",
+          "full",
+          "cross"
+        ],
+        [
+          "xref_em_start_model_em_image_processing_27",
+          "em_start_model",
+          "image_processing_id",
+          "em_image_processing",
+          "id",
+          ".",
+          ".",
+          "full",
+          "cross"
+        ],
+        [
+          "xref_em_3d_reconstruction_em_image_processing_28",
+          "em_3d_reconstruction",
+          "image_processing_id",
+          "em_image_processing",
+          "id",
+          ".",
+          ".",
+          "full",
+          "cross"
+        ],
+        [
+          "xref_em_final_classification_em_image_processing_29",
+          "em_final_classification",
+          "image_processing_id",
+          "em_image_processing",
+          "id",
+          ".",
+          ".",
+          "full",
+          "cross"
+        ],
+        [
+          "xref_em_3d_fitting_list_em_3d_fitting_30",
+          "em_3d_fitting_list",
+          "3d_fitting_id",
+          "em_3d_fitting",
+          "id",
+          ".",
+          ".",
+          "full",
+          "cross"
+        ]
+      ]
+    },
+    {
+      "category": "_validator_rule_cross_reference_expt.",
+      "columns": [
+        "rule_id",
+        "ordinal",
+        "mode"
+      ],
+      "row_count": 50,
+      "rows": [
+        {
+          "rule_id": "xref_exptl_crystal_grow_exptl_crystal_4",
+          "ordinal": "1",
+          "mode": "xray"
+        },
+        {
+          "rule_id": "xref_exptl_crystal_grow_exptl_crystal_4",
+          "ordinal": "2",
+          "mode": "nd"
+        },
+        {
+          "rule_id": "xref_exptl_crystal_grow_exptl_crystal_4",
+          "ordinal": "3",
+          "mode": "fd"
+        },
+        {
+          "rule_id": "xref_exptl_crystal_grow_exptl_crystal_4",
+          "ordinal": "4",
+          "mode": "ec"
+        },
+        {
+          "rule_id": "xref_diffrn_exptl_crystal_5",
+          "ordinal": "1",
+          "mode": "xray"
+        },
+        {
+          "rule_id": "xref_diffrn_exptl_crystal_5",
+          "ordinal": "2",
+          "mode": "nd"
+        },
+        {
+          "rule_id": "xref_diffrn_exptl_crystal_5",
+          "ordinal": "3",
+          "mode": "fd"
+        },
+        {
+          "rule_id": "xref_diffrn_detector_diffrn_6",
+          "ordinal": "1",
+          "mode": "xray"
+        },
+        {
+          "rule_id": "xref_diffrn_detector_diffrn_6",
+          "ordinal": "2",
+          "mode": "nd"
+        },
+        {
+          "rule_id": "xref_diffrn_detector_diffrn_6",
+          "ordinal": "3",
+          "mode": "fd"
+        },
+        {
+          "rule_id": "xref_diffrn_radiation_diffrn_7",
+          "ordinal": "1",
+          "mode": "xray"
+        },
+        {
+          "rule_id": "xref_diffrn_radiation_diffrn_7",
+          "ordinal": "2",
+          "mode": "nd"
+        },
+        {
+          "rule_id": "xref_diffrn_radiation_diffrn_7",
+          "ordinal": "3",
+          "mode": "fd"
+        },
+        {
+          "rule_id": "xref_diffrn_source_diffrn_8",
+          "ordinal": "1",
+          "mode": "xray"
+        },
+        {
+          "rule_id": "xref_diffrn_source_diffrn_8",
+          "ordinal": "2",
+          "mode": "nd"
+        },
+        {
+          "rule_id": "xref_diffrn_source_diffrn_8",
+          "ordinal": "3",
+          "mode": "fd"
+        },
+        {
+          "rule_id": "xref_pdbx_serial_crystallography_measurement_diffrn_9",
+          "ordinal": "1",
+          "mode": "xray"
+        },
+        {
+          "rule_id": "xref_pdbx_serial_crystallography_sample_delivery_diffrn_10",
+          "ordinal": "1",
+          "mode": "xray"
+        },
+        {
+          "rule_id": "xref_pdbx_serial_crystallography_sample_delivery_injection_diffrn_11",
+          "ordinal": "1",
+          "mode": "xray"
+        },
+        {
+          "rule_id": "xref_pdbx_serial_crystallography_sample_delivery_fixed_target_diffrn_1",
+          "ordinal": "1",
+          "mode": "xray"
+        },
+        {
+          "rule_id": "xref_pdbx_serial_crystallography_data_reduction_diffrn_13",
+          "ordinal": "1",
+          "mode": "xray"
+        },
+        {
+          "rule_id": "xref_pdbx_nmr_exptl_sample_pdbx_nmr_sample_details_16",
+          "ordinal": "1",
+          "mode": "nmr"
+        },
+        {
+          "rule_id": "xref_pdbx_nmr_exptl_sample_pdbx_nmr_sample_details_16",
+          "ordinal": "2",
+          "mode": "ssnmr"
+        },
+        {
+          "rule_id": "xref_pdbx_nmr_chem_shift_reference_pdbx_nmr_chem_shift_ref_17",
+          "ordinal": "1",
+          "mode": "nmr"
+        },
+        {
+          "rule_id": "xref_pdbx_nmr_chem_shift_reference_pdbx_nmr_chem_shift_ref_17",
+          "ordinal": "2",
+          "mode": "ssnmr"
+        },
+        {
+          "rule_id": "xref_pdbx_nmr_assigned_chem_shift_list_pdbx_nmr_chem_shift_experiment_",
+          "ordinal": "1",
+          "mode": "nmr"
+        },
+        {
+          "rule_id": "xref_pdbx_nmr_assigned_chem_shift_list_pdbx_nmr_chem_shift_experiment_",
+          "ordinal": "2",
+          "mode": "ssnmr"
+        },
+        {
+          "rule_id": "xref_pdbx_nmr_assigned_chem_shift_list_pdbx_nmr_chem_shift_software_19",
+          "ordinal": "1",
+          "mode": "nmr"
+        },
+        {
+          "rule_id": "xref_pdbx_nmr_assigned_chem_shift_list_pdbx_nmr_chem_shift_software_19",
+          "ordinal": "2",
+          "mode": "ssnmr"
+        },
+        {
+          "rule_id": "xref_pdbx_nmr_assigned_chem_shift_list_pdbx_nmr_systematic_chem_shift_",
+          "ordinal": "1",
+          "mode": "nmr"
+        },
+        {
+          "rule_id": "xref_pdbx_nmr_assigned_chem_shift_list_pdbx_nmr_systematic_chem_shift_",
+          "ordinal": "2",
+          "mode": "ssnmr"
+        },
+        {
+          "rule_id": "xref_em_specimen_em_experiment_21",
+          "ordinal": "1",
+          "mode": "em"
+        },
+        {
+          "rule_id": "xref_em_specimen_em_experiment_21",
+          "ordinal": "2",
+          "mode": "ec"
+        },
+        {
+          "rule_id": "xref_em_imaging_optics_em_imaging_22",
+          "ordinal": "1",
+          "mode": "em"
+        },
+        {
+          "rule_id": "xref_em_imaging_optics_em_imaging_22",
+          "ordinal": "2",
+          "mode": "ec"
+        },
+        {
+          "rule_id": "xref_em_image_scans_em_image_recording_23",
+          "ordinal": "1",
+          "mode": "em"
+        },
+        {
+          "rule_id": "xref_em_image_scans_em_image_recording_23",
+          "ordinal": "2",
+          "mode": "ec"
+        },
+        {
+          "rule_id": "xref_em_particle_selection_em_image_processing_24",
+          "ordinal": "1",
+          "mode": "em"
+        },
+        {
+          "rule_id": "xref_em_particle_selection_em_image_processing_24",
+          "ordinal": "2",
+          "mode": "ec"
+        },
+        {
+          "rule_id": "xref_em_volume_selection_em_image_processing_25",
+          "ordinal": "1",
+          "mode": "em"
+        },
+        {
+          "rule_id": "xref_em_ctf_correction_em_image_processing_26",
+          "ordinal": "1",
+          "mode": "em"
+        },
+        {
+          "rule_id": "xref_em_ctf_correction_em_image_processing_26",
+          "ordinal": "2",
+          "mode": "ec"
+        },
+        {
+          "rule_id": "xref_em_start_model_em_image_processing_27",
+          "ordinal": "1",
+          "mode": "em"
+        },
+        {
+          "rule_id": "xref_em_start_model_em_image_processing_27",
+          "ordinal": "2",
+          "mode": "ec"
+        },
+        {
+          "rule_id": "xref_em_3d_reconstruction_em_image_processing_28",
+          "ordinal": "1",
+          "mode": "em"
+        },
+        {
+          "rule_id": "xref_em_3d_reconstruction_em_image_processing_28",
+          "ordinal": "2",
+          "mode": "ec"
+        },
+        {
+          "rule_id": "xref_em_final_classification_em_image_processing_29",
+          "ordinal": "1",
+          "mode": "em"
+        },
+        {
+          "rule_id": "xref_em_final_classification_em_image_processing_29",
+          "ordinal": "2",
+          "mode": "ec"
+        },
+        {
+          "rule_id": "xref_em_3d_fitting_list_em_3d_fitting_30",
+          "ordinal": "1",
+          "mode": "em"
+        },
+        {
+          "rule_id": "xref_em_3d_fitting_list_em_3d_fitting_30",
+          "ordinal": "2",
+          "mode": "ec"
+        }
+      ],
+      "raw_rows": [
+        [
+          "xref_exptl_crystal_grow_exptl_crystal_4",
+          "1",
+          "xray"
+        ],
+        [
+          "xref_exptl_crystal_grow_exptl_crystal_4",
+          "2",
+          "nd"
+        ],
+        [
+          "xref_exptl_crystal_grow_exptl_crystal_4",
+          "3",
+          "fd"
+        ],
+        [
+          "xref_exptl_crystal_grow_exptl_crystal_4",
+          "4",
+          "ec"
+        ],
+        [
+          "xref_diffrn_exptl_crystal_5",
+          "1",
+          "xray"
+        ],
+        [
+          "xref_diffrn_exptl_crystal_5",
+          "2",
+          "nd"
+        ],
+        [
+          "xref_diffrn_exptl_crystal_5",
+          "3",
+          "fd"
+        ],
+        [
+          "xref_diffrn_detector_diffrn_6",
+          "1",
+          "xray"
+        ],
+        [
+          "xref_diffrn_detector_diffrn_6",
+          "2",
+          "nd"
+        ],
+        [
+          "xref_diffrn_detector_diffrn_6",
+          "3",
+          "fd"
+        ],
+        [
+          "xref_diffrn_radiation_diffrn_7",
+          "1",
+          "xray"
+        ],
+        [
+          "xref_diffrn_radiation_diffrn_7",
+          "2",
+          "nd"
+        ],
+        [
+          "xref_diffrn_radiation_diffrn_7",
+          "3",
+          "fd"
+        ],
+        [
+          "xref_diffrn_source_diffrn_8",
+          "1",
+          "xray"
+        ],
+        [
+          "xref_diffrn_source_diffrn_8",
+          "2",
+          "nd"
+        ],
+        [
+          "xref_diffrn_source_diffrn_8",
+          "3",
+          "fd"
+        ],
+        [
+          "xref_pdbx_serial_crystallography_measurement_diffrn_9",
+          "1",
+          "xray"
+        ],
+        [
+          "xref_pdbx_serial_crystallography_sample_delivery_diffrn_10",
+          "1",
+          "xray"
+        ],
+        [
+          "xref_pdbx_serial_crystallography_sample_delivery_injection_diffrn_11",
+          "1",
+          "xray"
+        ],
+        [
+          "xref_pdbx_serial_crystallography_sample_delivery_fixed_target_diffrn_1",
+          "1",
+          "xray"
+        ],
+        [
+          "xref_pdbx_serial_crystallography_data_reduction_diffrn_13",
+          "1",
+          "xray"
+        ],
+        [
+          "xref_pdbx_nmr_exptl_sample_pdbx_nmr_sample_details_16",
+          "1",
+          "nmr"
+        ],
+        [
+          "xref_pdbx_nmr_exptl_sample_pdbx_nmr_sample_details_16",
+          "2",
+          "ssnmr"
+        ],
+        [
+          "xref_pdbx_nmr_chem_shift_reference_pdbx_nmr_chem_shift_ref_17",
+          "1",
+          "nmr"
+        ],
+        [
+          "xref_pdbx_nmr_chem_shift_reference_pdbx_nmr_chem_shift_ref_17",
+          "2",
+          "ssnmr"
+        ],
+        [
+          "xref_pdbx_nmr_assigned_chem_shift_list_pdbx_nmr_chem_shift_experiment_",
+          "1",
+          "nmr"
+        ],
+        [
+          "xref_pdbx_nmr_assigned_chem_shift_list_pdbx_nmr_chem_shift_experiment_",
+          "2",
+          "ssnmr"
+        ],
+        [
+          "xref_pdbx_nmr_assigned_chem_shift_list_pdbx_nmr_chem_shift_software_19",
+          "1",
+          "nmr"
+        ],
+        [
+          "xref_pdbx_nmr_assigned_chem_shift_list_pdbx_nmr_chem_shift_software_19",
+          "2",
+          "ssnmr"
+        ],
+        [
+          "xref_pdbx_nmr_assigned_chem_shift_list_pdbx_nmr_systematic_chem_shift_",
+          "1",
+          "nmr"
+        ],
+        [
+          "xref_pdbx_nmr_assigned_chem_shift_list_pdbx_nmr_systematic_chem_shift_",
+          "2",
+          "ssnmr"
+        ],
+        [
+          "xref_em_specimen_em_experiment_21",
+          "1",
+          "em"
+        ],
+        [
+          "xref_em_specimen_em_experiment_21",
+          "2",
+          "ec"
+        ],
+        [
+          "xref_em_imaging_optics_em_imaging_22",
+          "1",
+          "em"
+        ],
+        [
+          "xref_em_imaging_optics_em_imaging_22",
+          "2",
+          "ec"
+        ],
+        [
+          "xref_em_image_scans_em_image_recording_23",
+          "1",
+          "em"
+        ],
+        [
+          "xref_em_image_scans_em_image_recording_23",
+          "2",
+          "ec"
+        ],
+        [
+          "xref_em_particle_selection_em_image_processing_24",
+          "1",
+          "em"
+        ],
+        [
+          "xref_em_particle_selection_em_image_processing_24",
+          "2",
+          "ec"
+        ],
+        [
+          "xref_em_volume_selection_em_image_processing_25",
+          "1",
+          "em"
+        ],
+        [
+          "xref_em_ctf_correction_em_image_processing_26",
+          "1",
+          "em"
+        ],
+        [
+          "xref_em_ctf_correction_em_image_processing_26",
+          "2",
+          "ec"
+        ],
+        [
+          "xref_em_start_model_em_image_processing_27",
+          "1",
+          "em"
+        ],
+        [
+          "xref_em_start_model_em_image_processing_27",
+          "2",
+          "ec"
+        ],
+        [
+          "xref_em_3d_reconstruction_em_image_processing_28",
+          "1",
+          "em"
+        ],
+        [
+          "xref_em_3d_reconstruction_em_image_processing_28",
+          "2",
+          "ec"
+        ],
+        [
+          "xref_em_final_classification_em_image_processing_29",
+          "1",
+          "em"
+        ],
+        [
+          "xref_em_final_classification_em_image_processing_29",
+          "2",
+          "ec"
+        ],
+        [
+          "xref_em_3d_fitting_list_em_3d_fitting_30",
+          "1",
+          "em"
+        ],
+        [
+          "xref_em_3d_fitting_list_em_3d_fitting_30",
+          "2",
+          "ec"
+        ]
+      ]
+    },
+    {
+      "category": "_validator_rule_make_mandatory.",
+      "columns": [
+        "id",
+        "scope",
+        "subtype",
+        "category"
+      ],
+      "row_count": 8,
+      "rows": [
+        {
+          "id": "mandatory_em_imaging",
+          "scope": "makeMandatory",
+          "subtype": ".",
+          "category": "em_imaging"
+        },
+        {
+          "id": "mandatory_pdbx_database_related",
+          "scope": "makeMandatory",
+          "subtype": ".",
+          "category": "pdbx_database_related"
+        },
+        {
+          "id": "mandatory_refine_ls_shell",
+          "scope": "makeMandatory",
+          "subtype": ".",
+          "category": "refine_ls_shell"
+        },
+        {
+          "id": "mandatory_ec_em_3d_reconstruction",
+          "scope": "makeMandatorySubtypes",
+          "subtype": "EC",
+          "category": "em_3d_reconstruction"
+        },
+        {
+          "id": "mandatory_em_helical_em_3d_reconstruction",
+          "scope": "makeMandatorySubtypes",
+          "subtype": "EM-helical",
+          "category": "em_3d_reconstruction"
+        },
+        {
+          "id": "mandatory_em_single_part_em_3d_reconstruction",
+          "scope": "makeMandatorySubtypes",
+          "subtype": "EM-single_part",
+          "category": "em_3d_reconstruction"
+        },
+        {
+          "id": "mandatory_em_subtomogram_em_3d_reconstruction",
+          "scope": "makeMandatorySubtypes",
+          "subtype": "EM-subtomogram",
+          "category": "em_3d_reconstruction"
+        },
+        {
+          "id": "mandatory_em_subtomogram_em_image_recording",
+          "scope": "makeMandatorySubtypes",
+          "subtype": "EM-subtomogram",
+          "category": "em_image_recording"
+        }
+      ],
+      "raw_rows": [
+        [
+          "mandatory_em_imaging",
+          "makeMandatory",
+          ".",
+          "em_imaging"
+        ],
+        [
+          "mandatory_pdbx_database_related",
+          "makeMandatory",
+          ".",
+          "pdbx_database_related"
+        ],
+        [
+          "mandatory_refine_ls_shell",
+          "makeMandatory",
+          ".",
+          "refine_ls_shell"
+        ],
+        [
+          "mandatory_ec_em_3d_reconstruction",
+          "makeMandatorySubtypes",
+          "EC",
+          "em_3d_reconstruction"
+        ],
+        [
+          "mandatory_em_helical_em_3d_reconstruction",
+          "makeMandatorySubtypes",
+          "EM-helical",
+          "em_3d_reconstruction"
+        ],
+        [
+          "mandatory_em_single_part_em_3d_reconstruction",
+          "makeMandatorySubtypes",
+          "EM-single_part",
+          "em_3d_reconstruction"
+        ],
+        [
+          "mandatory_em_subtomogram_em_3d_reconstruction",
+          "makeMandatorySubtypes",
+          "EM-subtomogram",
+          "em_3d_reconstruction"
+        ],
+        [
+          "mandatory_em_subtomogram_em_image_recording",
+          "makeMandatorySubtypes",
+          "EM-subtomogram",
+          "em_image_recording"
+        ]
+      ]
+    },
+    {
+      "category": "_validator_rule_make_mandatory_item.",
+      "columns": [
+        "rule_id",
+        "role",
+        "ordinal",
+        "item"
+      ],
+      "row_count": 17,
+      "rows": [
+        {
+          "rule_id": "mandatory_em_imaging",
+          "role": "to_check",
+          "ordinal": "1",
+          "item": "nominal_defocus_min"
+        },
+        {
+          "rule_id": "mandatory_em_imaging",
+          "role": "to_check",
+          "ordinal": "2",
+          "item": "nominal_defocus_max"
+        },
+        {
+          "rule_id": "mandatory_pdbx_database_related",
+          "role": "exclude",
+          "ordinal": "1",
+          "item": "content_type"
+        },
+        {
+          "rule_id": "mandatory_pdbx_database_related",
+          "role": "to_check",
+          "ordinal": "1",
+          "item": "db_name"
+        },
+        {
+          "rule_id": "mandatory_refine_ls_shell",
+          "role": "exclude",
+          "ordinal": "1",
+          "item": "pdbx_refine_id"
+        },
+        {
+          "rule_id": "mandatory_refine_ls_shell",
+          "role": "exclude",
+          "ordinal": "2",
+          "item": "pdbx_ordinal"
+        },
+        {
+          "rule_id": "mandatory_refine_ls_shell",
+          "role": "to_check",
+          "ordinal": "1",
+          "item": "d_res_high"
+        },
+        {
+          "rule_id": "mandatory_refine_ls_shell",
+          "role": "to_check",
+          "ordinal": "2",
+          "item": "d_res_low"
+        },
+        {
+          "rule_id": "mandatory_ec_em_3d_reconstruction",
+          "role": "to_check",
+          "ordinal": "1",
+          "item": "resolution"
+        },
+        {
+          "rule_id": "mandatory_ec_em_3d_reconstruction",
+          "role": "to_check",
+          "ordinal": "2",
+          "item": "resolution_method"
+        },
+        {
+          "rule_id": "mandatory_em_helical_em_3d_reconstruction",
+          "role": "to_check",
+          "ordinal": "1",
+          "item": "resolution"
+        },
+        {
+          "rule_id": "mandatory_em_helical_em_3d_reconstruction",
+          "role": "to_check",
+          "ordinal": "2",
+          "item": "resolution_method"
+        },
+        {
+          "rule_id": "mandatory_em_single_part_em_3d_reconstruction",
+          "role": "to_check",
+          "ordinal": "1",
+          "item": "resolution"
+        },
+        {
+          "rule_id": "mandatory_em_single_part_em_3d_reconstruction",
+          "role": "to_check",
+          "ordinal": "2",
+          "item": "resolution_method"
+        },
+        {
+          "rule_id": "mandatory_em_subtomogram_em_3d_reconstruction",
+          "role": "to_check",
+          "ordinal": "1",
+          "item": "resolution"
+        },
+        {
+          "rule_id": "mandatory_em_subtomogram_em_3d_reconstruction",
+          "role": "to_check",
+          "ordinal": "2",
+          "item": "resolution_method"
+        },
+        {
+          "rule_id": "mandatory_em_subtomogram_em_image_recording",
+          "role": "to_check",
+          "ordinal": "1",
+          "item": "avg_electron_dose_per_subtomogram"
+        }
+      ],
+      "raw_rows": [
+        [
+          "mandatory_em_imaging",
+          "to_check",
+          "1",
+          "nominal_defocus_min"
+        ],
+        [
+          "mandatory_em_imaging",
+          "to_check",
+          "2",
+          "nominal_defocus_max"
+        ],
+        [
+          "mandatory_pdbx_database_related",
+          "exclude",
+          "1",
+          "content_type"
+        ],
+        [
+          "mandatory_pdbx_database_related",
+          "to_check",
+          "1",
+          "db_name"
+        ],
+        [
+          "mandatory_refine_ls_shell",
+          "exclude",
+          "1",
+          "pdbx_refine_id"
+        ],
+        [
+          "mandatory_refine_ls_shell",
+          "exclude",
+          "2",
+          "pdbx_ordinal"
+        ],
+        [
+          "mandatory_refine_ls_shell",
+          "to_check",
+          "1",
+          "d_res_high"
+        ],
+        [
+          "mandatory_refine_ls_shell",
+          "to_check",
+          "2",
+          "d_res_low"
+        ],
+        [
+          "mandatory_ec_em_3d_reconstruction",
+          "to_check",
+          "1",
+          "resolution"
+        ],
+        [
+          "mandatory_ec_em_3d_reconstruction",
+          "to_check",
+          "2",
+          "resolution_method"
+        ],
+        [
+          "mandatory_em_helical_em_3d_reconstruction",
+          "to_check",
+          "1",
+          "resolution"
+        ],
+        [
+          "mandatory_em_helical_em_3d_reconstruction",
+          "to_check",
+          "2",
+          "resolution_method"
+        ],
+        [
+          "mandatory_em_single_part_em_3d_reconstruction",
+          "to_check",
+          "1",
+          "resolution"
+        ],
+        [
+          "mandatory_em_single_part_em_3d_reconstruction",
+          "to_check",
+          "2",
+          "resolution_method"
+        ],
+        [
+          "mandatory_em_subtomogram_em_3d_reconstruction",
+          "to_check",
+          "1",
+          "resolution"
+        ],
+        [
+          "mandatory_em_subtomogram_em_3d_reconstruction",
+          "to_check",
+          "2",
+          "resolution_method"
+        ],
+        [
+          "mandatory_em_subtomogram_em_image_recording",
+          "to_check",
+          "1",
+          "avg_electron_dose_per_subtomogram"
+        ]
+      ]
+    },
+    {
+      "category": "_validator_rule_one_of.",
+      "columns": [
+        "id",
+        "category"
+      ],
+      "row_count": 3,
+      "rows": [
+        {
+          "id": "oneof_refine",
+          "category": "refine"
+        },
+        {
+          "id": "oneof_reflns",
+          "category": "reflns"
+        },
+        {
+          "id": "oneof_reflns_shell",
+          "category": "reflns_shell"
+        }
+      ],
+      "raw_rows": [
+        [
+          "oneof_refine",
+          "refine"
+        ],
+        [
+          "oneof_reflns",
+          "reflns"
+        ],
+        [
+          "oneof_reflns_shell",
+          "reflns_shell"
+        ]
+      ]
+    },
+    {
+      "category": "_validator_rule_one_of_item.",
+      "columns": [
+        "rule_id",
+        "ordinal",
+        "item"
+      ],
+      "row_count": 15,
+      "rows": [
+        {
+          "rule_id": "oneof_refine",
+          "ordinal": "1",
+          "item": "ls_R_factor_obs"
+        },
+        {
+          "rule_id": "oneof_refine",
+          "ordinal": "2",
+          "item": "ls_R_factor_R_work"
+        },
+        {
+          "rule_id": "oneof_refine",
+          "ordinal": "3",
+          "item": "ls_R_factor_R_free"
+        },
+        {
+          "rule_id": "oneof_reflns",
+          "ordinal": "1",
+          "item": "pdbx_CC_half"
+        },
+        {
+          "rule_id": "oneof_reflns",
+          "ordinal": "2",
+          "item": "pdbx_Rmerge_I_obs"
+        },
+        {
+          "rule_id": "oneof_reflns",
+          "ordinal": "3",
+          "item": "pdbx_Rsym_value"
+        },
+        {
+          "rule_id": "oneof_reflns",
+          "ordinal": "4",
+          "item": "pdbx_Rpim_I_all"
+        },
+        {
+          "rule_id": "oneof_reflns",
+          "ordinal": "5",
+          "item": "pdbx_Rrim_I_all"
+        },
+        {
+          "rule_id": "oneof_reflns",
+          "ordinal": "6",
+          "item": "pdbx_R_split"
+        },
+        {
+          "rule_id": "oneof_reflns_shell",
+          "ordinal": "1",
+          "item": "pdbx_CC_half"
+        },
+        {
+          "rule_id": "oneof_reflns_shell",
+          "ordinal": "2",
+          "item": "Rmerge_I_obs"
+        },
+        {
+          "rule_id": "oneof_reflns_shell",
+          "ordinal": "3",
+          "item": "pdbx_Rsym_value"
+        },
+        {
+          "rule_id": "oneof_reflns_shell",
+          "ordinal": "4",
+          "item": "pdbx_Rpim_I_all"
+        },
+        {
+          "rule_id": "oneof_reflns_shell",
+          "ordinal": "5",
+          "item": "pdbx_Rrim_I_all"
+        },
+        {
+          "rule_id": "oneof_reflns_shell",
+          "ordinal": "6",
+          "item": "pdbx_R_split"
+        }
+      ],
+      "raw_rows": [
+        [
+          "oneof_refine",
+          "1",
+          "ls_R_factor_obs"
+        ],
+        [
+          "oneof_refine",
+          "2",
+          "ls_R_factor_R_work"
+        ],
+        [
+          "oneof_refine",
+          "3",
+          "ls_R_factor_R_free"
+        ],
+        [
+          "oneof_reflns",
+          "1",
+          "pdbx_CC_half"
+        ],
+        [
+          "oneof_reflns",
+          "2",
+          "pdbx_Rmerge_I_obs"
+        ],
+        [
+          "oneof_reflns",
+          "3",
+          "pdbx_Rsym_value"
+        ],
+        [
+          "oneof_reflns",
+          "4",
+          "pdbx_Rpim_I_all"
+        ],
+        [
+          "oneof_reflns",
+          "5",
+          "pdbx_Rrim_I_all"
+        ],
+        [
+          "oneof_reflns",
+          "6",
+          "pdbx_R_split"
+        ],
+        [
+          "oneof_reflns_shell",
+          "1",
+          "pdbx_CC_half"
+        ],
+        [
+          "oneof_reflns_shell",
+          "2",
+          "Rmerge_I_obs"
+        ],
+        [
+          "oneof_reflns_shell",
+          "3",
+          "pdbx_Rsym_value"
+        ],
+        [
+          "oneof_reflns_shell",
+          "4",
+          "pdbx_Rpim_I_all"
+        ],
+        [
+          "oneof_reflns_shell",
+          "5",
+          "pdbx_Rrim_I_all"
+        ],
+        [
+          "oneof_reflns_shell",
+          "6",
+          "pdbx_R_split"
+        ]
+      ]
+    },
+    {
+      "category": "_validator_rule_procedural.",
+      "columns": [
+        "id",
+        "kind",
+        "category",
+        "item",
+        "driver_item",
+        "skip_if_empty",
+        "severity",
+        "message",
+        "mismatch_message",
+        "missing_message",
+        "source_category",
+        "source_item",
+        "source_key",
+        "target_category",
+        "target_item",
+        "target_key"
+      ],
+      "row_count": 8,
+      "rows": [
+        {
+          "id": "diffrn_source_wavelength_vs_protocol",
+          "kind": "wavelength_protocol_consistency",
+          "category": ".",
+          "item": ".",
+          "driver_item": ".",
+          "skip_if_empty": ".",
+          "severity": ".",
+          "message": ".",
+          "mismatch_message": ".",
+          "missing_message": ".",
+          "source_category": "diffrn_source",
+          "source_item": "pdbx_wavelength_list",
+          "source_key": "diffrn_id",
+          "target_category": "diffrn_radiation",
+          "target_item": "pdbx_diffrn_protocol",
+          "target_key": "diffrn_id"
+        },
+        {
+          "id": "pdbx_database_related_db_id",
+          "kind": "accession_format_rule",
+          "category": "pdbx_database_related",
+          "item": "db_id",
+          "driver_item": "db_name",
+          "skip_if_empty": ".",
+          "severity": ".",
+          "message": ".",
+          "mismatch_message": ".",
+          "missing_message": ".",
+          "source_category": ".",
+          "source_item": ".",
+          "source_key": ".",
+          "target_category": ".",
+          "target_item": ".",
+          "target_key": "."
+        },
+        {
+          "id": "pdbx_struct_ref_seq_depositor_info_db_accession",
+          "kind": "accession_format_rule",
+          "category": "pdbx_struct_ref_seq_depositor_info",
+          "item": "db_accession",
+          "driver_item": "db_name",
+          "skip_if_empty": "yes",
+          "severity": ".",
+          "message": ".",
+          "mismatch_message": ".",
+          "missing_message": ".",
+          "source_category": ".",
+          "source_item": ".",
+          "source_key": ".",
+          "target_category": ".",
+          "target_item": ".",
+          "target_key": "."
+        },
+        {
+          "id": "pdbx_initial_refinement_model_accession_code",
+          "kind": "conditional_accession_format_rule",
+          "category": "pdbx_initial_refinement_model",
+          "item": "accession_code",
+          "driver_item": ".",
+          "skip_if_empty": ".",
+          "severity": ".",
+          "message": ".",
+          "mismatch_message": ".",
+          "missing_message": ".",
+          "source_category": ".",
+          "source_item": ".",
+          "source_key": ".",
+          "target_category": ".",
+          "target_item": ".",
+          "target_key": "."
+        },
+        {
+          "id": "pdbx_initial_refinement_model_integrative_source_name",
+          "kind": "conditional_value_rule",
+          "category": "pdbx_initial_refinement_model",
+          "item": "source_name",
+          "driver_item": ".",
+          "skip_if_empty": ".",
+          "severity": ".",
+          "message": ".",
+          "mismatch_message": ".",
+          "missing_message": ".",
+          "source_category": ".",
+          "source_item": ".",
+          "source_key": ".",
+          "target_category": ".",
+          "target_item": ".",
+          "target_key": "."
+        },
+        {
+          "id": "atom_site_occupancy",
+          "kind": "atom_site_occupancy",
+          "category": "atom_site",
+          "item": "occupancy",
+          "driver_item": ".",
+          "skip_if_empty": ".",
+          "severity": ".",
+          "message": ".",
+          "mismatch_message": ".",
+          "missing_message": ".",
+          "source_category": ".",
+          "source_item": ".",
+          "source_key": ".",
+          "target_category": ".",
+          "target_item": ".",
+          "target_key": "."
+        },
+        {
+          "id": "atom_site_vs_entity_poly_seq",
+          "kind": "sequence_model_mismatch",
+          "category": ".",
+          "item": ".",
+          "driver_item": ".",
+          "skip_if_empty": ".",
+          "severity": "hard",
+          "message": ".",
+          "mismatch_message": "Residue ([{chain}] [{comp}] [{residue}]) does not match with the residue '[{sequence_comp}]' in sequence.",
+          "missing_message": "Residue ([{chain}] [{comp}] [{residue}]) is not present in the sequence.",
+          "source_category": ".",
+          "source_item": ".",
+          "source_key": ".",
+          "target_category": ".",
+          "target_item": ".",
+          "target_key": "."
+        },
+        {
+          "id": "entity_poly_pdbx_seq_one_letter_code_poly_ala",
+          "kind": "sequence_predicate_warning",
+          "category": "entity_poly",
+          "item": "pdbx_seq_one_letter_code",
+          "driver_item": ".",
+          "skip_if_empty": ".",
+          "severity": ".",
+          "message": ".",
+          "mismatch_message": ".",
+          "missing_message": ".",
+          "source_category": ".",
+          "source_item": ".",
+          "source_key": ".",
+          "target_category": ".",
+          "target_item": ".",
+          "target_key": "."
+        }
+      ],
+      "raw_rows": [
+        [
+          "diffrn_source_wavelength_vs_protocol",
+          "wavelength_protocol_consistency",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          "diffrn_source",
+          "pdbx_wavelength_list",
+          "diffrn_id",
+          "diffrn_radiation",
+          "pdbx_diffrn_protocol",
+          "diffrn_id"
+        ],
+        [
+          "pdbx_database_related_db_id",
+          "accession_format_rule",
+          "pdbx_database_related",
+          "db_id",
+          "db_name",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          "."
+        ],
+        [
+          "pdbx_struct_ref_seq_depositor_info_db_accession",
+          "accession_format_rule",
+          "pdbx_struct_ref_seq_depositor_info",
+          "db_accession",
+          "db_name",
+          "yes",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          "."
+        ],
+        [
+          "pdbx_initial_refinement_model_accession_code",
+          "conditional_accession_format_rule",
+          "pdbx_initial_refinement_model",
+          "accession_code",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          "."
+        ],
+        [
+          "pdbx_initial_refinement_model_integrative_source_name",
+          "conditional_value_rule",
+          "pdbx_initial_refinement_model",
+          "source_name",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          "."
+        ],
+        [
+          "atom_site_occupancy",
+          "atom_site_occupancy",
+          "atom_site",
+          "occupancy",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          "."
+        ],
+        [
+          "atom_site_vs_entity_poly_seq",
+          "sequence_model_mismatch",
+          ".",
+          ".",
+          ".",
+          ".",
+          "hard",
+          ".",
+          ";Residue ([{chain}] [{comp}] [{residue}]) does not match with the residue '[{sequence_comp}]' in sequence.\n;",
+          ";Residue ([{chain}] [{comp}] [{residue}]) is not present in the sequence.\n;",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          "."
+        ],
+        [
+          "entity_poly_pdbx_seq_one_letter_code_poly_ala",
+          "sequence_predicate_warning",
+          "entity_poly",
+          "pdbx_seq_one_letter_code",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          "."
+        ]
+      ]
+    },
+    {
+      "category": "_validator_rule_procedural_branch.",
+      "columns": [
+        "rule_id",
+        "ordinal",
+        "driver_value",
+        "protocol",
+        "requires",
+        "predicate",
+        "substring",
+        "severity",
+        "message"
+      ],
+      "row_count": 13,
+      "rows": [
+        {
+          "rule_id": "diffrn_source_wavelength_vs_protocol",
+          "ordinal": "1",
+          "driver_value": ".",
+          "protocol": "LAUE",
+          "requires": "multi",
+          "predicate": ".",
+          "substring": ".",
+          "severity": "error",
+          "message": "Wavelength list is inconsistent with diffraction protocol 'LAUE'; provide multiple wavelengths or a wavelength range."
+        },
+        {
+          "rule_id": "diffrn_source_wavelength_vs_protocol",
+          "ordinal": "2",
+          "driver_value": ".",
+          "protocol": "SINGLE WAVELENGTH",
+          "requires": "single",
+          "predicate": ".",
+          "substring": ".",
+          "severity": "error",
+          "message": "Wavelength list is inconsistent with diffraction protocol 'SINGLE WAVELENGTH'; provide a single wavelength value."
+        },
+        {
+          "rule_id": "pdbx_database_related_db_id",
+          "ordinal": "1",
+          "driver_value": "PDB",
+          "protocol": ".",
+          "requires": ".",
+          "predicate": ".",
+          "substring": ".",
+          "severity": "error",
+          "message": "Invalid PDB accession code format."
+        },
+        {
+          "rule_id": "pdbx_database_related_db_id",
+          "ordinal": "2",
+          "driver_value": "EMDB",
+          "protocol": ".",
+          "requires": ".",
+          "predicate": ".",
+          "substring": ".",
+          "severity": "error",
+          "message": "Invalid EMDB accession code format."
+        },
+        {
+          "rule_id": "pdbx_struct_ref_seq_depositor_info_db_accession",
+          "ordinal": "1",
+          "driver_value": "GB",
+          "protocol": ".",
+          "requires": ".",
+          "predicate": ".",
+          "substring": ".",
+          "severity": "error",
+          "message": "Invalid GenBank accession code format. The format should be 'A12345.1' or 'AB123456.1'."
+        },
+        {
+          "rule_id": "pdbx_struct_ref_seq_depositor_info_db_accession",
+          "ordinal": "2",
+          "driver_value": "UNP",
+          "protocol": ".",
+          "requires": ".",
+          "predicate": ".",
+          "substring": ".",
+          "severity": "error",
+          "message": "Invalid UniProt accession code format."
+        },
+        {
+          "rule_id": "pdbx_initial_refinement_model_accession_code",
+          "ordinal": "1",
+          "driver_value": ".",
+          "protocol": ".",
+          "requires": ".",
+          "predicate": ".",
+          "substring": ".",
+          "severity": "error",
+          "message": "Invalid PDB accession code format."
+        },
+        {
+          "rule_id": "pdbx_initial_refinement_model_accession_code",
+          "ordinal": "2",
+          "driver_value": ".",
+          "protocol": ".",
+          "requires": ".",
+          "predicate": ".",
+          "substring": ".",
+          "severity": "error",
+          "message": "Invalid PDB-Dev accession code format."
+        },
+        {
+          "rule_id": "pdbx_initial_refinement_model_accession_code",
+          "ordinal": "3",
+          "driver_value": ".",
+          "protocol": ".",
+          "requires": ".",
+          "predicate": ".",
+          "substring": ".",
+          "severity": "error",
+          "message": "Invalid AlphaFold accession code format."
+        },
+        {
+          "rule_id": "pdbx_initial_refinement_model_accession_code",
+          "ordinal": "4",
+          "driver_value": ".",
+          "protocol": ".",
+          "requires": ".",
+          "predicate": ".",
+          "substring": ".",
+          "severity": "error",
+          "message": "Invalid ModelArchive accession code format."
+        },
+        {
+          "rule_id": "pdbx_initial_refinement_model_integrative_source_name",
+          "ordinal": "1",
+          "driver_value": ".",
+          "protocol": ".",
+          "requires": ".",
+          "predicate": ".",
+          "substring": ".",
+          "severity": "error",
+          "message": "Source name for integrative model type can be only PDB-Dev."
+        },
+        {
+          "rule_id": "entity_poly_pdbx_seq_one_letter_code_poly_ala",
+          "ordinal": "1",
+          "driver_value": ".",
+          "protocol": ".",
+          "requires": ".",
+          "predicate": "homopolymer_ala",
+          "substring": ".",
+          "severity": "soft",
+          "message": "We detected one or more chain(s) composed only of poly-ALA. If the residues have poorly defined side chains, they should be called by the register. If the register is unknown, the residues should be called UNK rather than ALA."
+        },
+        {
+          "rule_id": "entity_poly_pdbx_seq_one_letter_code_poly_ala",
+          "ordinal": "2",
+          "driver_value": ".",
+          "protocol": ".",
+          "requires": ".",
+          "predicate": "substring",
+          "substring": "AAAAAAAAAA",
+          "severity": "soft",
+          "message": "We detected one or more chain(s) containing stretches of poly-ALA. If the residues have poorly defined side chains, they should be called by the register."
+        }
+      ],
+      "raw_rows": [
+        [
+          "diffrn_source_wavelength_vs_protocol",
+          "1",
+          ".",
+          "LAUE",
+          "multi",
+          ".",
+          ".",
+          "error",
+          ";Wavelength list is inconsistent with diffraction protocol 'LAUE'; provide multiple wavelengths or a wavelength range.\n;"
+        ],
+        [
+          "diffrn_source_wavelength_vs_protocol",
+          "2",
+          ".",
+          ";SINGLE WAVELENGTH\n;",
+          "single",
+          ".",
+          ".",
+          "error",
+          ";Wavelength list is inconsistent with diffraction protocol 'SINGLE WAVELENGTH'; provide a single wavelength value.\n;"
+        ],
+        [
+          "pdbx_database_related_db_id",
+          "1",
+          "PDB",
+          ".",
+          ".",
+          ".",
+          ".",
+          "error",
+          ";Invalid PDB accession code format.\n;"
+        ],
+        [
+          "pdbx_database_related_db_id",
+          "2",
+          "EMDB",
+          ".",
+          ".",
+          ".",
+          ".",
+          "error",
+          ";Invalid EMDB accession code format.\n;"
+        ],
+        [
+          "pdbx_struct_ref_seq_depositor_info_db_accession",
+          "1",
+          "GB",
+          ".",
+          ".",
+          ".",
+          ".",
+          "error",
+          ";Invalid GenBank accession code format. The format should be 'A12345.1' or 'AB123456.1'.\n;"
+        ],
+        [
+          "pdbx_struct_ref_seq_depositor_info_db_accession",
+          "2",
+          "UNP",
+          ".",
+          ".",
+          ".",
+          ".",
+          "error",
+          ";Invalid UniProt accession code format.\n;"
+        ],
+        [
+          "pdbx_initial_refinement_model_accession_code",
+          "1",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          "error",
+          ";Invalid PDB accession code format.\n;"
+        ],
+        [
+          "pdbx_initial_refinement_model_accession_code",
+          "2",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          "error",
+          ";Invalid PDB-Dev accession code format.\n;"
+        ],
+        [
+          "pdbx_initial_refinement_model_accession_code",
+          "3",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          "error",
+          ";Invalid AlphaFold accession code format.\n;"
+        ],
+        [
+          "pdbx_initial_refinement_model_accession_code",
+          "4",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          "error",
+          ";Invalid ModelArchive accession code format.\n;"
+        ],
+        [
+          "pdbx_initial_refinement_model_integrative_source_name",
+          "1",
+          ".",
+          ".",
+          ".",
+          ".",
+          ".",
+          "error",
+          ";Source name for integrative model type can be only PDB-Dev.\n;"
+        ],
+        [
+          "entity_poly_pdbx_seq_one_letter_code_poly_ala",
+          "1",
+          ".",
+          ".",
+          ".",
+          "homopolymer_ala",
+          ".",
+          "soft",
+          ";We detected one or more chain(s) composed only of poly-ALA. If the residues have poorly defined side chains, they should be called by the register. If the register is unknown, the residues should be called UNK rather than ALA.\n;"
+        ],
+        [
+          "entity_poly_pdbx_seq_one_letter_code_poly_ala",
+          "2",
+          ".",
+          ".",
+          ".",
+          "substring",
+          "AAAAAAAAAA",
+          "soft",
+          ";We detected one or more chain(s) containing stretches of poly-ALA. If the residues have poorly defined side chains, they should be called by the register.\n;"
+        ]
+      ]
+    },
+    {
+      "category": "_validator_rule_procedural_format.",
+      "columns": [
+        "rule_id",
+        "branch_ordinal",
+        "ordinal",
+        "format"
+      ],
+      "row_count": 10,
+      "rows": [
+        {
+          "rule_id": "pdbx_database_related_db_id",
+          "branch_ordinal": "1",
+          "ordinal": "1",
+          "format": "pdb_id"
+        },
+        {
+          "rule_id": "pdbx_database_related_db_id",
+          "branch_ordinal": "1",
+          "ordinal": "2",
+          "format": "deposition_id"
+        },
+        {
+          "rule_id": "pdbx_database_related_db_id",
+          "branch_ordinal": "2",
+          "ordinal": "1",
+          "format": "emdb_id"
+        },
+        {
+          "rule_id": "pdbx_database_related_db_id",
+          "branch_ordinal": "2",
+          "ordinal": "2",
+          "format": "deposition_id"
+        },
+        {
+          "rule_id": "pdbx_struct_ref_seq_depositor_info_db_accession",
+          "branch_ordinal": "1",
+          "ordinal": "1",
+          "format": "genbank_id"
+        },
+        {
+          "rule_id": "pdbx_struct_ref_seq_depositor_info_db_accession",
+          "branch_ordinal": "2",
+          "ordinal": "1",
+          "format": "uniprot_id"
+        },
+        {
+          "rule_id": "pdbx_initial_refinement_model_accession_code",
+          "branch_ordinal": "1",
+          "ordinal": "1",
+          "format": "pdb_id"
+        },
+        {
+          "rule_id": "pdbx_initial_refinement_model_accession_code",
+          "branch_ordinal": "2",
+          "ordinal": "1",
+          "format": "pdbdev_id"
+        },
+        {
+          "rule_id": "pdbx_initial_refinement_model_accession_code",
+          "branch_ordinal": "3",
+          "ordinal": "1",
+          "format": "alphafold_id"
+        },
+        {
+          "rule_id": "pdbx_initial_refinement_model_accession_code",
+          "branch_ordinal": "4",
+          "ordinal": "1",
+          "format": "modelarchive_id"
+        }
+      ],
+      "raw_rows": [
+        [
+          "pdbx_database_related_db_id",
+          "1",
+          "1",
+          "pdb_id"
+        ],
+        [
+          "pdbx_database_related_db_id",
+          "1",
+          "2",
+          "deposition_id"
+        ],
+        [
+          "pdbx_database_related_db_id",
+          "2",
+          "1",
+          "emdb_id"
+        ],
+        [
+          "pdbx_database_related_db_id",
+          "2",
+          "2",
+          "deposition_id"
+        ],
+        [
+          "pdbx_struct_ref_seq_depositor_info_db_accession",
+          "1",
+          "1",
+          "genbank_id"
+        ],
+        [
+          "pdbx_struct_ref_seq_depositor_info_db_accession",
+          "2",
+          "1",
+          "uniprot_id"
+        ],
+        [
+          "pdbx_initial_refinement_model_accession_code",
+          "1",
+          "1",
+          "pdb_id"
+        ],
+        [
+          "pdbx_initial_refinement_model_accession_code",
+          "2",
+          "1",
+          "pdbdev_id"
+        ],
+        [
+          "pdbx_initial_refinement_model_accession_code",
+          "3",
+          "1",
+          "alphafold_id"
+        ],
+        [
+          "pdbx_initial_refinement_model_accession_code",
+          "4",
+          "1",
+          "modelarchive_id"
+        ]
+      ]
+    },
+    {
+      "category": "_validator_rule_procedural_allowed_value.",
+      "columns": [
+        "rule_id",
+        "branch_ordinal",
+        "ordinal",
+        "value"
+      ],
+      "row_count": 1,
+      "rows": [
+        {
+          "rule_id": "pdbx_initial_refinement_model_integrative_source_name",
+          "branch_ordinal": "1",
+          "ordinal": "1",
+          "value": "PDB-Dev"
+        }
+      ],
+      "raw_rows": [
+        [
+          "pdbx_initial_refinement_model_integrative_source_name",
+          "1",
+          "1",
+          "PDB-Dev"
+        ]
+      ]
+    },
+    {
+      "category": "_validator_rule_procedural_empty_list.",
+      "columns": [
+        "rule_id",
+        "ordinal",
+        "protocol",
+        "severity",
+        "message"
+      ],
+      "row_count": 2,
+      "rows": [
+        {
+          "rule_id": "diffrn_source_wavelength_vs_protocol",
+          "ordinal": "1",
+          "protocol": "LAUE",
+          "severity": "hard",
+          "message": "pdbx_wavelength_list must not be empty when pdbx_diffrn_protocol is LAUE or SINGLE WAVELENGTH for the same diffrn_id."
+        },
+        {
+          "rule_id": "diffrn_source_wavelength_vs_protocol",
+          "ordinal": "2",
+          "protocol": "SINGLE WAVELENGTH",
+          "severity": "hard",
+          "message": "pdbx_wavelength_list must not be empty when pdbx_diffrn_protocol is LAUE or SINGLE WAVELENGTH for the same diffrn_id."
+        }
+      ],
+      "raw_rows": [
+        [
+          "diffrn_source_wavelength_vs_protocol",
+          "1",
+          "LAUE",
+          "hard",
+          ";pdbx_wavelength_list must not be empty when pdbx_diffrn_protocol is LAUE or SINGLE WAVELENGTH for the same diffrn_id.\n;"
+        ],
+        [
+          "diffrn_source_wavelength_vs_protocol",
+          "2",
+          ";SINGLE WAVELENGTH\n;",
+          "hard",
+          ";pdbx_wavelength_list must not be empty when pdbx_diffrn_protocol is LAUE or SINGLE WAVELENGTH for the same diffrn_id.\n;"
+        ]
+      ]
+    },
+    {
+      "category": "_validator_rule_procedural_limit.",
+      "columns": [
+        "rule_id",
+        "role",
+        "limit",
+        "severity",
+        "message"
+      ],
+      "row_count": 2,
+      "rows": [
+        {
+          "rule_id": "atom_site_occupancy",
+          "role": "over_one",
+          "limit": "1",
+          "severity": "hard",
+          "message": "Chain [{chain}] residue [{residue}] [{comp}] atom [{atom}] in model [{model}] has a total occupancy of [{total}]."
+        },
+        {
+          "rule_id": "atom_site_occupancy",
+          "role": "below",
+          "limit": "0.1",
+          "severity": "soft",
+          "message": "Chain [{chain}] residue [{residue}] [{comp}] atom [{atom}] in model [{model}] has occupancy [{occupancy}] (below 0.1)."
+        }
+      ],
+      "raw_rows": [
+        [
+          "atom_site_occupancy",
+          "over_one",
+          "1",
+          "hard",
+          ";Chain [{chain}] residue [{residue}] [{comp}] atom [{atom}] in model [{model}] has a total occupancy of [{total}].\n;"
+        ],
+        [
+          "atom_site_occupancy",
+          "below",
+          "0.1",
+          "soft",
+          ";Chain [{chain}] residue [{residue}] [{comp}] atom [{atom}] in model [{model}] has occupancy [{occupancy}] (below 0.1).\n;"
+        ]
+      ]
+    }
+  ]
+}

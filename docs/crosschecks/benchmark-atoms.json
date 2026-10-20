@@ -1,0 +1,82 @@
+[
+  {
+    "kind": "atoms",
+    "count": 10000,
+    "median_seconds": 0.20651360700139776,
+    "trial_seconds": [
+      0.20651360700139776
+    ],
+    "prepare_seconds": 0.005742805005866103,
+    "parse_seconds": 0.00363983100396581,
+    "serialize_seconds": 0.0011802509980043396,
+    "issues": 0,
+    "complete": true,
+    "index_builds": 0,
+    "peak_rss_kib": 61832,
+    "fixture_digest": "24ac9495560f63b49ef4cf6e6d4c766069417cd4b1fd9ef88da88205ba284276",
+    "backend": "0.7.5",
+    "python": "3.13.12",
+    "host": "Linux-7.0.0-34-generic-x86_64-with-glibc2.39",
+    "rules_digest": "cec6e4517628adee71028c7fe0f4acd25cb3455576ff5208b245bfb5f455c8bc"
+  },
+  {
+    "kind": "atoms",
+    "count": 100000,
+    "median_seconds": 2.492931981003494,
+    "trial_seconds": [
+      2.492931981003494
+    ],
+    "prepare_seconds": 0.006408357003238052,
+    "parse_seconds": 0.042622560999006964,
+    "serialize_seconds": 0.0012724990083370358,
+    "issues": 0,
+    "complete": true,
+    "index_builds": 0,
+    "peak_rss_kib": 215564,
+    "fixture_digest": "435936bf3d8bc4df3889b95ce33742ea54aeac9fed81778881932a633e476d8c",
+    "backend": "0.7.5",
+    "python": "3.13.12",
+    "host": "Linux-7.0.0-34-generic-x86_64-with-glibc2.39",
+    "rules_digest": "cec6e4517628adee71028c7fe0f4acd25cb3455576ff5208b245bfb5f455c8bc"
+  },
+  {
+    "kind": "atoms",
+    "count": 200000,
+    "median_seconds": 5.032801176988869,
+    "trial_seconds": [
+      5.032801176988869
+    ],
+    "prepare_seconds": 0.008624252004665323,
+    "parse_seconds": 0.09886803499830421,
+    "serialize_seconds": 0.0016374349943362176,
+    "issues": 0,
+    "complete": true,
+    "index_builds": 0,
+    "peak_rss_kib": 386668,
+    "fixture_digest": "24ce8fe397a17b347132ad3e020c6ef41782e8fdc6a65e6c338f76c2b30fe857",
+    "backend": "0.7.5",
+    "python": "3.13.12",
+    "host": "Linux-7.0.0-34-generic-x86_64-with-glibc2.39",
+    "rules_digest": "cec6e4517628adee71028c7fe0f4acd25cb3455576ff5208b245bfb5f455c8bc"
+  },
+  {
+    "kind": "atoms",
+    "count": 1000000,
+    "median_seconds": 26.80387133199838,
+    "trial_seconds": [
+      26.80387133199838
+    ],
+    "prepare_seconds": 0.006137550997664221,
+    "parse_seconds": 0.42813358300190885,
+    "serialize_seconds": 0.001534574999823235,
+    "issues": 0,
+    "complete": true,
+    "index_builds": 0,
+    "peak_rss_kib": 1703636,
+    "fixture_digest": "d0de49ec39fa9e744d9a4ae86b7a06450e85e1fa35bc6bf069239bdf7cb67f39",
+    "backend": "0.7.5",
+    "python": "3.13.12",
+    "host": "Linux-7.0.0-34-generic-x86_64-with-glibc2.39",
+    "rules_digest": "cec6e4517628adee71028c7fe0f4acd25cb3455576ff5208b245bfb5f455c8bc"
+  }
+]

@@ -1,0 +1,1489 @@
+{
+  "artifact_role": "rule-to-plan and test coverage checklist; not a runtime source",
+  "bundle_digest": "cec6e4517628adee71028c7fe0f4acd25cb3455576ff5208b245bfb5f455c8bc",
+  "root_rule_count": 149,
+  "rules": [
+    {
+      "id": "pairwise_em_3d_reconstruction_resolution_1",
+      "family": "pairwise",
+      "source_category": "_validator_rule_pairwise.",
+      "source_row": 0,
+      "tests": [
+        "test_semantics.py::test_pairwise_uses_first_violating_witness_and_whole_token_message"
+      ]
+    },
+    {
+      "id": "pairwise_em_diffraction_shell_high_resolution_1",
+      "family": "pairwise",
+      "source_category": "_validator_rule_pairwise.",
+      "source_row": 1,
+      "tests": [
+        "test_semantics.py::test_pairwise_uses_first_violating_witness_and_whole_token_message"
+      ]
+    },
+    {
+      "id": "pairwise_em_diffraction_shell_num_structure_factors_1",
+      "family": "pairwise",
+      "source_category": "_validator_rule_pairwise.",
+      "source_row": 2,
+      "tests": [
+        "test_semantics.py::test_pairwise_uses_first_violating_witness_and_whole_token_message"
+      ]
+    },
+    {
+      "id": "pairwise_em_focused_ion_beam_final_thickness_1",
+      "family": "pairwise",
+      "source_category": "_validator_rule_pairwise.",
+      "source_row": 3,
+      "tests": [
+        "test_semantics.py::test_pairwise_uses_first_violating_witness_and_whole_token_message"
+      ]
+    },
+    {
+      "id": "pairwise_em_imaging_recording_temperature_maximum_1",
+      "family": "pairwise",
+      "source_category": "_validator_rule_pairwise.",
+      "source_row": 4,
+      "tests": [
+        "test_semantics.py::test_pairwise_uses_first_violating_witness_and_whole_token_message"
+      ]
+    },
+    {
+      "id": "pairwise_em_imaging_recording_temperature_minimum_1",
+      "family": "pairwise",
+      "source_category": "_validator_rule_pairwise.",
+      "source_row": 5,
+      "tests": [
+        "test_semantics.py::test_pairwise_uses_first_violating_witness_and_whole_token_message"
+      ]
+    },
+    {
+      "id": "pairwise_pdbx_nmr_ensemble_conformers_submitted_total_number_1",
+      "family": "pairwise",
+      "source_category": "_validator_rule_pairwise.",
+      "source_row": 6,
+      "tests": [
+        "test_semantics.py::test_pairwise_uses_first_violating_witness_and_whole_token_message"
+      ]
+    },
+    {
+      "id": "pairwise_pdbx_nmr_representative_conformer_id_1",
+      "family": "pairwise",
+      "source_category": "_validator_rule_pairwise.",
+      "source_row": 7,
+      "tests": [
+        "test_semantics.py::test_pairwise_uses_first_violating_witness_and_whole_token_message"
+      ]
+    },
+    {
+      "id": "pairwise_refine_ls_shell_r_factor_r_work_1",
+      "family": "pairwise",
+      "source_category": "_validator_rule_pairwise.",
+      "source_row": 8,
+      "tests": [
+        "test_semantics.py::test_pairwise_uses_first_violating_witness_and_whole_token_message"
+      ]
+    },
+    {
+      "id": "pairwise_refine_ls_shell_d_res_high_1",
+      "family": "pairwise",
+      "source_category": "_validator_rule_pairwise.",
+      "source_row": 9,
+      "tests": [
+        "test_semantics.py::test_pairwise_uses_first_violating_witness_and_whole_token_message"
+      ]
+    },
+    {
+      "id": "pairwise_refine_ls_shell_d_res_low_1",
+      "family": "pairwise",
+      "source_category": "_validator_rule_pairwise.",
+      "source_row": 10,
+      "tests": [
+        "test_semantics.py::test_pairwise_uses_first_violating_witness_and_whole_token_message"
+      ]
+    },
+    {
+      "id": "pairwise_reflns_shell_d_res_high_1",
+      "family": "pairwise",
+      "source_category": "_validator_rule_pairwise.",
+      "source_row": 11,
+      "tests": [
+        "test_semantics.py::test_pairwise_uses_first_violating_witness_and_whole_token_message"
+      ]
+    },
+    {
+      "id": "pairwise_reflns_shell_d_res_low_1",
+      "family": "pairwise",
+      "source_category": "_validator_rule_pairwise.",
+      "source_row": 12,
+      "tests": [
+        "test_semantics.py::test_pairwise_uses_first_violating_witness_and_whole_token_message"
+      ]
+    },
+    {
+      "id": "date_pdbx_database_status_recvd_initial_deposition_date_1",
+      "family": "date_order",
+      "source_category": "_validator_rule_date_order.",
+      "source_row": 0,
+      "tests": [
+        "test_semantics.py::test_calendar_equality_is_valid_but_impossible_date_blocks_comparison"
+      ]
+    },
+    {
+      "id": "date_pdbx_database_status_recvd_initial_deposition_date_2",
+      "family": "date_order",
+      "source_category": "_validator_rule_date_order.",
+      "source_row": 1,
+      "tests": [
+        "test_semantics.py::test_calendar_equality_is_valid_but_impossible_date_blocks_comparison"
+      ]
+    },
+    {
+      "id": "date_pdbx_database_status_date_deposition_form_3",
+      "family": "date_order",
+      "source_category": "_validator_rule_date_order.",
+      "source_row": 2,
+      "tests": [
+        "test_semantics.py::test_calendar_equality_is_valid_but_impossible_date_blocks_comparison"
+      ]
+    },
+    {
+      "id": "date_pdbx_database_status_date_begin_deposition_4",
+      "family": "date_order",
+      "source_category": "_validator_rule_date_order.",
+      "source_row": 3,
+      "tests": [
+        "test_semantics.py::test_calendar_equality_is_valid_but_impossible_date_blocks_comparison"
+      ]
+    },
+    {
+      "id": "uniq_entity_1",
+      "family": "uniqueness",
+      "source_category": "_validator_rule_uniqueness.",
+      "source_row": 0,
+      "tests": [
+        "test_engine.py::test_uniqueness_reports_all_duplicate_rows_and_isolates_blocks",
+        "test_semantics.py::test_issue_cap_retains_one_terminal_fatal_and_marks_incomplete"
+      ]
+    },
+    {
+      "id": "uniq_struct_asym_2",
+      "family": "uniqueness",
+      "source_category": "_validator_rule_uniqueness.",
+      "source_row": 1,
+      "tests": [
+        "test_engine.py::test_uniqueness_reports_all_duplicate_rows_and_isolates_blocks",
+        "test_semantics.py::test_issue_cap_retains_one_terminal_fatal_and_marks_incomplete"
+      ]
+    },
+    {
+      "id": "uniq_entity_poly_3",
+      "family": "uniqueness",
+      "source_category": "_validator_rule_uniqueness.",
+      "source_row": 2,
+      "tests": [
+        "test_engine.py::test_uniqueness_reports_all_duplicate_rows_and_isolates_blocks",
+        "test_semantics.py::test_issue_cap_retains_one_terminal_fatal_and_marks_incomplete"
+      ]
+    },
+    {
+      "id": "linked_em_3d_fitting_list_source_name_1",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 0,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_em_3d_fitting_list_source_name_2",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 1,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_em_3d_fitting_list_source_name_3",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 2,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_em_3d_fitting_list_source_name_4",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 3,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_em_3d_fitting_list_source_name_5",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 4,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_em_3d_fitting_list_type_1",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 5,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_em_3d_fitting_list_type_2",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 6,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_em_3d_fitting_list_type_3",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 7,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_em_3d_fitting_list_type_4",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 8,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_em_3d_fitting_list_type_5",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 9,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_em_buffer_component_concentration_1",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 10,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_em_buffer_component_concentration_2",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 11,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_em_buffer_component_concentration_3",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 12,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_em_buffer_component_concentration_units_1",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 13,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_em_buffer_component_concentration_units_2",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 14,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_em_buffer_component_concentration_units_3",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 15,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_em_buffer_component_name_1",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 16,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_em_buffer_component_name_2",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 17,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_em_buffer_component_name_3",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 18,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_em_entity_assembly_molwt_experimental_flag_1",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 19,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_em_entity_assembly_molwt_experimental_flag_2",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 20,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_em_entity_assembly_molwt_units_1",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 21,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_em_entity_assembly_molwt_value_1",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 22,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_em_imaging_calibrated_defocus_max_1",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 23,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_em_imaging_calibrated_defocus_min_1",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 24,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_em_imaging_nominal_defocus_max_1",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 25,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_em_imaging_nominal_defocus_min_1",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 26,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_em_sample_support_grid_type_1",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 27,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_em_sample_support_grid_type_2",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 28,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_em_sample_support_grid_type_3",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 29,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_em_sample_support_grid_type_4",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 30,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_em_sample_support_grid_type_5",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 31,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_em_sample_support_grid_type_6",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 32,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_em_sample_support_grid_type_7",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 33,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_refine_ls_r_factor_r_work_1",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 34,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_refine_ls_d_res_high_1",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 35,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_refine_ls_d_res_high_2",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 36,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_refine_ls_d_res_low_1",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 37,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_refine_ls_d_res_low_2",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 38,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_refine_ls_shell_d_res_high_1",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 39,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_refine_ls_shell_d_res_low_1",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 40,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_reflns_d_resolution_high_1",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 41,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_reflns_d_resolution_low_1",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 42,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_reflns_number_all_1",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 43,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_reflns_number_obs_1",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 44,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "linked_reflns_shell_d_res_high_1",
+      "family": "linked",
+      "source_category": "_validator_rule_linked.",
+      "source_row": 45,
+      "tests": [
+        "test_semantics.py::test_linked_presence_break_applies_to_each_source_row_independently",
+        "test_semantics.py::test_linked_singleton_fallback_never_joins_disagreeing_keys",
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine"
+      ]
+    },
+    {
+      "id": "condreq_em_3d_fitting_list_1",
+      "family": "conditional_required",
+      "source_category": "_validator_rule_conditional_required.",
+      "source_row": 0,
+      "tests": [
+        "test_semantics.py::test_whitespace_empty_is_unfilled_but_quoted_null_is_a_value"
+      ]
+    },
+    {
+      "id": "condreq_em_3d_fitting_list_2",
+      "family": "conditional_required",
+      "source_category": "_validator_rule_conditional_required.",
+      "source_row": 1,
+      "tests": [
+        "test_semantics.py::test_whitespace_empty_is_unfilled_but_quoted_null_is_a_value"
+      ]
+    },
+    {
+      "id": "condreq_em_3d_fitting_list_3",
+      "family": "conditional_required",
+      "source_category": "_validator_rule_conditional_required.",
+      "source_row": 2,
+      "tests": [
+        "test_semantics.py::test_whitespace_empty_is_unfilled_but_quoted_null_is_a_value"
+      ]
+    },
+    {
+      "id": "condreq_em_3d_reconstruction_1",
+      "family": "conditional_required",
+      "source_category": "_validator_rule_conditional_required.",
+      "source_row": 3,
+      "tests": [
+        "test_semantics.py::test_whitespace_empty_is_unfilled_but_quoted_null_is_a_value"
+      ]
+    },
+    {
+      "id": "condreq_em_entity_assembly_molwt_1",
+      "family": "conditional_required",
+      "source_category": "_validator_rule_conditional_required.",
+      "source_row": 4,
+      "tests": [
+        "test_semantics.py::test_whitespace_empty_is_unfilled_but_quoted_null_is_a_value"
+      ]
+    },
+    {
+      "id": "condreq_em_software_1",
+      "family": "conditional_required",
+      "source_category": "_validator_rule_conditional_required.",
+      "source_row": 5,
+      "tests": [
+        "test_semantics.py::test_whitespace_empty_is_unfilled_but_quoted_null_is_a_value"
+      ]
+    },
+    {
+      "id": "condreq_em_software_2",
+      "family": "conditional_required",
+      "source_category": "_validator_rule_conditional_required.",
+      "source_row": 6,
+      "tests": [
+        "test_semantics.py::test_whitespace_empty_is_unfilled_but_quoted_null_is_a_value"
+      ]
+    },
+    {
+      "id": "condreq_em_software_3",
+      "family": "conditional_required",
+      "source_category": "_validator_rule_conditional_required.",
+      "source_row": 7,
+      "tests": [
+        "test_semantics.py::test_whitespace_empty_is_unfilled_but_quoted_null_is_a_value"
+      ]
+    },
+    {
+      "id": "condreq_em_software_4",
+      "family": "conditional_required",
+      "source_category": "_validator_rule_conditional_required.",
+      "source_row": 8,
+      "tests": [
+        "test_semantics.py::test_whitespace_empty_is_unfilled_but_quoted_null_is_a_value"
+      ]
+    },
+    {
+      "id": "condreq_em_software_5",
+      "family": "conditional_required",
+      "source_category": "_validator_rule_conditional_required.",
+      "source_row": 9,
+      "tests": [
+        "test_semantics.py::test_whitespace_empty_is_unfilled_but_quoted_null_is_a_value"
+      ]
+    },
+    {
+      "id": "condreq_em_start_model_1",
+      "family": "conditional_required",
+      "source_category": "_validator_rule_conditional_required.",
+      "source_row": 10,
+      "tests": [
+        "test_semantics.py::test_whitespace_empty_is_unfilled_but_quoted_null_is_a_value"
+      ]
+    },
+    {
+      "id": "condreq_em_start_model_2",
+      "family": "conditional_required",
+      "source_category": "_validator_rule_conditional_required.",
+      "source_row": 11,
+      "tests": [
+        "test_semantics.py::test_whitespace_empty_is_unfilled_but_quoted_null_is_a_value"
+      ]
+    },
+    {
+      "id": "condreq_em_start_model_3",
+      "family": "conditional_required",
+      "source_category": "_validator_rule_conditional_required.",
+      "source_row": 12,
+      "tests": [
+        "test_semantics.py::test_whitespace_empty_is_unfilled_but_quoted_null_is_a_value"
+      ]
+    },
+    {
+      "id": "condreq_em_start_model_4",
+      "family": "conditional_required",
+      "source_category": "_validator_rule_conditional_required.",
+      "source_row": 13,
+      "tests": [
+        "test_semantics.py::test_whitespace_empty_is_unfilled_but_quoted_null_is_a_value"
+      ]
+    },
+    {
+      "id": "condreq_em_start_model_5",
+      "family": "conditional_required",
+      "source_category": "_validator_rule_conditional_required.",
+      "source_row": 14,
+      "tests": [
+        "test_semantics.py::test_whitespace_empty_is_unfilled_but_quoted_null_is_a_value"
+      ]
+    },
+    {
+      "id": "condreq_em_start_model_6",
+      "family": "conditional_required",
+      "source_category": "_validator_rule_conditional_required.",
+      "source_row": 15,
+      "tests": [
+        "test_semantics.py::test_whitespace_empty_is_unfilled_but_quoted_null_is_a_value"
+      ]
+    },
+    {
+      "id": "condreq_em_start_model_7",
+      "family": "conditional_required",
+      "source_category": "_validator_rule_conditional_required.",
+      "source_row": 16,
+      "tests": [
+        "test_semantics.py::test_whitespace_empty_is_unfilled_but_quoted_null_is_a_value"
+      ]
+    },
+    {
+      "id": "condreq_pdbx_audit_support_1",
+      "family": "conditional_required",
+      "source_category": "_validator_rule_conditional_required.",
+      "source_row": 17,
+      "tests": [
+        "test_semantics.py::test_whitespace_empty_is_unfilled_but_quoted_null_is_a_value"
+      ]
+    },
+    {
+      "id": "condreq_pdbx_audit_support_2",
+      "family": "conditional_required",
+      "source_category": "_validator_rule_conditional_required.",
+      "source_row": 18,
+      "tests": [
+        "test_semantics.py::test_whitespace_empty_is_unfilled_but_quoted_null_is_a_value"
+      ]
+    },
+    {
+      "id": "condreq_pdbx_initial_refinement_model_1",
+      "family": "conditional_required",
+      "source_category": "_validator_rule_conditional_required.",
+      "source_row": 19,
+      "tests": [
+        "test_semantics.py::test_whitespace_empty_is_unfilled_but_quoted_null_is_a_value"
+      ]
+    },
+    {
+      "id": "condreq_pdbx_initial_refinement_model_2",
+      "family": "conditional_required",
+      "source_category": "_validator_rule_conditional_required.",
+      "source_row": 20,
+      "tests": [
+        "test_semantics.py::test_whitespace_empty_is_unfilled_but_quoted_null_is_a_value"
+      ]
+    },
+    {
+      "id": "condreq_refine_1",
+      "family": "conditional_required",
+      "source_category": "_validator_rule_conditional_required.",
+      "source_row": 21,
+      "tests": [
+        "test_semantics.py::test_whitespace_empty_is_unfilled_but_quoted_null_is_a_value"
+      ]
+    },
+    {
+      "id": "condreq_software_1",
+      "family": "conditional_required",
+      "source_category": "_validator_rule_conditional_required.",
+      "source_row": 22,
+      "tests": [
+        "test_semantics.py::test_whitespace_empty_is_unfilled_but_quoted_null_is_a_value"
+      ]
+    },
+    {
+      "id": "regex_em_3d_fitting_list_accession_code_1",
+      "family": "conditional_regex",
+      "source_category": "_validator_rule_conditional_regex.",
+      "source_row": 0,
+      "tests": [
+        "test_semantics.py::test_conditional_regex_is_applied_only_to_present_targets"
+      ]
+    },
+    {
+      "id": "enum_em_3d_fitting_list_type_1",
+      "family": "conditional_enum",
+      "source_category": "_validator_rule_conditional_enum.",
+      "source_row": 0,
+      "tests": [
+        "test_semantics.py::test_conditional_enumeration_uses_the_driver_branch_message"
+      ]
+    },
+    {
+      "id": "enum_em_3d_fitting_list_source_name_2",
+      "family": "conditional_enum",
+      "source_category": "_validator_rule_conditional_enum.",
+      "source_row": 1,
+      "tests": [
+        "test_semantics.py::test_conditional_enumeration_uses_the_driver_branch_message"
+      ]
+    },
+    {
+      "id": "enum_pdbx_initial_refinement_model_type_1",
+      "family": "conditional_enum",
+      "source_category": "_validator_rule_conditional_enum.",
+      "source_row": 2,
+      "tests": [
+        "test_semantics.py::test_conditional_enumeration_uses_the_driver_branch_message"
+      ]
+    },
+    {
+      "id": "enum_pdbx_initial_refinement_model_source_name_2",
+      "family": "conditional_enum",
+      "source_category": "_validator_rule_conditional_enum.",
+      "source_row": 3,
+      "tests": [
+        "test_semantics.py::test_conditional_enumeration_uses_the_driver_branch_message"
+      ]
+    },
+    {
+      "id": "catitem_pdbx_initial_refinement_model_type_1",
+      "family": "conditional_category_item",
+      "source_category": "_validator_rule_conditional_category_item.",
+      "source_row": 0,
+      "tests": [
+        "test_semantics.py::test_category_trigger_requires_targets_and_related_trigger_location"
+      ]
+    },
+    {
+      "id": "catitem_pdbx_initial_refinement_model_source_name_2",
+      "family": "conditional_category_item",
+      "source_category": "_validator_rule_conditional_category_item.",
+      "source_row": 1,
+      "tests": [
+        "test_semantics.py::test_category_trigger_requires_targets_and_related_trigger_location"
+      ]
+    },
+    {
+      "id": "dictenum_diffrn_detector_type",
+      "family": "dictionary_enum",
+      "source_category": "_validator_rule_dictionary_enum.",
+      "source_row": 0,
+      "tests": [
+        "test_dictionary.py::test_dictionary_cross_enumeration_uses_details_and_keeps_missing_policy"
+      ]
+    },
+    {
+      "id": "dictenum_diffrn_source_type",
+      "family": "dictionary_enum",
+      "source_category": "_validator_rule_dictionary_enum.",
+      "source_row": 1,
+      "tests": [
+        "test_dictionary.py::test_dictionary_cross_enumeration_uses_details_and_keeps_missing_policy"
+      ]
+    },
+    {
+      "id": "dictenum_pdbx_database_related_db_name",
+      "family": "dictionary_enum",
+      "source_category": "_validator_rule_dictionary_enum.",
+      "source_row": 2,
+      "tests": [
+        "test_dictionary.py::test_dictionary_cross_enumeration_uses_details_and_keeps_missing_policy"
+      ]
+    },
+    {
+      "id": "dictenum_software_name",
+      "family": "dictionary_enum",
+      "source_category": "_validator_rule_dictionary_enum.",
+      "source_row": 3,
+      "tests": [
+        "test_dictionary.py::test_dictionary_cross_enumeration_uses_details_and_keeps_missing_policy"
+      ]
+    },
+    {
+      "id": "xref_entity_poly_entity_src_gen_1",
+      "family": "cross_reference",
+      "source_category": "_validator_rule_cross_reference.",
+      "source_row": 0,
+      "tests": [
+        "test_semantics.py::test_cross_reference_absent_target_is_a_violation",
+        "test_semantics.py::test_explicit_empty_context_suppresses_file_method_inference"
+      ]
+    },
+    {
+      "id": "xref_entity_poly_entity_src_nat_2",
+      "family": "cross_reference",
+      "source_category": "_validator_rule_cross_reference.",
+      "source_row": 1,
+      "tests": [
+        "test_semantics.py::test_cross_reference_absent_target_is_a_violation",
+        "test_semantics.py::test_explicit_empty_context_suppresses_file_method_inference"
+      ]
+    },
+    {
+      "id": "xref_entity_poly_pdbx_entity_src_syn_3",
+      "family": "cross_reference",
+      "source_category": "_validator_rule_cross_reference.",
+      "source_row": 2,
+      "tests": [
+        "test_semantics.py::test_cross_reference_absent_target_is_a_violation",
+        "test_semantics.py::test_explicit_empty_context_suppresses_file_method_inference"
+      ]
+    },
+    {
+      "id": "xref_exptl_crystal_grow_exptl_crystal_4",
+      "family": "cross_reference",
+      "source_category": "_validator_rule_cross_reference.",
+      "source_row": 3,
+      "tests": [
+        "test_semantics.py::test_cross_reference_absent_target_is_a_violation",
+        "test_semantics.py::test_explicit_empty_context_suppresses_file_method_inference"
+      ]
+    },
+    {
+      "id": "xref_diffrn_exptl_crystal_5",
+      "family": "cross_reference",
+      "source_category": "_validator_rule_cross_reference.",
+      "source_row": 4,
+      "tests": [
+        "test_semantics.py::test_cross_reference_absent_target_is_a_violation",
+        "test_semantics.py::test_explicit_empty_context_suppresses_file_method_inference"
+      ]
+    },
+    {
+      "id": "xref_diffrn_detector_diffrn_6",
+      "family": "cross_reference",
+      "source_category": "_validator_rule_cross_reference.",
+      "source_row": 5,
+      "tests": [
+        "test_semantics.py::test_cross_reference_absent_target_is_a_violation",
+        "test_semantics.py::test_explicit_empty_context_suppresses_file_method_inference"
+      ]
+    },
+    {
+      "id": "xref_diffrn_radiation_diffrn_7",
+      "family": "cross_reference",
+      "source_category": "_validator_rule_cross_reference.",
+      "source_row": 6,
+      "tests": [
+        "test_semantics.py::test_cross_reference_absent_target_is_a_violation",
+        "test_semantics.py::test_explicit_empty_context_suppresses_file_method_inference"
+      ]
+    },
+    {
+      "id": "xref_diffrn_source_diffrn_8",
+      "family": "cross_reference",
+      "source_category": "_validator_rule_cross_reference.",
+      "source_row": 7,
+      "tests": [
+        "test_semantics.py::test_cross_reference_absent_target_is_a_violation",
+        "test_semantics.py::test_explicit_empty_context_suppresses_file_method_inference"
+      ]
+    },
+    {
+      "id": "xref_pdbx_serial_crystallography_measurement_diffrn_9",
+      "family": "cross_reference",
+      "source_category": "_validator_rule_cross_reference.",
+      "source_row": 8,
+      "tests": [
+        "test_semantics.py::test_cross_reference_absent_target_is_a_violation",
+        "test_semantics.py::test_explicit_empty_context_suppresses_file_method_inference"
+      ]
+    },
+    {
+      "id": "xref_pdbx_serial_crystallography_sample_delivery_diffrn_10",
+      "family": "cross_reference",
+      "source_category": "_validator_rule_cross_reference.",
+      "source_row": 9,
+      "tests": [
+        "test_semantics.py::test_cross_reference_absent_target_is_a_violation",
+        "test_semantics.py::test_explicit_empty_context_suppresses_file_method_inference"
+      ]
+    },
+    {
+      "id": "xref_pdbx_serial_crystallography_sample_delivery_injection_diffrn_11",
+      "family": "cross_reference",
+      "source_category": "_validator_rule_cross_reference.",
+      "source_row": 10,
+      "tests": [
+        "test_semantics.py::test_cross_reference_absent_target_is_a_violation",
+        "test_semantics.py::test_explicit_empty_context_suppresses_file_method_inference"
+      ]
+    },
+    {
+      "id": "xref_pdbx_serial_crystallography_sample_delivery_fixed_target_diffrn_1",
+      "family": "cross_reference",
+      "source_category": "_validator_rule_cross_reference.",
+      "source_row": 11,
+      "tests": [
+        "test_semantics.py::test_cross_reference_absent_target_is_a_violation",
+        "test_semantics.py::test_explicit_empty_context_suppresses_file_method_inference"
+      ]
+    },
+    {
+      "id": "xref_pdbx_serial_crystallography_data_reduction_diffrn_13",
+      "family": "cross_reference",
+      "source_category": "_validator_rule_cross_reference.",
+      "source_row": 12,
+      "tests": [
+        "test_semantics.py::test_cross_reference_absent_target_is_a_violation",
+        "test_semantics.py::test_explicit_empty_context_suppresses_file_method_inference"
+      ]
+    },
+    {
+      "id": "xref_pdbx_struct_assembly_depositor_info_pdbx_struct_assembly_auth_evi",
+      "family": "cross_reference",
+      "source_category": "_validator_rule_cross_reference.",
+      "source_row": 13,
+      "tests": [
+        "test_semantics.py::test_cross_reference_absent_target_is_a_violation",
+        "test_semantics.py::test_explicit_empty_context_suppresses_file_method_inference"
+      ]
+    },
+    {
+      "id": "xref_pdbx_struct_assembly_depositor_info_pdbx_struct_assembly_gen_depo",
+      "family": "cross_reference",
+      "source_category": "_validator_rule_cross_reference.",
+      "source_row": 14,
+      "tests": [
+        "test_semantics.py::test_cross_reference_absent_target_is_a_violation",
+        "test_semantics.py::test_explicit_empty_context_suppresses_file_method_inference"
+      ]
+    },
+    {
+      "id": "xref_pdbx_nmr_exptl_sample_pdbx_nmr_sample_details_16",
+      "family": "cross_reference",
+      "source_category": "_validator_rule_cross_reference.",
+      "source_row": 15,
+      "tests": [
+        "test_semantics.py::test_cross_reference_absent_target_is_a_violation",
+        "test_semantics.py::test_explicit_empty_context_suppresses_file_method_inference"
+      ]
+    },
+    {
+      "id": "xref_pdbx_nmr_chem_shift_reference_pdbx_nmr_chem_shift_ref_17",
+      "family": "cross_reference",
+      "source_category": "_validator_rule_cross_reference.",
+      "source_row": 16,
+      "tests": [
+        "test_semantics.py::test_cross_reference_absent_target_is_a_violation",
+        "test_semantics.py::test_explicit_empty_context_suppresses_file_method_inference"
+      ]
+    },
+    {
+      "id": "xref_pdbx_nmr_assigned_chem_shift_list_pdbx_nmr_chem_shift_experiment_",
+      "family": "cross_reference",
+      "source_category": "_validator_rule_cross_reference.",
+      "source_row": 17,
+      "tests": [
+        "test_semantics.py::test_cross_reference_absent_target_is_a_violation",
+        "test_semantics.py::test_explicit_empty_context_suppresses_file_method_inference"
+      ]
+    },
+    {
+      "id": "xref_pdbx_nmr_assigned_chem_shift_list_pdbx_nmr_chem_shift_software_19",
+      "family": "cross_reference",
+      "source_category": "_validator_rule_cross_reference.",
+      "source_row": 18,
+      "tests": [
+        "test_semantics.py::test_cross_reference_absent_target_is_a_violation",
+        "test_semantics.py::test_explicit_empty_context_suppresses_file_method_inference"
+      ]
+    },
+    {
+      "id": "xref_pdbx_nmr_assigned_chem_shift_list_pdbx_nmr_systematic_chem_shift_",
+      "family": "cross_reference",
+      "source_category": "_validator_rule_cross_reference.",
+      "source_row": 19,
+      "tests": [
+        "test_semantics.py::test_cross_reference_absent_target_is_a_violation",
+        "test_semantics.py::test_explicit_empty_context_suppresses_file_method_inference"
+      ]
+    },
+    {
+      "id": "xref_em_specimen_em_experiment_21",
+      "family": "cross_reference",
+      "source_category": "_validator_rule_cross_reference.",
+      "source_row": 20,
+      "tests": [
+        "test_semantics.py::test_cross_reference_absent_target_is_a_violation",
+        "test_semantics.py::test_explicit_empty_context_suppresses_file_method_inference"
+      ]
+    },
+    {
+      "id": "xref_em_imaging_optics_em_imaging_22",
+      "family": "cross_reference",
+      "source_category": "_validator_rule_cross_reference.",
+      "source_row": 21,
+      "tests": [
+        "test_semantics.py::test_cross_reference_absent_target_is_a_violation",
+        "test_semantics.py::test_explicit_empty_context_suppresses_file_method_inference"
+      ]
+    },
+    {
+      "id": "xref_em_image_scans_em_image_recording_23",
+      "family": "cross_reference",
+      "source_category": "_validator_rule_cross_reference.",
+      "source_row": 22,
+      "tests": [
+        "test_semantics.py::test_cross_reference_absent_target_is_a_violation",
+        "test_semantics.py::test_explicit_empty_context_suppresses_file_method_inference"
+      ]
+    },
+    {
+      "id": "xref_em_particle_selection_em_image_processing_24",
+      "family": "cross_reference",
+      "source_category": "_validator_rule_cross_reference.",
+      "source_row": 23,
+      "tests": [
+        "test_semantics.py::test_cross_reference_absent_target_is_a_violation",
+        "test_semantics.py::test_explicit_empty_context_suppresses_file_method_inference"
+      ]
+    },
+    {
+      "id": "xref_em_volume_selection_em_image_processing_25",
+      "family": "cross_reference",
+      "source_category": "_validator_rule_cross_reference.",
+      "source_row": 24,
+      "tests": [
+        "test_semantics.py::test_cross_reference_absent_target_is_a_violation",
+        "test_semantics.py::test_explicit_empty_context_suppresses_file_method_inference"
+      ]
+    },
+    {
+      "id": "xref_em_ctf_correction_em_image_processing_26",
+      "family": "cross_reference",
+      "source_category": "_validator_rule_cross_reference.",
+      "source_row": 25,
+      "tests": [
+        "test_semantics.py::test_cross_reference_absent_target_is_a_violation",
+        "test_semantics.py::test_explicit_empty_context_suppresses_file_method_inference"
+      ]
+    },
+    {
+      "id": "xref_em_start_model_em_image_processing_27",
+      "family": "cross_reference",
+      "source_category": "_validator_rule_cross_reference.",
+      "source_row": 26,
+      "tests": [
+        "test_semantics.py::test_cross_reference_absent_target_is_a_violation",
+        "test_semantics.py::test_explicit_empty_context_suppresses_file_method_inference"
+      ]
+    },
+    {
+      "id": "xref_em_3d_reconstruction_em_image_processing_28",
+      "family": "cross_reference",
+      "source_category": "_validator_rule_cross_reference.",
+      "source_row": 27,
+      "tests": [
+        "test_semantics.py::test_cross_reference_absent_target_is_a_violation",
+        "test_semantics.py::test_explicit_empty_context_suppresses_file_method_inference"
+      ]
+    },
+    {
+      "id": "xref_em_final_classification_em_image_processing_29",
+      "family": "cross_reference",
+      "source_category": "_validator_rule_cross_reference.",
+      "source_row": 28,
+      "tests": [
+        "test_semantics.py::test_cross_reference_absent_target_is_a_violation",
+        "test_semantics.py::test_explicit_empty_context_suppresses_file_method_inference"
+      ]
+    },
+    {
+      "id": "xref_em_3d_fitting_list_em_3d_fitting_30",
+      "family": "cross_reference",
+      "source_category": "_validator_rule_cross_reference.",
+      "source_row": 29,
+      "tests": [
+        "test_semantics.py::test_cross_reference_absent_target_is_a_violation",
+        "test_semantics.py::test_explicit_empty_context_suppresses_file_method_inference"
+      ]
+    },
+    {
+      "id": "mandatory_em_imaging",
+      "family": "make_mandatory",
+      "source_category": "_validator_rule_make_mandatory.",
+      "source_row": 0,
+      "tests": [
+        "test_semantics.py::test_any_filled_column_triggers_mandatory_fields"
+      ]
+    },
+    {
+      "id": "mandatory_pdbx_database_related",
+      "family": "make_mandatory",
+      "source_category": "_validator_rule_make_mandatory.",
+      "source_row": 1,
+      "tests": [
+        "test_semantics.py::test_any_filled_column_triggers_mandatory_fields"
+      ]
+    },
+    {
+      "id": "mandatory_refine_ls_shell",
+      "family": "make_mandatory",
+      "source_category": "_validator_rule_make_mandatory.",
+      "source_row": 2,
+      "tests": [
+        "test_semantics.py::test_any_filled_column_triggers_mandatory_fields"
+      ]
+    },
+    {
+      "id": "mandatory_ec_em_3d_reconstruction",
+      "family": "make_mandatory",
+      "source_category": "_validator_rule_make_mandatory.",
+      "source_row": 3,
+      "tests": [
+        "test_semantics.py::test_any_filled_column_triggers_mandatory_fields"
+      ]
+    },
+    {
+      "id": "mandatory_em_helical_em_3d_reconstruction",
+      "family": "make_mandatory",
+      "source_category": "_validator_rule_make_mandatory.",
+      "source_row": 4,
+      "tests": [
+        "test_semantics.py::test_any_filled_column_triggers_mandatory_fields"
+      ]
+    },
+    {
+      "id": "mandatory_em_single_part_em_3d_reconstruction",
+      "family": "make_mandatory",
+      "source_category": "_validator_rule_make_mandatory.",
+      "source_row": 5,
+      "tests": [
+        "test_semantics.py::test_any_filled_column_triggers_mandatory_fields"
+      ]
+    },
+    {
+      "id": "mandatory_em_subtomogram_em_3d_reconstruction",
+      "family": "make_mandatory",
+      "source_category": "_validator_rule_make_mandatory.",
+      "source_row": 6,
+      "tests": [
+        "test_semantics.py::test_any_filled_column_triggers_mandatory_fields"
+      ]
+    },
+    {
+      "id": "mandatory_em_subtomogram_em_image_recording",
+      "family": "make_mandatory",
+      "source_category": "_validator_rule_make_mandatory.",
+      "source_row": 7,
+      "tests": [
+        "test_semantics.py::test_any_filled_column_triggers_mandatory_fields"
+      ]
+    },
+    {
+      "id": "oneof_refine",
+      "family": "one_of",
+      "source_category": "_validator_rule_one_of.",
+      "source_row": 0,
+      "tests": [
+        "test_semantics.py::test_one_of_is_category_level_across_rows"
+      ]
+    },
+    {
+      "id": "oneof_reflns",
+      "family": "one_of",
+      "source_category": "_validator_rule_one_of.",
+      "source_row": 1,
+      "tests": [
+        "test_semantics.py::test_one_of_is_category_level_across_rows"
+      ]
+    },
+    {
+      "id": "oneof_reflns_shell",
+      "family": "one_of",
+      "source_category": "_validator_rule_one_of.",
+      "source_row": 2,
+      "tests": [
+        "test_semantics.py::test_one_of_is_category_level_across_rows"
+      ]
+    },
+    {
+      "id": "diffrn_source_wavelength_vs_protocol",
+      "family": "procedural",
+      "source_category": "_validator_rule_procedural.",
+      "source_row": 0,
+      "tests": [
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine",
+        "test_semantics.py::test_wavelength_grammar_handles_exponent_minus",
+        "test_semantics.py::test_sequence_direct_mapping_accepts_noninteger_author_ids_and_microheterogeneity"
+      ]
+    },
+    {
+      "id": "pdbx_database_related_db_id",
+      "family": "procedural",
+      "source_category": "_validator_rule_procedural.",
+      "source_row": 1,
+      "tests": [
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine",
+        "test_semantics.py::test_wavelength_grammar_handles_exponent_minus",
+        "test_semantics.py::test_sequence_direct_mapping_accepts_noninteger_author_ids_and_microheterogeneity"
+      ]
+    },
+    {
+      "id": "pdbx_struct_ref_seq_depositor_info_db_accession",
+      "family": "procedural",
+      "source_category": "_validator_rule_procedural.",
+      "source_row": 2,
+      "tests": [
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine",
+        "test_semantics.py::test_wavelength_grammar_handles_exponent_minus",
+        "test_semantics.py::test_sequence_direct_mapping_accepts_noninteger_author_ids_and_microheterogeneity"
+      ]
+    },
+    {
+      "id": "pdbx_initial_refinement_model_accession_code",
+      "family": "procedural",
+      "source_category": "_validator_rule_procedural.",
+      "source_row": 3,
+      "tests": [
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine",
+        "test_semantics.py::test_wavelength_grammar_handles_exponent_minus",
+        "test_semantics.py::test_sequence_direct_mapping_accepts_noninteger_author_ids_and_microheterogeneity"
+      ]
+    },
+    {
+      "id": "pdbx_initial_refinement_model_integrative_source_name",
+      "family": "procedural",
+      "source_category": "_validator_rule_procedural.",
+      "source_row": 4,
+      "tests": [
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine",
+        "test_semantics.py::test_wavelength_grammar_handles_exponent_minus",
+        "test_semantics.py::test_sequence_direct_mapping_accepts_noninteger_author_ids_and_microheterogeneity"
+      ]
+    },
+    {
+      "id": "atom_site_occupancy",
+      "family": "procedural",
+      "source_category": "_validator_rule_procedural.",
+      "source_row": 5,
+      "tests": [
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine",
+        "test_semantics.py::test_wavelength_grammar_handles_exponent_minus",
+        "test_semantics.py::test_sequence_direct_mapping_accepts_noninteger_author_ids_and_microheterogeneity"
+      ]
+    },
+    {
+      "id": "atom_site_vs_entity_poly_seq",
+      "family": "procedural",
+      "source_category": "_validator_rule_procedural.",
+      "source_row": 6,
+      "tests": [
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine",
+        "test_semantics.py::test_wavelength_grammar_handles_exponent_minus",
+        "test_semantics.py::test_sequence_direct_mapping_accepts_noninteger_author_ids_and_microheterogeneity"
+      ]
+    },
+    {
+      "id": "entity_poly_pdbx_seq_one_letter_code_poly_ala",
+      "family": "procedural",
+      "source_category": "_validator_rule_procedural.",
+      "source_row": 7,
+      "tests": [
+        "test_legacy_fixtures.py::test_legacy_fixture_contract_through_public_engine",
+        "test_semantics.py::test_wavelength_grammar_handles_exponent_minus",
+        "test_semantics.py::test_sequence_direct_mapping_accepts_noninteger_author_ids_and_microheterogeneity"
+      ]
+    }
+  ]
+}

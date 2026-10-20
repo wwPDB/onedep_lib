@@ -1,0 +1,71 @@
+[
+  {
+    "kind": "linked",
+    "count": 800,
+    "median_seconds": 0.01894290099153295,
+    "trial_seconds": [
+      0.01894290099153295,
+      0.020496413999353535,
+      0.017418389004888013
+    ],
+    "prepare_seconds": 0.00286061099905055,
+    "parse_seconds": 7.909000851213932e-05,
+    "serialize_seconds": 0.0005834149924339727,
+    "issues": 0,
+    "complete": true,
+    "index_builds": 3,
+    "peak_rss_kib": 46408,
+    "fixture_digest": "f4cfe95537022b713c2c5e9aa2c91c3279f439513e988a3ef3b5f806e94701e6",
+    "backend": "0.7.5",
+    "python": "3.13.12",
+    "host": "Linux-7.0.0-34-generic-x86_64-with-glibc2.39",
+    "rules_digest": "6544f7e643a406564f243bc0fe08f3b892b799c6399f0dca0f5ae38a63931451",
+    "legacy_median_seconds": 1.6161434250097955,
+    "legacy_issues": 0,
+    "speedup": 85.31657456965937
+  },
+  {
+    "kind": "linked",
+    "count": 10000,
+    "median_seconds": 0.13995130799594335,
+    "trial_seconds": [
+      0.14130528399255127,
+      0.13995130799594335,
+      0.13983446499332786
+    ],
+    "prepare_seconds": 0.0026108029996976256,
+    "parse_seconds": 0.0016615069907857105,
+    "serialize_seconds": 0.0004714359965873882,
+    "issues": 0,
+    "complete": true,
+    "index_builds": 3,
+    "peak_rss_kib": 54728,
+    "fixture_digest": "8de6477cf780d661b0f8d738a773720b5e9b90e1a59b23fcb8af8f1080d59232",
+    "backend": "0.7.5",
+    "python": "3.13.12",
+    "host": "Linux-7.0.0-34-generic-x86_64-with-glibc2.39",
+    "rules_digest": "6544f7e643a406564f243bc0fe08f3b892b799c6399f0dca0f5ae38a63931451"
+  },
+  {
+    "kind": "linked",
+    "count": 20000,
+    "median_seconds": 0.28283539999392815,
+    "trial_seconds": [
+      0.28283539999392815,
+      0.30051430499588605,
+      0.2780756330030272
+    ],
+    "prepare_seconds": 0.002736043999902904,
+    "parse_seconds": 0.003453406010521576,
+    "serialize_seconds": 0.0005162739980733022,
+    "issues": 0,
+    "complete": true,
+    "index_builds": 3,
+    "peak_rss_kib": 63804,
+    "fixture_digest": "585c06d25ff1fbfa825b8e6c28b82e8bee1679694b1efb40329083e02cc659d8",
+    "backend": "0.7.5",
+    "python": "3.13.12",
+    "host": "Linux-7.0.0-34-generic-x86_64-with-glibc2.39",
+    "rules_digest": "6544f7e643a406564f243bc0fe08f3b892b799c6399f0dca0f5ae38a63931451"
+  }
+]
