@@ -156,7 +156,7 @@ class HttpApiClient:
         try:
             return response.json()
         except (ValueError, JSONDecodeError) as e:
-            raise ApiError("Bad JSON in response", 502) from e
+            raise ApiError(status_code=502, **error_arguments(response, "Bad JSON in response")) from e
 
     def _do(
         self,
@@ -211,7 +211,10 @@ class HttpApiClient:
             if isinstance(data_out, dict):
                 retry_site_base_url = self._redirect_site_base_url(data_out)
                 if retry_site_base_url is not None:
-                    raise ApiError("Redirect retry returned another invalid_location", 502)
+                    raise ApiError(
+                        status_code=502,
+                        **error_arguments(response, "Redirect retry returned another invalid_location"),
+                    )
 
         return data_out
 
@@ -342,9 +345,9 @@ class HttpApiClient:
                 last_data = data_out
                 next_uploaded_bytes = data_out.get("uploadedBytes", chunk_end + 1)
                 if not isinstance(next_uploaded_bytes, int) or isinstance(next_uploaded_bytes, bool):
-                    raise ApiError("Invalid uploadedBytes in response", 502)
+                    raise ApiError(status_code=502, **error_arguments(response, "Invalid uploadedBytes in response"))
                 if not chunk_start < next_uploaded_bytes <= file_size:
-                    raise ApiError("Invalid uploadedBytes in response", 502)
+                    raise ApiError(status_code=502, **error_arguments(response, "Invalid uploadedBytes in response"))
                 uploaded_bytes = next_uploaded_bytes
                 if uploaded_bytes < file_size:
                     fp.seek(uploaded_bytes)

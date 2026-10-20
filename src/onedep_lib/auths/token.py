@@ -250,14 +250,19 @@ class TokenStore:
         try:
             body = response.json()
         except Exception as exc:
-            raise ApiError(f"Token {operation} failed: {exc}", response.status_code) from exc
+            raise ApiError(
+                status_code=response.status_code,
+                **error_arguments(response, f"Token {operation} failed: {exc}"),
+            ) from exc
 
         access_token = body.get("access_token")
         refresh_token_out = body.get("refresh_token")
         if not isinstance(access_token, str) or not isinstance(refresh_token_out, str):
             raise ApiError(
-                f"Token {operation} response missing access_token or refresh_token",
-                response.status_code,
+                status_code=response.status_code,
+                **error_arguments(
+                    response, f"Token {operation} response missing access_token or refresh_token"
+                ),
             )
         return access_token, refresh_token_out
 
