@@ -22,7 +22,7 @@ from pathlib import Path
 
 from gemmi import cif
 
-from onedep_lib.checks.gemmi_crosscheck.rules import load_dictionary_enum_details, load_rules
+from onedep_lib.checks.crosscheck.rules import load_dictionary_enum_details, load_rules
 
 
 @dataclass

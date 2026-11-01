@@ -4,14 +4,14 @@ import pytest
 
 pytest.importorskip("gemmi")
 
-from onedep_lib.checks.gemmi_crosscheck import (  # noqa: E402
+from onedep_lib.checks.crosscheck import (  # noqa: E402
     DEFAULT_RULES_PATH,
     Context,
     CrossChecker,
     load_rules,
     validate,
 )
-from onedep_lib.checks.gemmi_crosscheck.__main__ import main  # noqa: E402
+from onedep_lib.checks.crosscheck.__main__ import main  # noqa: E402
 
 DUPLICATE_ENTITY = """data_test
 _entry.id TEST

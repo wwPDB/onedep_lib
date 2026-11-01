@@ -1,5 +1,5 @@
 """
-Command line: python -m onedep_lib.checks.gemmi_crosscheck FILE.cif [FILE.cif ...]
+Command line: python -m onedep_lib.checks.crosscheck FILE.cif [FILE.cif ...]
 
 Exit status is 0 when no errors were found (warnings allowed), 1 when any
 file has an error, and 2 when a file or the rule store cannot be read.
@@ -12,13 +12,13 @@ import json
 import sys
 from pathlib import Path
 
-from onedep_lib.checks.gemmi_crosscheck.checks import Context, validate
-from onedep_lib.checks.gemmi_crosscheck.rules import DEFAULT_RULES_PATH, load_rules
+from onedep_lib.checks.crosscheck.checks import Context, validate
+from onedep_lib.checks.crosscheck.rules import DEFAULT_RULES_PATH, load_rules
 
 
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(
-        prog="python -m onedep_lib.checks.gemmi_crosscheck",
+        prog="python -m onedep_lib.checks.crosscheck",
         description="Run the cross-checks in schemas/cif/cross_checks.cif on mmCIF files (parsed with gemmi).",
     )
     parser.add_argument("files", nargs="+", type=Path, help="mmCIF files to check")

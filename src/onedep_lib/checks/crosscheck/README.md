@@ -1,4 +1,4 @@
-# gemmi_crosscheck
+# crosscheck
 
 Runs the cross-checks defined in `onedep_lib/schemas/cif/cross_checks.cif` on mmCIF files.
 [gemmi](https://gemmi.readthedocs.io/) parses both the rule store and the input
@@ -24,7 +24,7 @@ Tested with gemmi 0.7.5 and Python 3.9+.
 ## Validate a file from the command line
 
 ```bash
-python -m onedep_lib.checks.gemmi_crosscheck path/to/entry.cif
+python -m onedep_lib.checks.crosscheck path/to/entry.cif
 ```
 
 Several files can be given at once. Example output:
@@ -66,17 +66,17 @@ Examples:
 
 ```bash
 # X-ray entry, gated rules on, JSON output
-python -m onedep_lib.checks.gemmi_crosscheck --expt xray --json entry.cif
+python -m onedep_lib.checks.crosscheck --expt xray --json entry.cif
 
 # Let the file say which method it is, and check dictionary enum pairings
-python -m onedep_lib.checks.gemmi_crosscheck --detect-context --dict mmcif_pdbx_v50.dic entry.cif
+python -m onedep_lib.checks.crosscheck --detect-context --dict mmcif_pdbx_v50.dic entry.cif
 ```
 
 ## Use from Python
 
 ```python
 from pathlib import Path
-from onedep_lib.checks.gemmi_crosscheck import Context, load_rules, validate
+from onedep_lib.checks.crosscheck import Context, load_rules, validate
 
 rules = load_rules()  # parse cross_checks.cif once, reuse for many files
 for f in validate(Path("entry.cif"), rules=rules, context=Context({"xray"}, set(), {"PDB"})):
@@ -87,7 +87,7 @@ To run on a block already in memory, build a `CrossChecker` directly:
 
 ```python
 from gemmi import cif
-from onedep_lib.checks.gemmi_crosscheck import Context, CrossChecker, load_rules
+from onedep_lib.checks.crosscheck import Context, CrossChecker, load_rules
 
 block = cif.read("entry.cif")[0]
 findings = CrossChecker(block, load_rules(), Context.empty()).run()
@@ -106,5 +106,5 @@ findings = CrossChecker(block, load_rules(), Context.empty()).run()
 Copied from the `gemmi_crosscheck` package in
 [mmcif-validator](https://github.com/PDBeurope/mmcif-validator), where a parity
 test checks it against that repository's own rule engine. The tests here
-(`tests/checks/test_gemmi_crosscheck.py`) cover the packaged rule store and a
+(`tests/checks/test_crosscheck.py`) cover the packaged rule store and a
 small set of inline mmCIF blocks.
