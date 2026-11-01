@@ -31,6 +31,11 @@ dependencies = [
 ]
 requires-python = ">= 3.9"
 
+[project.optional-dependencies]
+gemmi = [
+  "gemmi>=0.7.5",
+]
+
 [dependency-groups]
 dev = [
     { include-group = "lint" },
@@ -44,6 +49,7 @@ test = [
     "coverage",
     "pytest",
     "pytest-httpserver",
+    "gemmi>=0.7.5",
 ]
 typecheck = [
     "ty",
