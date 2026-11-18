@@ -247,7 +247,7 @@ R068 1 WHEN '_em_3d_fitting_list.source_name' EQ Other . . . .
 R068 2 THEN '_em_3d_fitting_list.details' NOT_EMPTY . . . . .
 R069 1 WHEN '_em_3d_fitting_list.source_name' EQ PDB . . . .
 R069 2 THEN '_em_3d_fitting_list.accession_code' NOT_EMPTY . . . . .
-R070 1 WHEN '_em_3d_reconstruction.resolution_method' IN 'FSC 0.5 CUT-OFF, FSC 0.33 CUT-OFF, FSC 0.143 CUT-OFF, FSC 3 SIGMA CUT-OFF, FSC 1/2 BIT CUT-OFF' . . . .
+R070 1 WHEN '_em_3d_reconstruction.resolution_method' IN 'FSC 0.5 CUT-OFF,FSC 0.33 CUT-OFF,FSC 0.143 CUT-OFF,FSC 3 SIGMA CUT-OFF,FSC 1/2 BIT CUT-OFF' . . . .
 R070 2 THEN '_em_3d_reconstruction.fsc_type' NOT_EMPTY . . . . .
 R071 1 WHEN '_em_entity_assembly_molwt.experimental_flag' EQ YES . . . .
 R071 2 THEN '_em_entity_assembly_molwt.units' NOT_EMPTY . . AND . .
@@ -276,9 +276,9 @@ R082 1 WHEN '_em_start_model.type' EQ 'RANDOM CONICAL TILT' . . . .
 R082 2 THEN '_em_start_model.random_conical_tilt_num_images' NOT_EMPTY . . . . .
 R083 1 WHEN '_em_start_model.type' EQ 'RANDOM CONICAL TILT' . . . .
 R083 2 THEN '_em_start_model.random_conical_tilt_angle' NOT_EMPTY . . . . .
-R084 1 WHEN '_pdbx_audit_support.funding_organization' IN 'Other government, Other private' . . . .
+R084 1 WHEN '_pdbx_audit_support.funding_organization' IN 'Other government,Other private' . . . .
 R084 2 THEN '_pdbx_audit_support.country' NOT_EMPTY . . . . .
-R085 1 WHEN '_pdbx_audit_support.funding_organization' IN 'Other government, Other private' . . . .
+R085 1 WHEN '_pdbx_audit_support.funding_organization' IN 'Other government,Other private' . . . .
 R085 2 THEN '_pdbx_audit_support.details' NOT_EMPTY . . . . .
 R086 1 WHEN '_pdbx_initial_refinement_model.source_name' EQ Other . . . .
 R086 2 THEN '_pdbx_initial_refinement_model.details' NOT_EMPTY . . . . .
@@ -288,12 +288,12 @@ R088 1 WHEN '_refine.pdbx_method_to_determine_struct' EQ 'MOLECULAR REPLACEMENT'
 R088 2 THEN '_refine.pdbx_starting_model' NOT_EMPTY . . . . .
 R088 3 UNLESS '_pdbx_initial_refinement_model.id' NOT_EMPTY . . . ANY .
 R089 1 WHEN '_software.classification' EQ refinement . AND . .
-R089 2 WHEN '_software.name' IN 'PHENIX, REFMAC' . AND . .
+R089 2 WHEN '_software.name' IN 'PHENIX,REFMAC' . AND . .
 R089 3 THEN '_software.version' NOT_EMPTY . . . . .
 R090 1 WHEN '_em_3d_fitting_list.source_name' EQ PDB . . . .
 R090 2 THEN '_em_3d_fitting_list.accession_code' MATCHES_TYPE pdb_id_dep . . . .
 R091 1 WHEN '_em_3d_fitting_list.type' EQ 'experimental model' . . . .
-R091 2 THEN '_em_3d_fitting_list.source_name' IN 'PDB, Other' . . . .
+R091 2 THEN '_em_3d_fitting_list.source_name' IN 'PDB,Other' . . . .
 R092 1 WHEN '_em_3d_fitting_list.type' EQ 'integrative model' . . . .
 R092 2 THEN '_em_3d_fitting_list.source_name' EQ Other . . . .
 R093 1 WHEN '_em_3d_fitting_list.type' EQ other . . . .
@@ -301,7 +301,7 @@ R093 2 THEN '_em_3d_fitting_list.source_name' EQ Other . . . .
 R094 1 WHEN '_em_3d_fitting_list.source_name' EQ PDB . . . .
 R094 2 THEN '_em_3d_fitting_list.type' EQ 'experimental model' . . . .
 R095 1 WHEN '_pdbx_initial_refinement_model.type' EQ 'experimental model' . . . .
-R095 2 THEN '_pdbx_initial_refinement_model.source_name' IN 'PDB, Other' . . . .
+R095 2 THEN '_pdbx_initial_refinement_model.source_name' IN 'PDB,Other' . . . .
 R096 1 WHEN '_pdbx_initial_refinement_model.type' EQ other . . . .
 R096 2 THEN '_pdbx_initial_refinement_model.source_name' EQ Other . . . .
 R097 1 WHEN '_pdbx_initial_refinement_model.source_name' EQ PDB . . . .
@@ -320,19 +320,19 @@ R105 1 WHEN '_entity.src_method' EQ nat . . ANY .
 R105 2 THEN '_entity_poly.entity_id' IN_COLUMN_OF . '_entity_src_nat.entity_id' . . .
 R106 1 WHEN '_entity.src_method' EQ syn . . ANY .
 R106 2 THEN '_entity_poly.entity_id' IN_COLUMN_OF . '_pdbx_entity_src_syn.entity_id' . . .
-R107 1 WHEN '_exptl.method' IN 'X-RAY DIFFRACTION, NEUTRON DIFFRACTION, FIBER DIFFRACTION, ELECTRON CRYSTALLOGRAPHY' . AND ANY .
+R107 1 WHEN '_exptl.method' IN 'X-RAY DIFFRACTION,NEUTRON DIFFRACTION,FIBER DIFFRACTION,ELECTRON CRYSTALLOGRAPHY' . AND ANY .
 R107 2 WHEN '_exptl_crystal.id' NOT_EMPTY . . AND ANY .
 R107 3 THEN '_exptl_crystal_grow.crystal_id' IN_COLUMN_OF . '_exptl_crystal.id' . . .
-R108 1 WHEN '_exptl.method' IN 'X-RAY DIFFRACTION, NEUTRON DIFFRACTION, FIBER DIFFRACTION' . AND ANY .
+R108 1 WHEN '_exptl.method' IN 'X-RAY DIFFRACTION,NEUTRON DIFFRACTION,FIBER DIFFRACTION' . AND ANY .
 R108 2 WHEN '_exptl_crystal.id' NOT_EMPTY . . AND ANY .
 R108 3 THEN '_diffrn.crystal_id' IN_COLUMN_OF . '_exptl_crystal.id' . . .
-R109 1 WHEN '_exptl.method' IN 'X-RAY DIFFRACTION, NEUTRON DIFFRACTION, FIBER DIFFRACTION' . AND ANY .
+R109 1 WHEN '_exptl.method' IN 'X-RAY DIFFRACTION,NEUTRON DIFFRACTION,FIBER DIFFRACTION' . AND ANY .
 R109 2 WHEN '_diffrn.id' NOT_EMPTY . . AND ANY .
 R109 3 THEN '_diffrn_detector.diffrn_id' IN_COLUMN_OF . '_diffrn.id' . . .
-R110 1 WHEN '_exptl.method' IN 'X-RAY DIFFRACTION, NEUTRON DIFFRACTION, FIBER DIFFRACTION' . AND ANY .
+R110 1 WHEN '_exptl.method' IN 'X-RAY DIFFRACTION,NEUTRON DIFFRACTION,FIBER DIFFRACTION' . AND ANY .
 R110 2 WHEN '_diffrn.id' NOT_EMPTY . . AND ANY .
 R110 3 THEN '_diffrn_radiation.diffrn_id' IN_COLUMN_OF . '_diffrn.id' . . .
-R111 1 WHEN '_exptl.method' IN 'X-RAY DIFFRACTION, NEUTRON DIFFRACTION, FIBER DIFFRACTION' . AND ANY .
+R111 1 WHEN '_exptl.method' IN 'X-RAY DIFFRACTION,NEUTRON DIFFRACTION,FIBER DIFFRACTION' . AND ANY .
 R111 2 WHEN '_diffrn.id' NOT_EMPTY . . AND ANY .
 R111 3 THEN '_diffrn_source.diffrn_id' IN_COLUMN_OF . '_diffrn.id' . . .
 R112 1 WHEN '_exptl.method' EQ 'X-RAY DIFFRACTION' . AND ANY .
@@ -354,49 +354,49 @@ R117 1 WHEN '_pdbx_struct_assembly_auth_evidence_depositor_info.assembly_id' NOT
 R117 2 THEN '_pdbx_struct_assembly_depositor_info.id' IN_COLUMN_OF . '_pdbx_struct_assembly_auth_evidence_depositor_info.assembly_id' . . .
 R118 1 WHEN '_pdbx_struct_assembly_gen_depositor_info.assembly_id' NOT_EMPTY . . . ANY .
 R118 2 THEN '_pdbx_struct_assembly_depositor_info.id' IN_COLUMN_OF . '_pdbx_struct_assembly_gen_depositor_info.assembly_id' . . .
-R119 1 WHEN '_exptl.method' IN 'SOLUTION NMR, SOLID-STATE NMR' . AND ANY .
+R119 1 WHEN '_exptl.method' IN 'SOLUTION NMR,SOLID-STATE NMR' . AND ANY .
 R119 2 WHEN '_pdbx_nmr_sample_details.solution_id' NOT_EMPTY . . AND ANY .
 R119 3 THEN '_pdbx_nmr_exptl_sample.solution_id' IN_COLUMN_OF . '_pdbx_nmr_sample_details.solution_id' . . .
-R120 1 WHEN '_exptl.method' IN 'SOLUTION NMR, SOLID-STATE NMR' . AND ANY .
+R120 1 WHEN '_exptl.method' IN 'SOLUTION NMR,SOLID-STATE NMR' . AND ANY .
 R120 2 WHEN '_pdbx_nmr_chem_shift_ref.chem_shift_reference_id' NOT_EMPTY . . AND ANY .
 R120 3 THEN '_pdbx_nmr_chem_shift_reference.id' IN_COLUMN_OF . '_pdbx_nmr_chem_shift_ref.chem_shift_reference_id' . . .
-R121 1 WHEN '_exptl.method' IN 'SOLUTION NMR, SOLID-STATE NMR' . AND ANY .
+R121 1 WHEN '_exptl.method' IN 'SOLUTION NMR,SOLID-STATE NMR' . AND ANY .
 R121 2 WHEN '_pdbx_nmr_chem_shift_experiment.assigned_chem_shift_list_id' NOT_EMPTY . . AND ANY .
 R121 3 THEN '_pdbx_nmr_assigned_chem_shift_list.id' IN_COLUMN_OF . '_pdbx_nmr_chem_shift_experiment.assigned_chem_shift_list_id' . . .
-R122 1 WHEN '_exptl.method' IN 'SOLUTION NMR, SOLID-STATE NMR' . AND ANY .
+R122 1 WHEN '_exptl.method' IN 'SOLUTION NMR,SOLID-STATE NMR' . AND ANY .
 R122 2 WHEN '_pdbx_nmr_chem_shift_software.assigned_chem_shift_list_id' NOT_EMPTY . . AND ANY .
 R122 3 THEN '_pdbx_nmr_assigned_chem_shift_list.id' IN_COLUMN_OF . '_pdbx_nmr_chem_shift_software.assigned_chem_shift_list_id' . . .
-R123 1 WHEN '_exptl.method' IN 'SOLUTION NMR, SOLID-STATE NMR' . AND ANY .
+R123 1 WHEN '_exptl.method' IN 'SOLUTION NMR,SOLID-STATE NMR' . AND ANY .
 R123 2 WHEN '_pdbx_nmr_systematic_chem_shift_offset.assigned_chem_shift_list_id' NOT_EMPTY . . AND ANY .
 R123 3 THEN '_pdbx_nmr_assigned_chem_shift_list.id' IN_COLUMN_OF . '_pdbx_nmr_systematic_chem_shift_offset.assigned_chem_shift_list_id' . . .
-R124 1 WHEN '_exptl.method' IN 'ELECTRON MICROSCOPY, ELECTRON CRYSTALLOGRAPHY' . AND ANY .
+R124 1 WHEN '_exptl.method' IN 'ELECTRON MICROSCOPY,ELECTRON CRYSTALLOGRAPHY' . AND ANY .
 R124 2 WHEN '_em_experiment.id' NOT_EMPTY . . AND ANY .
 R124 3 THEN '_em_specimen.experiment_id' IN_COLUMN_OF . '_em_experiment.id' . . .
-R125 1 WHEN '_exptl.method' IN 'ELECTRON MICROSCOPY, ELECTRON CRYSTALLOGRAPHY' . AND ANY .
+R125 1 WHEN '_exptl.method' IN 'ELECTRON MICROSCOPY,ELECTRON CRYSTALLOGRAPHY' . AND ANY .
 R125 2 WHEN '_em_imaging.id' NOT_EMPTY . . AND ANY .
 R125 3 THEN '_em_imaging_optics.imaging_id' IN_COLUMN_OF . '_em_imaging.id' . . .
-R126 1 WHEN '_exptl.method' IN 'ELECTRON MICROSCOPY, ELECTRON CRYSTALLOGRAPHY' . AND ANY .
+R126 1 WHEN '_exptl.method' IN 'ELECTRON MICROSCOPY,ELECTRON CRYSTALLOGRAPHY' . AND ANY .
 R126 2 WHEN '_em_image_recording.id' NOT_EMPTY . . AND ANY .
 R126 3 THEN '_em_image_scans.image_recording_id' IN_COLUMN_OF . '_em_image_recording.id' . . .
-R127 1 WHEN '_exptl.method' IN 'ELECTRON MICROSCOPY, ELECTRON CRYSTALLOGRAPHY' . AND ANY .
+R127 1 WHEN '_exptl.method' IN 'ELECTRON MICROSCOPY,ELECTRON CRYSTALLOGRAPHY' . AND ANY .
 R127 2 WHEN '_em_image_processing.id' NOT_EMPTY . . AND ANY .
 R127 3 THEN '_em_particle_selection.image_processing_id' IN_COLUMN_OF . '_em_image_processing.id' . . .
 R128 1 WHEN '_exptl.method' EQ 'ELECTRON MICROSCOPY' . AND ANY .
 R128 2 WHEN '_em_image_processing.id' NOT_EMPTY . . AND ANY .
 R128 3 THEN '_em_volume_selection.image_processing_id' IN_COLUMN_OF . '_em_image_processing.id' . . .
-R129 1 WHEN '_exptl.method' IN 'ELECTRON MICROSCOPY, ELECTRON CRYSTALLOGRAPHY' . AND ANY .
+R129 1 WHEN '_exptl.method' IN 'ELECTRON MICROSCOPY,ELECTRON CRYSTALLOGRAPHY' . AND ANY .
 R129 2 WHEN '_em_image_processing.id' NOT_EMPTY . . AND ANY .
 R129 3 THEN '_em_ctf_correction.em_image_processing_id' IN_COLUMN_OF . '_em_image_processing.id' . . .
-R130 1 WHEN '_exptl.method' IN 'ELECTRON MICROSCOPY, ELECTRON CRYSTALLOGRAPHY' . AND ANY .
+R130 1 WHEN '_exptl.method' IN 'ELECTRON MICROSCOPY,ELECTRON CRYSTALLOGRAPHY' . AND ANY .
 R130 2 WHEN '_em_image_processing.id' NOT_EMPTY . . AND ANY .
 R130 3 THEN '_em_start_model.image_processing_id' IN_COLUMN_OF . '_em_image_processing.id' . . .
-R131 1 WHEN '_exptl.method' IN 'ELECTRON MICROSCOPY, ELECTRON CRYSTALLOGRAPHY' . AND ANY .
+R131 1 WHEN '_exptl.method' IN 'ELECTRON MICROSCOPY,ELECTRON CRYSTALLOGRAPHY' . AND ANY .
 R131 2 WHEN '_em_image_processing.id' NOT_EMPTY . . AND ANY .
 R131 3 THEN '_em_3d_reconstruction.image_processing_id' IN_COLUMN_OF . '_em_image_processing.id' . . .
-R132 1 WHEN '_exptl.method' IN 'ELECTRON MICROSCOPY, ELECTRON CRYSTALLOGRAPHY' . AND ANY .
+R132 1 WHEN '_exptl.method' IN 'ELECTRON MICROSCOPY,ELECTRON CRYSTALLOGRAPHY' . AND ANY .
 R132 2 WHEN '_em_image_processing.id' NOT_EMPTY . . AND ANY .
 R132 3 THEN '_em_final_classification.image_processing_id' IN_COLUMN_OF . '_em_image_processing.id' . . .
-R133 1 WHEN '_exptl.method' IN 'ELECTRON MICROSCOPY, ELECTRON CRYSTALLOGRAPHY' . AND ANY .
+R133 1 WHEN '_exptl.method' IN 'ELECTRON MICROSCOPY,ELECTRON CRYSTALLOGRAPHY' . AND ANY .
 R133 2 WHEN '_em_3d_fitting.id' NOT_EMPTY . . AND ANY .
 R133 3 THEN '_em_3d_fitting_list.3d_fitting_id' IN_COLUMN_OF . '_em_3d_fitting.id' . . .
 R134 1 THEN '_em_imaging.nominal_defocus_min' NOT_EMPTY . . AND . .
@@ -404,10 +404,10 @@ R134 2 THEN '_em_imaging.nominal_defocus_max' NOT_EMPTY . . AND . .
 R135 1 THEN '_pdbx_database_related.db_name' NOT_EMPTY . . . . .
 R136 1 THEN '_refine_ls_shell.d_res_high' NOT_EMPTY . . AND . .
 R136 2 THEN '_refine_ls_shell.d_res_low' NOT_EMPTY . . AND . .
-R137 1 WHEN '_em_experiment.reconstruction_method' IN 'CRYSTALLOGRAPHY, HELICAL, SINGLE PARTICLE, SUBTOMOGRAM AVERAGING, TOMOGRAPHY' . . ANY .
+R137 1 WHEN '_em_experiment.reconstruction_method' IN 'CRYSTALLOGRAPHY,HELICAL,SINGLE PARTICLE,SUBTOMOGRAM AVERAGING,TOMOGRAPHY' . . ANY .
 R137 2 THEN '_em_3d_reconstruction.resolution' NOT_EMPTY . . AND . .
 R137 3 THEN '_em_3d_reconstruction.resolution_method' NOT_EMPTY . . AND . .
-R141 1 WHEN '_em_experiment.reconstruction_method' IN 'SUBTOMOGRAM AVERAGING, TOMOGRAPHY' . . ANY .
+R141 1 WHEN '_em_experiment.reconstruction_method' IN 'SUBTOMOGRAM AVERAGING,TOMOGRAPHY' . . ANY .
 R141 2 THEN '_em_image_recording.avg_electron_dose_per_subtomogram' NOT_EMPTY . . . . .
 R142 1 THEN '_refine.ls_R_factor_obs' NOT_EMPTY . . OR . .
 R142 2 THEN '_refine.ls_R_factor_R_work' NOT_EMPTY . . OR . .
@@ -424,14 +424,14 @@ R144 3 THEN '_reflns_shell.pdbx_Rsym_value' NOT_EMPTY . . OR . .
 R144 4 THEN '_reflns_shell.pdbx_Rpim_I_all' NOT_EMPTY . . OR . .
 R144 5 THEN '_reflns_shell.pdbx_Rrim_I_all' NOT_EMPTY . . OR . .
 R144 6 THEN '_reflns_shell.pdbx_R_split' NOT_EMPTY . . OR . .
-R145 1 WHEN '_diffrn_radiation.pdbx_diffrn_protocol' IN 'LAUE, SINGLE WAVELENGTH' . . ANY .
+R145 1 WHEN '_diffrn_radiation.pdbx_diffrn_protocol' IN 'LAUE,SINGLE WAVELENGTH' . . ANY .
 R145 2 THEN '_diffrn_source.pdbx_wavelength_list' NOT_EMPTY . . . . .
 R146 1 WHEN '_diffrn_radiation.pdbx_diffrn_protocol' EQ LAUE . . ANY .
 R146 2 THEN '_diffrn_source.pdbx_wavelength_list' MATCHES '.*[,-].*' . . . .
 R147 1 WHEN '_diffrn_radiation.pdbx_diffrn_protocol' EQ 'SINGLE WAVELENGTH' . . ANY .
 R147 2 THEN '_diffrn_source.pdbx_wavelength_list' NOT_MATCHES '.*[,-].*' . . . .
 R148 1 WHEN '_pdbx_database_related.db_name' EQ PDB . . . .
-R148 2 THEN '_pdbx_database_related.db_id' MATCHES_TYPE 'pdb_id_dep, deposition_id' . . . .
+R148 2 THEN '_pdbx_database_related.db_id' MATCHES_TYPE 'pdb_id_dep,deposition_id' . . . .
 R149 1 WHEN '_pdbx_database_related.db_name' EQ EMDB . . . .
 R149 2 THEN '_pdbx_database_related.db_id' MATCHES '^([Ee][Mm][Dd]-[0-9]+|D_1[0-9]{9})$' . . . .
 R150 1 WHEN '_pdbx_struct_ref_seq_depositor_info.db_name' EQ GB . . . .

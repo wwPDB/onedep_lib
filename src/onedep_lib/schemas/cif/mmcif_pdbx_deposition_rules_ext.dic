@@ -9,9 +9,9 @@ _item_type_list.code
 _item_type_list.primitive_code
 _item_type_list.construct
 _item_type_list.detail
-               alphanum-csv     uchar
-               '[0-9A-Za-z ]+(?:\s*,\s*[0-9A-Za-z ]+)*'
-               "comma separated alphanumeric codes (no spaces)  ..."
+               value_csv        char
+               '[^ \t\n,]+((, ?| )[^ \t\n,]+)*'
+               'value or comma-separated list of values; single spaces are allowed inside a value and after a comma; no tabs, newlines, spaces before a comma, or empty entries'
                pdb_id_u         uchar
                '([1-9][A-Za-z0-9]{3}|[Pp][Dd][Bb]_[A-Za-z0-9]{8})'
                'PDB code (case insensitive)'
@@ -494,19 +494,24 @@ save__pdbx_deposition_rule_condition.operator
 
 save__pdbx_deposition_rule_condition.value
     _item_description.description
-;    Comma-separated lis of value corresponding the rule condition.
-     Can be a single value, regex, or a list of enumerations.
-     For MATCHES_TYPE, a comma-separated list of item type codes.
+;    Value used by the rule condition.
+     For IN and NOT_IN, a comma-separated list of values; for
+     MATCHES_TYPE, a comma-separated list of item type codes. A single
+     space after a comma is allowed and is not part of the next entry.
+     A list entry cannot itself contain a comma.
+     For MATCHES and NOT_MATCHES, a regular expression; for other
+     comparison operators, a single value. For these operators a comma
+     is part of the value.
 ;
   _item.name               '_pdbx_deposition_rule_condition.value'
   _item.category_id        pdbx_deposition_rule_condition
   _item.mandatory_code     no
-  _item_type.code          alphanum-csv
+  _item_type.code          value_csv
   loop_
   _item_examples.case
    'X-RAY DIFFRACTION'
    'PDB'
-   'ELECTRON MICROSCOPY, ELECTRON CRYSTALLOGRAPHY'
+   'ELECTRON MICROSCOPY,ELECTRON CRYSTALLOGRAPHY'
    save_
 
 save__pdbx_deposition_rule_condition.compare_item_name
