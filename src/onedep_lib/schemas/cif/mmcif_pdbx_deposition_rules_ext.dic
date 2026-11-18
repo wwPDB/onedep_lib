@@ -280,12 +280,9 @@ save_pdbx_deposition_rule_condition
      - If one item of a condition belongs to the scope category and
        the other to a partner category, the scope item is given in
        item_name and the partner item in compare_item_name.
-     - THEN conditions: item_name must belong to the scope category;
-       compare_item_name may belong to the scope category or to a
-       partner category.
-     - WHEN and UNLESS conditions: item_name may belong to the scope
-       category or to a partner category. compare_item_name may belong
-       to:
+     - WHEN, THEN and UNLESS conditions: item_name may belong to the
+       scope category or to a partner category. compare_item_name may
+       belong to:
          the scope category, when item_name also belongs to the scope
            category (both values are taken from the scope row);
          a partner category, when item_name belongs to the scope
@@ -322,7 +319,11 @@ save_pdbx_deposition_rule_condition
    interpreted according to its item type in the main dictionary is
    reported by dictionary validation and treated as missing here.
      - The operators EXISTS, NOT_EXISTS, EMPTY and NOT_EMPTY test for
-       missing values and are evaluated normally.
+       missing values and are evaluated normally. Over partner rows,
+       every paired partner row is tested, including rows with missing
+       values. If there are no partner rows, for example because the
+       partner category is absent, a condition with quantifier ANY does
+       not hold and a condition with quantifier ALL holds.
      - For all other operators (comparisons such as EQ, IN, MATCHES,
        GE or GE_ITEM), a comparison cannot be made if the value of
        item_name is missing, or, for operators that compare two items
@@ -336,7 +337,7 @@ save_pdbx_deposition_rule_condition
                  violation is reported by this rule.
        Missing values are reported only by rules that test for them
        explicitly using NOT_EMPTY or EXISTS.
-     - For conditions evaluated over partner rows, partner rows with a
+     - For comparisons evaluated over partner rows, partner rows with a
        missing value are ignored. If every partner row has a missing
        value, no comparison can be made and the condition is skipped
        as described above, whatever its quantifier: a WHEN or UNLESS
@@ -439,10 +440,9 @@ save__pdbx_deposition_rule_condition.item_name
     _item_description.description
 ;    Full item name where the rule condition applies.
      Must be an item name defined in the main dictionary.
-     For THEN conditions, the item must belong to the rule's scope
-     category; for WHEN and UNLESS conditions, it may belong to the
-     scope category or to a partner category (see the
-     PDBX_DEPOSITION_RULE_CONDITION category description).
+     The item may belong to the rule's scope category or to a partner
+     category (see the PDBX_DEPOSITION_RULE_CONDITION category
+     description).
 ;
   _item.name               '_pdbx_deposition_rule_condition.item_name'
   _item.category_id        pdbx_deposition_rule_condition
@@ -568,6 +568,9 @@ save__pdbx_deposition_rule_condition.quantifier
      Each condition is quantified independently; two ANY conditions
      on the same partner category may be satisfied by different
      partner rows.
+     To require that a partner category is present, use EXISTS or
+     NOT_EMPTY with quantifier ANY; with ALL, a condition over no
+     partner rows holds.
 ;
   _item.name               '_pdbx_deposition_rule_condition.quantifier'
   _item.category_id        pdbx_deposition_rule_condition
