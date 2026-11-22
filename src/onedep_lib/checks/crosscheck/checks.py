@@ -6,7 +6,8 @@ Each rule is evaluated as the extension dictionary describes
 category:
 
 1. rows of each category the rule refers to are restricted by
-   _pdbx_deposition_rule_row_selection (the MIN or MAX row per group);
+   _pdbx_deposition_rule_row_selection (the MIN or MAX row per group, or
+   every row with a value: ANY_VALUE);
 2. each remaining scope row is paired with rows of each partner category
    through _pdbx_deposition_rule_join, or with every row when the rule has no
    join; a scope row without a match is skipped, reported, or paired by the
@@ -17,11 +18,11 @@ category:
 
 Values are typed by the PDBx/mmCIF dictionary: numbers, dates or text, with
 uchar types (ucode, uline, ...) compared case-insensitively. A value is
-missing when its item or category is absent, when it is '?' or '.', when it is
-blank, or when it cannot be read as its type. A comparison with a missing
-value is skipped: the WHEN or UNLESS condition does not hold, and the THEN
-condition is satisfied. Only EXISTS, NOT_EXISTS, EMPTY and NOT_EMPTY test for
-missing values.
+missing when its item or category is absent, when it is empty, '?' or '.'
+once stripped, or when it cannot be read as its type. A comparison with a
+missing value is skipped: the WHEN or UNLESS condition does not hold, and the
+THEN condition is satisfied. EXISTS, NOT_EXISTS, EMPTY and NOT_EMPTY test for
+missing values and are always evaluated.
 
 Each failing scope row is reported once. gemmi records line numbers per item
 or loop, not per value: a finding on a key-value item carries that item's
@@ -34,12 +35,12 @@ import operator
 import re
 from collections import defaultdict
 from collections.abc import Iterable, Iterator
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
 from gemmi import cif
 
-from onedep_lib.checks.crosscheck.dictionary import DATE, NUMBER, TEXT, Dictionary, convert, load_dictionary
+from onedep_lib.checks.crosscheck.dictionary import DATE, NUMBER, TEXT, Dictionary, convert
 from onedep_lib.checks.crosscheck.rules import (
     EXISTENCE_OPERATORS,
     ITEM_OPERATORS,
@@ -74,15 +75,13 @@ class Finding:
 
 @dataclass
 class Context:
-    """Selectors for rules gated on experiment, entry subtype, or requested codes."""
+    """What the depositor asked for: requested accession codes (e.g. PDB) for experiment_code rules."""
 
-    experiment_modes: set[str]
-    entry_subtypes: set[str]
-    requested_codes: set[str]
+    requested_codes: set[str] = field(default_factory=set)
 
     @classmethod
     def empty(cls) -> Context:
-        return cls(set(), set(), set())
+        return cls()
 
 
 # Comparison of two items, and the symbol of its violation (for messages).
@@ -107,39 +106,6 @@ _AGGREGATES = {"SUM": sum, "COUNT": len}
 # Families evaluated row by row from their conditions alone.
 _CONDITION_FAMILIES = {"pairwise_order", "conditional_presence", "conditional_value", "format", "cross_reference"}
 
-# Accession formats used by the procedural accession rules: (regex, match lowercased).
-_FORMATS = {
-    "pdb_id": (r"^(pdb_0000)?[\w\d]{4}$", True),
-    "emdb_id": (r"^emd-\d+$", True),
-    "deposition_id": (r"^D_1\d{9}$", False),
-    "genbank_id": (r"^([A-Za-z]{2}\d{6}|[A-Za-z]\d{5})\.\d$", False),
-    "uniprot_id": (r"^([OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2})(-\d+)?$", False),
-    "pdbdev_id": (r"^pdbdev_[\d]{8}$", True),
-    "alphafold_id": (
-        r"^((AF-)?([OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2})(-F[0-9])?)?$",
-        False,
-    ),
-    "modelarchive_id": (r"^(ma-[\w\d]{5})?$", True),
-}
-
-# _exptl.method -> experiment mode token used by the experiment_modes parameter.
-_METHOD_MODES = {
-    "X-RAY DIFFRACTION": "xray",
-    "NEUTRON DIFFRACTION": "nd",
-    "FIBER DIFFRACTION": "fd",
-    "ELECTRON CRYSTALLOGRAPHY": "ec",
-    "ELECTRON MICROSCOPY": "em",
-    "SOLUTION NMR": "nmr",
-    "SOLID-STATE NMR": "ssnmr",
-}
-# _em_experiment.reconstruction_method -> subtype used by makeMandatorySubtypes.
-_EM_SUBTYPES = {
-    "SINGLE PARTICLE": "EM-single_part",
-    "HELICAL": "EM-helical",
-    "SUBTOMOGRAM AVERAGING": "EM-subtomogram",
-    "CRYSTALLOGRAPHY": "EC",
-}
-
 
 def _fmt_number(value: float) -> str:
     return f"{round(value, 4):.4f}".rstrip("0").rstrip(".") or "0"
@@ -157,13 +123,6 @@ def _render(template: str | None, **values) -> str:
         text = text.replace(f"[{{{key}}}]", str(value or ""))
     text = re.sub(r"\[\{[^}]+\}\]", "", text).strip()
     return re.sub(r"\s{2,}", " ", text)
-
-
-def _format_ok(fmt: str, value: str) -> bool:
-    pattern, lower = _FORMATS.get(fmt, (None, False))
-    if pattern is None:
-        return False
-    return re.match(pattern, value.lower() if lower else value) is not None
 
 
 def _with_label_fallback(item: str) -> tuple[str, ...]:
@@ -202,7 +161,7 @@ class Category:
         return item.lower() in self.index
 
     def column(self, item: str) -> list[str | None]:
-        """Raw values; None for '?', '.' and an absent item."""
+        """Raw values; None for unquoted '?' and '.' and for an absent item."""
         key = item.lower()
         col = self._columns.get(key)
         if col is None:
@@ -258,16 +217,11 @@ class Category:
 class CrossChecker:
     """Runs every enabled rule of a RuleSet against one data block."""
 
-    def __init__(
-        self,
-        block: cif.Block,
-        rules: RuleSet,
-        context: Context,
-    ):
+    def __init__(self, block: cif.Block, rules: RuleSet, context: Context | None = None):
         self.block = block
         self.rules = rules
         self.dictionary = rules.dictionary
-        self.context = context
+        self.context = context or Context.empty()
         self.findings: list[Finding] = []
         self._categories: dict[str, Category] = {}
         self._selected: dict[tuple[str, str], list[int]] = {}
@@ -305,25 +259,10 @@ class CrossChecker:
                 self._check_rows(rule)
         return self.findings
 
-    # -- whether a rule runs on this entry ------------------------------------
-
     def _in_effect(self, rule: Rule) -> bool:
-        """Gating parameters: experiment, entry subtype, cross-reference type, skipped categories."""
-        scope = (rule.param("experiment_scope") or "").lower()
-        if scope == "coded":
-            code = rule.param("experiment_code")
-            if not code or code.upper() not in self.context.requested_codes:
-                return False
-        elif scope != "all":
-            modes = {m.lower() for m in rule.param_list("experiment_modes")}
-            if modes and not modes & self.context.experiment_modes:
-                return False
-        if (rule.param("xref_type") or "cross") != "cross" or (rule.param("xref_subtype") or "full") != "full":
-            return False
-        if rule.param("mandatory_scope") == "makeMandatorySubtypes":
-            if rule.param("subtype") not in self.context.entry_subtypes:
-                return False
-        return not any(len(self.cat(name)) for name in rule.param_list("skip_if_any_category_present"))
+        """An experiment_code rule applies only when that accession code type is requested."""
+        code = rule.param("experiment_code")
+        return code is None or code.upper() in {c.upper() for c in self.context.requested_codes}
 
     # -- rows: selection, pairing and conditions ------------------------------
 
@@ -337,8 +276,12 @@ class CrossChecker:
         selection = rule.selections.get(category)
         if selection is None:
             rows = list(range(len(c)))
+        elif selection.selector == "ANY_VALUE":
+            exclude = {n.item.lower() for n in selection.exclude_items}
+            items = [item for item in c.index if item not in exclude]
+            rows = [i for i in range(len(c)) if any(c.values(item, TEXT)[i] is not None for item in items)]
         else:
-            ranks = c.values(selection.selector_item.item)
+            ranks = c.values(selection.selector_item.item) if selection.selector_item else [None] * len(c)
             groups: dict[tuple, list[int]] = defaultdict(list)
             for i in range(len(c)):
                 if ranks[i] is not None:
@@ -368,9 +311,8 @@ class CrossChecker:
                 continue
             matches = self._joined(rule, join, rows).get(self._key(scope, join.scope_items, i) or (), [])
             if not matches:
-                if join.on_no_match != "SINGLE_ROW_FALLBACK" or not self._single_row_fallback(
-                    rule, join, scope, i, rows
-                ):
+                fallback = join.on_no_match == "SINGLE_ROW_FALLBACK"
+                if not fallback or not self._single_row_fallback(rule, join, scope, i, rows):
                     return partners, join
                 matches = rows
             partners[name] = matches
@@ -400,14 +342,7 @@ class CrossChecker:
     def _applicable_rows(self, rule: Rule) -> Iterator[tuple[int, dict[str, list[int]]]]:
         """Scope rows the rule applies to, with their partner rows."""
         scope = self.cat(rule.scope_category)
-        signal = None
-        if rule.param("mandatory_scope"):
-            # makeMandatory: only rows that carry a value outside exclude_items.
-            exclude = {n.item.lower() for n in rule.param_items("exclude_items")}
-            signal = [item for item in scope.index if item not in exclude]
         for i in self._selected_rows(rule, scope.name):
-            if signal is not None and not any(scope.get(i, item) is not None for item in signal):
-                continue
             partners, unmatched = self._partners(rule, scope, i)
             if unmatched is not None:
                 if unmatched.on_no_match == "FAIL":
@@ -431,7 +366,7 @@ class CrossChecker:
     def _then_failure(
         self, rule: Rule, scope: Category, i: int, partners: dict
     ) -> tuple[Condition, tuple[Category, int] | None] | None:
-        """The first failing THEN condition (and its witness row), or None when THEN holds."""
+        """The first failing THEN condition (and the row it failed on), or None when THEN holds."""
         outcomes = [(c, *self._condition(rule, c, scope, i, partners)) for c in rule.then]
         satisfied = [result is None or result for _, result, _ in outcomes]
         if _combine(rule.then, satisfied):
@@ -465,33 +400,32 @@ class CrossChecker:
     ) -> tuple[bool | None, tuple[Category, int] | None]:
         """
         (result, witness): result is None when no comparison could be made; witness
-        is the row a failing comparison was made against.
+        is the row the condition failed on.
         """
         if cond.operator == "IN_COLUMN_OF":
-            return self._in_column(rule, cond, scope, i), None
-        if cond.operator == "IN_ENUMERATION_OF":
-            return self._in_enumeration(cond, scope, i), None
+            return self._in_column(rule, cond, scope, i), (scope, i)
+        if cond.operator == "IN_ENUMERATION_DETAILS_OF":
+            return self._in_enumeration_details(cond, scope, i), (scope, i)
         item_in_scope = cond.item.category == scope.name
         if item_in_scope and (cond.compare is None or cond.compare.category == scope.name):
-            result = self._test(rule, cond, scope, i, scope, i)
-            return result, (scope, i) if result is False else None
+            return self._test(rule, cond, scope, i, scope, i), (scope, i)
         partner = self.cat(cond.compare.category if item_in_scope and cond.compare else cond.item.category)
         existence = cond.operator in EXISTENCE_OPERATORS
+        quantify = all if cond.effective_quantifier == "ALL" else any
         results: list[bool] = []
         witness = None
         for j in partners.get(partner.name, []):
-            if item_in_scope:
-                result = self._test(rule, cond, scope, i, partner, j)
-            else:
-                result = self._test(rule, cond, partner, j, partner, j)
-            if result is None and not existence:
-                continue  # partner rows with a missing value are ignored
-            results.append(bool(result))
-            if result is False and witness is None:
+            a, ai = (scope, i) if item_in_scope else (partner, j)
+            result = self._test(rule, cond, a, ai, partner, j)
+            if result is None:
+                continue  # comparisons ignore partner rows with a missing value
+            results.append(result)
+            if not result and witness is None:
                 witness = (partner, j)
         if not results:
-            return None, None
-        holds = all(results) if cond.effective_quantifier == "ALL" else any(results)
+            # Existence tests over no partner rows: ANY does not hold, ALL holds.
+            return (quantify([]) if existence else None), None
+        holds = quantify(results)
         return holds, None if holds else witness
 
     def _test(self, rule: Rule, cond: Condition, a: Category, ai: int, b: Category, bi: int) -> bool | None:
@@ -503,10 +437,13 @@ class CrossChecker:
             return not a.has(cond.item.item)
         if op in ("EMPTY", "NOT_EMPTY"):
             return a.missing(ai, cond.item.item) == (op == "EMPTY")
-        if op in ("MATCHES", "NOT_MATCHES"):
+        if op in ("MATCHES", "NOT_MATCHES", "MATCHES_TYPE"):
             raw = a.get(ai, cond.item.item)
-            if a.missing(ai, cond.item.item) or raw is None:
+            if raw is None or a.missing(ai, cond.item.item):
                 return None
+            if op == "MATCHES_TYPE":
+                # Constructs match the whole value, as in DDL2 type checking.
+                return any(self.rules.type_pattern(code).fullmatch(raw.strip()) for code in cond.values)
             return (re.search(cond.value or "", _unwrap(raw)) is not None) == (op == "MATCHES")
         if op == "UNIQUE":
             return None  # checked over all rows by _uniqueness
@@ -547,24 +484,29 @@ class CrossChecker:
             return None
         return value in targets
 
-    def _in_enumeration(self, cond: Condition, scope: Category, i: int) -> bool | None:
+    def _allowed_by_details(self, cond: Condition, scope: Category, i: int) -> list[str] | None:
+        """The values the dictionary allows for item_name, given compare_item_name in the same row."""
+        if cond.compare is None or scope.missing(i, cond.compare.item):
+            return None
+        details = self.dictionary.enum_details(cond.compare.tag)
+        selected = (scope.get(i, cond.compare.item) or "").strip()
+        if self.dictionary.case_insensitive(cond.compare.tag):
+            folded = {value.upper(): allowed for value, allowed in details.items()}
+            return folded.get(selected.upper())
+        return details.get(selected)
+
+    def _in_enumeration_details(self, cond: Condition, scope: Category, i: int) -> bool | None:
         """
-        The dictionary's _item_enumeration.detail for the value lists the values
-        allowed in the compare item of the same row.
+        The detail of the dictionary's enumeration entry for the compare value lists
+        the values allowed for item_name; skipped when there is no such detail.
         """
-        details = self.dictionary.enum_details(cond.item.tag)
-        if scope.missing(i, cond.item.item) or not details or cond.compare is None:
+        allowed = self._allowed_by_details(cond, scope, i)
+        value = scope.values(cond.item.item, TEXT)[i]
+        if not allowed or value is None:
             return None
-        # A value the dictionary pairs with nothing (or does not enumerate) cannot be compared.
-        allowed = details.get((scope.get(i, cond.item.item) or "").strip())
-        if not allowed:
-            return None
-        # Typed values of a case-insensitive item are upper-cased; fold the allowed values the same way.
-        other = scope.values(cond.compare.item)[i]
-        if other is None:
-            return None
-        folded = self.dictionary.case_insensitive(cond.compare.tag)
-        return other in {a.upper() if folded else a for a in allowed}
+        if self.dictionary.case_insensitive(cond.item.tag):
+            return value in {a.upper() for a in allowed}
+        return value in allowed
 
     # -- reporting ----------------------------------------------------------------
 
@@ -582,27 +524,37 @@ class CrossChecker:
     def _report_failure(
         self, rule: Rule, scope: Category, i: int, cond: Condition, witness: tuple[Category, int] | None
     ) -> None:
-        left = (scope.get(i, cond.item.item) or "").strip()
+        # The THEN item is usually in the scope row; one in a partner category is
+        # reported at the partner row it failed on.
+        at, ai = (scope, i) if cond.item.category == scope.name or witness is None else witness
+        if at.name != cond.item.category:
+            at, ai = scope, i
+        left = (at.get(ai, cond.item.item) or "").strip()
         shown = left
-        if self.dictionary.kind(cond.item.tag) == NUMBER and scope.values(cond.item.item)[i] is not None:
-            shown = _fmt_number(scope.values(cond.item.item)[i])
+        typed = at.values(cond.item.item)[ai]
+        if self.dictionary.kind(cond.item.tag) == NUMBER and typed is not None:
+            shown = _fmt_number(typed)
         fields = {"value": shown, cond.item.item: shown, "left_value": left}
         if witness is not None and cond.compare is not None and cond.operator in ITEM_OPERATORS:
             right = (witness[0].get(witness[1], cond.compare.item) or "").strip()
             fields.update(item2CrossValue=right, right_value=right)
-        if scope.name == "atom_site":
-            fields.update(self._atom_display(scope, i))
+        if at.name == "atom_site":
+            fields.update(self._atom_display(at, ai))
         message = _render(rule.message, **fields) or "Deposition rule failed"
         detail = None
         if cond.operator in _ITEM_COMPARE:
             detail = f"value={left}, condition {_ITEM_COMPARE[cond.operator][1]} {cond.compare}"
         elif cond.operator == "IN_COLUMN_OF":
             detail = f"value={left}"
-        elif cond.operator == "IN_ENUMERATION_OF":
-            allowed = sorted(set(self.dictionary.enum_details(cond.item.tag).get(left, [])))
-            other = (scope.get(i, cond.compare.item) or "").strip() if cond.compare else ""
-            detail = f"value={left}, {cond.compare}={other}; allowed: {', '.join(allowed)}"
-        self.report(rule, scope, cond.item.item, i, f"{message} ({detail})" if detail else message)
+        elif cond.operator == "IN_ENUMERATION_DETAILS_OF":
+            allowed = ", ".join(self._allowed_by_details(cond, scope, i) or [])
+            selected = (scope.get(i, cond.compare.item) or "").strip() if cond.compare else ""
+            detail = f"value={left}, {cond.compare}={selected}; allowed: {allowed}"
+        elif cond.operator == "MATCHES_TYPE":
+            detail = f"value={left}; expected type: {', '.join(cond.values)}"
+        line, loop_row = at.location(cond.item.item, ai) if len(at) else scope.location(cond.item.item, i)
+        text = f"{message} ({detail})" if detail else message
+        self.findings.append(Finding(rule.severity, cond.item.tag, text, rule.id, line, loop_row))
 
     # -- families -------------------------------------------------------------------
 
@@ -661,48 +613,6 @@ class CrossChecker:
                 self.report(rule, scope, cond.item.item, i, message)
 
     # -- procedural ---------------------------------------------------------------
-
-    def _param_item(self, rule: Rule) -> str:
-        items = rule.param_items("item")
-        if len(items) != 1 or items[0].category != rule.scope_category:
-            raise RulesError(f"rule {rule.id}: 'item' parameter must name one item of {rule.scope_category}")
-        return items[0].item
-
-    def _proc_wavelength_protocol_consistency(self, rule: Rule) -> None:
-        """A wavelength list must hold several values (requires=multi) or one (requires=single)."""
-        scope, item = self.cat(rule.scope_category), self._param_item(rule)
-        multi = rule.param("requires") == "multi"
-        for i, _ in self._applicable_rows(rule):
-            value = scope.get(i, item)
-            if scope.missing(i, item) or value is None:
-                continue
-            if ("," in value or "-" in value) != multi:
-                self.report(rule, scope, item, i, _render(rule.message))
-
-    def _proc_accession_format_rule(self, rule: Rule) -> None:
-        """A value must match any (format_match=ANY) or all of the named formats."""
-        scope, item = self.cat(rule.scope_category), self._param_item(rule)
-        formats = rule.param_list("format")
-        match = all if (rule.param("format_match") or "ANY").upper() == "ALL" else any
-        for i, _ in self._applicable_rows(rule):
-            value = scope.get(i, item)
-            if scope.missing(i, item) or value is None:
-                continue
-            if not match(_format_ok(f, value.strip()) for f in formats):
-                self.report(rule, scope, item, i, _render(rule.message) or "Invalid accession code format.")
-
-    _proc_conditional_accession_format_rule = _proc_accession_format_rule
-
-    def _proc_sequence_predicate(self, rule: Rule) -> None:
-        scope, item = self.cat(rule.scope_category), self._param_item(rule)
-        predicate = rule.param("predicate")
-        if predicate != "homopolymer_ala":
-            raise RulesError(f"rule {rule.id}: unknown sequence predicate {predicate!r}")
-        for i, _ in self._applicable_rows(rule):
-            # Sequences in text fields are wrapped over several lines.
-            seq = "".join((scope.get(i, item) or "").split())
-            if seq and set(seq.upper()) == {"A"}:
-                self.report(rule, scope, item, i, _render(rule.message))
 
     def _proc_seq_model_mismatch(self, rule: Rule) -> None:
         """
@@ -809,29 +719,11 @@ class CrossChecker:
                     emit(res, seq[idx])
 
 
-def detect_context(block: cif.Block, dictionary: Dictionary | None = None) -> Context:
-    """Derive experiment modes and EM subtypes from _exptl and _em_experiment."""
-    dictionary = dictionary or load_dictionary()
-    exptl = Category(block, "exptl", dictionary)
-    em = Category(block, "em_experiment", dictionary)
-    methods = {(v or "").strip().upper() for v in exptl.column("method")}
-    modes = {_METHOD_MODES[m] for m in methods if m in _METHOD_MODES}
-    subtypes = {
-        _EM_SUBTYPES[v.strip().upper()]
-        for v in em.column("reconstruction_method")
-        if v and v.strip().upper() in _EM_SUBTYPES
-    }
-    if "ec" in modes:
-        subtypes.add("EC")
-    return Context(modes, subtypes, set())
-
-
 def validate(
     path: Path,
     rules_path: Path | None = None,
     dictionary_path: Path | None = None,
     context: Context | None = None,
-    detect: bool = False,
     rules: RuleSet | None = None,
     lenient: bool = False,
 ) -> list[Finding]:
@@ -840,23 +732,14 @@ def validate(
 
     rules is a RuleSet from load_rules(); without it the store at rules_path
     (or the packaged one) is loaded against the PDBx/mmCIF dictionary at
-    dictionary_path (or the packaged v50 dictionary). Without a context (or
-    detect=True), rules gated on experiment mode, entry subtype or requested
-    code are skipped. lenient=True lets gemmi accept duplicate tags (the last
-    value wins) instead of rejecting the file.
+    dictionary_path (or the packaged v50 dictionary). context gives the
+    requested accession codes for experiment_code rules, which are skipped
+    without one. lenient=True lets gemmi accept duplicate tags (the last value
+    wins) instead of rejecting the file.
     """
     rules = rules or load_rules(rules_path, dictionary_path)
     doc = cif.read_file(str(path), check_level=0) if lenient else cif.read(str(path))
-    block = doc[0]
-    ctx = context or Context.empty()
-    if detect:
-        found = detect_context(block, rules.dictionary)
-        ctx = Context(
-            ctx.experiment_modes | found.experiment_modes,
-            ctx.entry_subtypes | found.entry_subtypes,
-            ctx.requested_codes,
-        )
-    return CrossChecker(block, rules, ctx).run()
+    return CrossChecker(doc[0], rules, context).run()
 
 
 def iter_errors(findings: Iterable[Finding]) -> Iterable[Finding]:

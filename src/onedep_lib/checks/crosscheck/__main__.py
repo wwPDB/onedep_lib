@@ -48,30 +48,11 @@ def main(argv=None) -> int:
         help="print rule-store warnings (e.g. items missing from the PDBx/mmCIF dictionary) to stderr",
     )
     parser.add_argument(
-        "--expt",
-        action="append",
-        default=[],
-        metavar="MODE",
-        help="experiment mode for gated cross-reference rules: xray, nd, fd, ec, em, nmr, ssnmr",
-    )
-    parser.add_argument(
-        "--subtype",
-        action="append",
-        default=[],
-        metavar="SUBTYPE",
-        help="entry subtype for makeMandatorySubtypes rules: EC, EM-helical, EM-single_part, EM-subtomogram",
-    )
-    parser.add_argument(
         "--code",
         action="append",
         default=[],
         metavar="CODE",
-        help="requested accession code for 'coded' rules, e.g. PDB",
-    )
-    parser.add_argument(
-        "--detect-context",
-        action="store_true",
-        help="also derive experiment modes and EM subtypes from _exptl.method and _em_experiment",
+        help="requested accession code type for experiment_code rules, e.g. PDB",
     )
     parser.add_argument(
         "--lenient", action="store_true", help="accept duplicate tags instead of rejecting the file (no .gz support)"
@@ -89,11 +70,7 @@ def main(argv=None) -> int:
         for warning in rules.warnings:
             print(f"warning: {warning}", file=sys.stderr)
 
-    context = Context(
-        {m.lower() for m in args.expt},
-        set(args.subtype),
-        {c.upper() for c in args.code},
-    )
+    context = Context({c.upper() for c in args.code})
 
     status = 0
     report = {}
@@ -102,7 +79,6 @@ def main(argv=None) -> int:
             findings = validate(
                 path,
                 context=context,
-                detect=args.detect_context,
                 rules=rules,
                 lenient=args.lenient,
             )

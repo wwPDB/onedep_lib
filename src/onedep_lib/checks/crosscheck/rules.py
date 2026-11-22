@@ -9,9 +9,9 @@ category keys must be unique and rule_id links must resolve.
 
 The rules are then checked against the PDBx/mmCIF dictionary (every category
 and item they name) and against the constraints the extension dictionary
-describes in prose: THEN items in the scope category, one group operator per
-role, at most one partner category per condition, flags matching the records
-present, and so on. All problems are collected and raised together as a
+describes in prose: one group operator per role, at most one partner category
+per condition, compare items placed as described, known item types for
+MATCHES_TYPE, flags matching the records present, and so on. All problems are collected and raised together as a
 RulesError. An item missing from the PDBx/mmCIF dictionary is only a warning,
 since dictionary versions differ; an unknown category is an error.
 """
@@ -37,11 +37,13 @@ DEFAULT_RULES_PATH = SCHEMA_DIR / "cross_checks_deposition_rules.cif"
 
 ROLES = ("WHEN", "THEN", "UNLESS")
 EXISTENCE_OPERATORS = {"EXISTS", "NOT_EXISTS", "EMPTY", "NOT_EMPTY"}
-LIST_OPERATORS = {"IN", "NOT_IN"}
+# Operators whose value is a comma-separated list (value_csv in the extension dictionary).
+LIST_OPERATORS = {"IN", "NOT_IN", "MATCHES_TYPE"}
 ORDER_OPERATORS = {"LT", "LE", "GT", "GE"}
 VALUE_OPERATORS = {"EQ", "NE", "MATCHES", "NOT_MATCHES"} | LIST_OPERATORS | ORDER_OPERATORS
 ITEM_OPERATORS = {"EQ_ITEM", "LE_ITEM", "GE_ITEM", "LT_ITEM", "GT_ITEM"}
-COLUMN_OPERATORS = {"IN_COLUMN_OF", "IN_ENUMERATION_OF"}
+COLUMN_OPERATORS = {"IN_COLUMN_OF", "IN_ENUMERATION_DETAILS_OF"}
+SELECTORS_BY_VALUE = {"MIN", "MAX"}
 
 
 class RulesError(Exception):
@@ -99,7 +101,7 @@ class Condition:
 
     @property
     def values(self) -> list[str]:
-        """The literal operand(s): a list for IN / NOT_IN, else the single value."""
+        """The literal operand(s): a list for IN, NOT_IN and MATCHES_TYPE, else the single value."""
         if self.operator in LIST_OPERATORS:
             return split_list(self.value)
         return [] if self.value is None else [self.value]
@@ -111,7 +113,7 @@ class Condition:
 
     @property
     def paired_categories(self) -> set[str]:
-        """Categories whose rows are paired with the scope row (not the IN_COLUMN_OF / IN_ENUMERATION_OF item)."""
+        """Categories paired with the scope row (an IN_COLUMN_OF or IN_ENUMERATION_DETAILS_OF compare item is not)."""
         names = {self.item.category}
         if self.compare is not None and self.operator not in COLUMN_OPERATORS:
             names.add(self.compare.category)
@@ -134,12 +136,17 @@ class Join:
 
 @dataclass(frozen=True)
 class RowSelection:
-    """One row of _pdbx_deposition_rule_row_selection: keep the MIN or MAX row per group."""
+    """
+    One row of _pdbx_deposition_rule_row_selection: keep the MIN or MAX row
+    (by selector_item) per group_by group, or every row with a value outside
+    exclude_items (ANY_VALUE).
+    """
 
     category: str
-    selector: str  # MIN or MAX
-    selector_item: ItemName
+    selector: str  # MIN, MAX or ANY_VALUE
+    selector_item: ItemName | None = None
     group_by: tuple[ItemName, ...] = ()
+    exclude_items: tuple[ItemName, ...] = ()
 
 
 @dataclass
@@ -189,13 +196,21 @@ class Rule:
 
 
 class RuleSet:
-    """The rules of a store, with the PDBx/mmCIF dictionary they were checked against."""
+    """The rules of a store, with the dictionaries they were checked against."""
 
-    def __init__(self, rules: list[Rule], dictionary: Dictionary, warnings: list[str] | None = None):
+    def __init__(
+        self,
+        rules: list[Rule],
+        dictionary: Dictionary,
+        extension: Dictionary,
+        warnings: list[str] | None = None,
+    ):
         self.rules = rules
         self.dictionary = dictionary
+        self.extension = extension
         self.warnings = warnings or []
         self._by_id = {r.id: r for r in rules}
+        self._patterns: dict[str, re.Pattern] = {}
 
     def __iter__(self):
         return iter(self.rules)
@@ -209,7 +224,21 @@ class RuleSet:
     def subset(self, *rule_ids: str) -> RuleSet:
         """A RuleSet with only the given rules (in store order)."""
         wanted = set(rule_ids)
-        return RuleSet([r for r in self.rules if r.id in wanted], self.dictionary, self.warnings)
+        return RuleSet([r for r in self.rules if r.id in wanted], self.dictionary, self.extension, self.warnings)
+
+    def type_pattern(self, code: str) -> re.Pattern:
+        """The construct of an item type, from the extension dictionary or else the PDBx/mmCIF dictionary."""
+        pattern = self._patterns.get(code)
+        if pattern is None:
+            construct = _type_construct(code, self.dictionary, self.extension)
+            if construct is None:
+                raise RulesError(f"item type {code!r} has no construct")
+            pattern = self._patterns[code] = re.compile(construct)
+        return pattern
+
+
+def _type_construct(code: str, dic: Dictionary, ext: Dictionary) -> str | None:
+    return ext.constructs.get(code) or dic.constructs.get(code)
 
 
 # -- reading the store against the extension dictionary ---------------------
@@ -347,16 +376,19 @@ def _build(rows: dict[str, list[dict]], problems: list[str]) -> list[Rule]:
         where = f"rule {s['rule_id']} row selection on {s['category_id']}"
         selector_item = _parse_names(s["selector_item"], where, problems)
         group_by = _parse_names(s["group_by"], where, problems)
-        if rule is None or len(selector_item) != 1:
+        exclude = _parse_names(s.get("exclude_items"), where, problems)
+        if rule is None:
             continue
-        rule.selections[s["category_id"]] = RowSelection(s["category_id"], s["selector"], selector_item[0], group_by)
+        rule.selections[s["category_id"]] = RowSelection(
+            s["category_id"], s["selector"], selector_item[0] if selector_item else None, group_by, exclude
+        )
     return list(rules.values())
 
 
 # -- rule constraints from the extension dictionary -------------------------
 
 
-def _check_rule(rule: Rule, dic: Dictionary, problems: list[str], warnings: list[str]) -> None:
+def _check_rule(rule: Rule, dic: Dictionary, ext: Dictionary, problems: list[str], warnings: list[str]) -> None:
     def problem(text: str) -> None:
         problems.append(f"rule {rule.id}: {text}")
 
@@ -395,14 +427,11 @@ def _check_rule(rule: Rule, dic: Dictionary, problems: list[str], warnings: list
         if cond.compare is not None:
             known_item(cond.compare, where)
         op = cond.operator
-        if cond.role == "THEN" and cond.item.category != scope:
-            problem(f"{where}: THEN item {cond.item} is not in the scope category {scope}")
         partners = cond.paired_categories - {scope}
         if len(partners) > 1:
             problem(f"{where}: refers to more than one partner category {sorted(partners)}")
         if (
-            cond.role != "THEN"
-            and cond.compare is not None
+            cond.compare is not None
             and cond.item.category != scope
             and cond.compare.category == scope
             and op not in COLUMN_OPERATORS
@@ -425,16 +454,24 @@ def _check_rule(rule: Rule, dic: Dictionary, problems: list[str], warnings: list
             for name in (cond.item, cond.compare if op in ITEM_OPERATORS else None):
                 if name is not None and dic.kind(name.tag) != NUMBER:
                     problem(f"{where}: value_transform ABS on non-numeric {name}")
-        if op == "IN_ENUMERATION_OF" and cond.compare is not None:
-            compare_def = dic.item(cond.compare.tag)
-            if compare_def is not None and not compare_def.enumeration:
-                problem(f"{where}: {cond.compare} has no enumeration in {dic.name}")
+        if op == "IN_ENUMERATION_DETAILS_OF" and cond.compare is not None:
             if cond.compare.category != cond.item.category:
-                problem(f"{where}: IN_ENUMERATION_OF pairs values of one row, so both items must be in one category")
-            if not dic.enum_details(cond.item.tag):
+                problem(f"{where}: {op} needs item_name and compare_item_name in one category")
+            if dic.item(cond.compare.tag) is not None and not dic.enum_details(cond.compare.tag):
                 warnings.append(
-                    f"rule {rule.id}: {cond.item} has no enumeration details in {dic.name}, so the rule never fails"
+                    f"rule {rule.id}: {where}: {cond.compare} has no enumeration details in {dic.name}, "
+                    "so the condition is always skipped"
                 )
+        if op == "MATCHES_TYPE":
+            for code in cond.values:
+                construct = _type_construct(code, dic, ext)
+                if construct is None:
+                    problem(f"{where}: item type {code!r} is not defined in {ext.name} or {dic.name}")
+                    continue
+                try:
+                    re.compile(construct)
+                except re.error as exc:
+                    problem(f"{where}: construct of item type {code!r} is not a valid pattern: {exc}")
 
     for partner, join in rule.joins.items():
         where = f"join {join.ordinal}"
@@ -453,17 +490,30 @@ def _check_rule(rule: Rule, dic: Dictionary, problems: list[str], warnings: list
         where = f"row selection on {category}"
         if category != scope and category not in rule.partner_categories:
             problem(f"{where}: the rule does not refer to {category}")
-        if any(n.category != category for n in (selection.selector_item, *selection.group_by)):
-            problem(f"{where}: selector and group_by items must be in {category}")
-        if dic.kind(selection.selector_item.tag) not in (NUMBER, DATE):
-            problem(f"{where}: selector item {selection.selector_item} must have a numeric or date type")
-        for name in (selection.selector_item, *selection.group_by):
+        named = [n for n in (selection.selector_item, *selection.group_by, *selection.exclude_items) if n]
+        if any(n.category != category for n in named):
+            problem(f"{where}: selector_item, group_by and exclude_items must be in {category}")
+        if selection.selector in SELECTORS_BY_VALUE:
+            if selection.selector_item is None:
+                problem(f"{where}: {selection.selector} needs selector_item")
+            elif dic.kind(selection.selector_item.tag) not in (NUMBER, DATE):
+                problem(f"{where}: selector item {selection.selector_item} must have a numeric or date type")
+            if selection.exclude_items:
+                problem(f"{where}: exclude_items is only used with ANY_VALUE")
+        elif selection.selector_item or selection.group_by:
+            problem(f"{where}: selector_item and group_by are not used with {selection.selector}")
+        for name in named:
             known_item(name, where)
 
-    for name in ("item", "group_by", "exclude_items"):
-        for item in _parse_names(rule.param(name), f"rule {rule.id}: param {name}", problems):
-            known_item(item, f"param {name}")
-    for name in ("skip_if_any_category_present", "source_category", "target_category"):
+    # Parameter names are those the extension dictionary gives as examples.
+    param_name = ext.item("_pdbx_deposition_rule_param.name")
+    known_params = set(param_name.examples) if param_name else set()
+    for name in rule.params:
+        if known_params and name not in known_params:
+            warnings.append(f"rule {rule.id}: parameter {name!r} is not described in {ext.name}")
+    for item in _parse_names(rule.param("group_by"), f"rule {rule.id}: param group_by", problems):
+        known_item(item, "param group_by")
+    for name in ("source_category", "target_category"):
         for category in rule.param_list(name):
             if dic.category(category) is None:
                 problem(f"param {name}: category {category} is not in {dic.name}")
@@ -491,7 +541,7 @@ def load_rules(
         problems.append("rule store has no _pdbx_deposition_rule rows")
     rules = _build(rows, problems) if not problems else []
     for rule in rules:
-        _check_rule(rule, dic, problems, warnings)
+        _check_rule(rule, dic, ext, problems, warnings)
     if problems:
         raise RulesError(problems)
-    return RuleSet(rules, dic, warnings)
+    return RuleSet(rules, dic, ext, warnings)

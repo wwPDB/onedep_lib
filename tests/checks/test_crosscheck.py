@@ -31,7 +31,7 @@ CONDITION_TAGS = (
     "value_transform",
 )
 JOIN_TAGS = ("rule_id", "ordinal", "scope_item_names", "partner_item_names", "on_no_match")
-SELECTION_TAGS = ("rule_id", "category_id", "selector", "selector_item", "group_by")
+SELECTION_TAGS = ("rule_id", "category_id", "selector", "selector_item", "group_by", "exclude_items")
 
 
 def _loop(category, tags, rows):
@@ -42,10 +42,15 @@ def _loop(category, tags, rows):
     return "\n".join(lines) + "\n"
 
 
+def _pad(rows, tags):
+    return [tuple(r) + (None,) * (len(tags) - len(r)) for r in rows]
+
+
 def make_store(rules, conditions=(), params=(), joins=(), selections=(), flags=None):
     """
-    A rule store as text. rules: (id, family, scope, message); conditions: CONDITION_TAGS
-    rows, padded with '.'. Flags are derived from the records given unless overridden.
+    A rule store as text. rules: (id, family, scope, message); conditions and
+    selections are padded with '.'. Flags are derived from the records given
+    unless overridden.
     """
     rule_rows = []
     for rule_id, family, scope, message in rules:
@@ -56,14 +61,13 @@ def make_store(rules, conditions=(), params=(), joins=(), selections=(), flags=N
         ]
         method = message.split(":", 1)[0] if family == "procedural" else None
         rule_rows.append((rule_id, family, "ERROR", scope, method, message, "YES", *(flags or derived)))
-    condition_rows = [tuple(c) + (None,) * (len(CONDITION_TAGS) - len(c)) for c in conditions]
     return (
         "data_rules\n"
         + _loop("pdbx_deposition_rule", RULE_TAGS + FLAG_TAGS, rule_rows)
-        + _loop("pdbx_deposition_rule_condition", CONDITION_TAGS, condition_rows)
+        + _loop("pdbx_deposition_rule_condition", CONDITION_TAGS, _pad(conditions, CONDITION_TAGS))
         + _loop("pdbx_deposition_rule_param", ("rule_id", "name", "value"), params)
         + _loop("pdbx_deposition_rule_join", JOIN_TAGS, joins)
-        + _loop("pdbx_deposition_rule_row_selection", SELECTION_TAGS, selections)
+        + _loop("pdbx_deposition_rule_row_selection", SELECTION_TAGS, _pad(selections, SELECTION_TAGS))
     )
 
 
@@ -83,7 +87,7 @@ def custom(tmp_path):
 
 
 def _run(text, rules, context=None):
-    return CrossChecker(cif.read_string(text)[0], rules, context or Context.empty()).run()
+    return CrossChecker(cif.read_string(text)[0], rules, context).run()
 
 
 def _ids(findings):
@@ -119,7 +123,7 @@ _entity.type
 
 def test_packaged_rule_store_loads(rules):
     assert DEFAULT_RULES_PATH.name == "cross_checks_deposition_rules.cif"
-    assert len(rules) == 141
+    assert len(rules) == 138
     assert {r.family for r in rules} == {
         "aggregate",
         "conditional_presence",
@@ -131,8 +135,11 @@ def test_packaged_rule_store_loads(rules):
         "uniqueness",
     }
     assert rules.dictionary.name == "mmcif_pdbx.dic"
+    assert rules.extension.name == "mmcif_pdbx_deposition_rules_ext.dic"
     # Named in R136 but not defined in the packaged PDBx/mmCIF dictionary.
-    assert rules.warnings == ["rule R136: param exclude_items: _refine_ls_shell.pdbx_ordinal is not in mmcif_pdbx.dic"]
+    assert rules.warnings == [
+        "rule R136: row selection on refine_ls_shell: _refine_ls_shell.pdbx_ordinal is not in mmcif_pdbx.dic"
+    ]
 
 
 def test_rule_parts_are_read(rules):
@@ -142,6 +149,10 @@ def test_rule_parts_are_read(rules):
     r021 = rules.get("R021")
     assert [c.effective_quantifier for c in r021.when + r021.then] == ["ANY"] * 5 + ["ALL"]
     assert rules.get("R044").then[0].value_transform == "ABS"
+    r136 = rules.get("R136").selections["refine_ls_shell"]
+    assert r136.selector == "ANY_VALUE"
+    assert [n.item for n in r136.exclude_items] == ["pdbx_refine_id", "pdbx_ordinal"]
+    assert rules.get("R148").then[0].values == ["pdb_id_dep", "deposition_id"]
 
 
 def test_store_is_checked_against_the_extension_dictionary(tmp_path):
@@ -162,19 +173,35 @@ def test_store_is_checked_against_the_extension_dictionary(tmp_path):
 def test_store_is_checked_against_rule_constraints(custom):
     with pytest.raises(RulesError) as exc:
         custom(
-            [("X1", "pairwise_order", "refine_ls_shell", "m"), ("X2", "conditional_presence", "no_such_cat", "m")],
             [
-                # The R010 typo: a THEN item outside the scope category.
-                ("X1", 1, "THEN", "_refine_lsc_shell.d_res_high", "LE_ITEM", None, "_refine_ls_shell.d_res_low"),
-                ("X2", 1, "THEN", "_no_such_cat.x", "NOT_EMPTY"),
+                ("X1", "pairwise_order", "refine_ls_shell", "m"),
+                ("X2", "format", "exptl", "m"),
+                ("X3", "conditional_presence", "refine_ls_shell", "m"),
             ],
-            params=[("X1", "item", "_refine_ls_shell.d_res_high")],
-            flags=("NO", "NO", "NO"),
+            [
+                # A misspelt category, as once in R010.
+                ("X1", 1, "THEN", "_refine_lsc_shell.d_res_high", "LE_ITEM", None, "_refine_ls_shell.d_res_low"),
+                ("X2", 1, "THEN", "_exptl.method", "MATCHES_TYPE", "no_such_type"),
+                ("X3", 1, "THEN", "_refine_ls_shell.d_res_high", "NOT_EMPTY"),
+            ],
+            params=[("X1", "group_by", "_refine_ls_shell.d_res_high")],
+            selections=[("X3", "refine_ls_shell", "MIN")],
+            flags=("NO", "NO", "YES"),
         )
     problems = "\n".join(exc.value.problems)
-    assert "THEN item _refine_lsc_shell.d_res_high is not in the scope category refine_ls_shell" in problems
-    assert "param_flag is NO but the rule has records" in problems
-    assert "scope category no_such_cat is not in mmcif_pdbx.dic" in problems
+    assert "category refine_lsc_shell is not in mmcif_pdbx.dic" in problems
+    assert "rule X1: param_flag is NO but the rule has records" in problems
+    assert "item type 'no_such_type' is not defined" in problems
+    assert "MIN needs selector_item" in problems
+
+
+def test_unknown_parameter_is_a_warning(custom):
+    rules = custom(
+        [("X1", "conditional_presence", "exptl", "m")],
+        [("X1", 1, "THEN", "_exptl.method", "NOT_EMPTY")],
+        params=[("X1", "colour", "red")],
+    )
+    assert rules.warnings == ["rule X1: parameter 'colour' is not described in mmcif_pdbx_deposition_rules_ext.dic"]
 
 
 def test_ordering_needs_numbers_or_dates(custom):
@@ -241,6 +268,8 @@ _reflns.pdbx_CC_half 0.9
 def test_missing_compare_value_satisfies_then(rules):
     text = "data_t\n_refine.ls_R_factor_R_work 0.3\n_refine.ls_R_factor_R_free {}\n"
     assert _run(text.format("?"), rules) == []
+    # Quoted '?' is missing too.
+    assert _run(text.format("'?'"), rules) == []
     assert [f.rule_id for f in _run(text.format("0.25"), rules)] == ["R055"]
 
 
@@ -277,6 +306,24 @@ _reflns_shell.pdbx_CC_half
     assert _ids(findings) == [("R144", 2)]
 
 
+def test_any_value_row_selection(rules):
+    # R136 checks rows with a value outside pdbx_refine_id and pdbx_ordinal.
+    findings = _run(
+        """data_t
+loop_
+_refine_ls_shell.pdbx_refine_id
+_refine_ls_shell.pdbx_ordinal
+_refine_ls_shell.d_res_high
+_refine_ls_shell.d_res_low
+_refine_ls_shell.number_reflns_obs
+X 1 ? ? ?
+X 2 ? ? 1000
+""",
+        rules,
+    )
+    assert _ids(findings) == [("R136", 2)]
+
+
 def test_unreadable_number_counts_as_missing(rules):
     findings = _run(
         "data_t\n_em_imaging.id 1\n_em_imaging.nominal_defocus_min abc\n_em_imaging.nominal_defocus_max 2000\n", rules
@@ -299,13 +346,56 @@ _em_imaging.calibrated_defocus_max -1000
     assert [f.rule_id for f in findings] == ["R044", "R045"]
 
 
-def test_enumeration_pairing_from_the_dictionary(rules):
+def test_unless_on_a_partner_category(rules):
+    text = """data_t
+_refine.pdbx_method_to_determine_struct 'MOLECULAR REPLACEMENT'
+_refine.ls_R_factor_R_work 0.2
+{}"""
+    assert [f.rule_id for f in _run(text.format(""), rules)] == ["R088"]
+    model = "_pdbx_initial_refinement_model.id 1\n_pdbx_initial_refinement_model.type 'experimental model'\n"
+    model += "_pdbx_initial_refinement_model.source_name PDB\n_pdbx_initial_refinement_model.accession_code 1abc\n"
+    assert _run(text.format(model), rules) == []
+
+
+def test_when_through_a_join(rules):
+    text = """data_t
+loop_
+_entity.id
+_entity.src_method
+1 man
+2 nat
+loop_
+_entity_poly.entity_id
+1
+2
+loop_
+_entity_src_gen.entity_id
+1
+loop_
+_entity_src_nat.entity_id
+{}
+"""
+    # Entity 2 is natural but missing from _entity_src_nat (which has entity 3 only).
+    assert _ids(_run(text.format("3"), rules)) == [("R105", 2)]
+    assert _run(text.format("2"), rules) == []
+
+
+def test_enumeration_details(rules):
     text = "data_t\n_software.name PHENIX\n_software.classification '{}'\n_software.version 1.20\n"
     # _software.classification is uline, so case does not matter.
     assert _run(text.format("REFINEMENT"), rules) == []
     findings = _run(text.format("data collection"), rules)
-    assert [f.rule_id for f in findings] == ["R103"]
-    assert "allowed: model building, phasing, refinement" in findings[0].message
+    assert [(f.rule_id, f.item) for f in findings] == [("R103", "_software.classification")]
+    assert "allowed: refinement, phasing, model building" in findings[0].message
+
+
+def test_matches_type(rules):
+    text = "data_t\n_pdbx_database_related.db_name PDB\n_pdbx_database_related.db_id {}\n"
+    for valid in ("1abc", "pdb_00001abc", "D_1000123456"):
+        assert _run(text.format(valid), rules) == [], valid
+    findings = _run(text.format("abcd"), rules)
+    assert [f.rule_id for f in findings] == ["R148"]
+    assert findings[0].message.endswith("(value=abcd; expected type: pdb_id_dep, deposition_id)")
 
 
 def test_occupancy_sum_and_low_value(rules):
@@ -359,23 +449,31 @@ _diffrn_source.diffrn_id
 _diffrn_source.pdbx_wavelength_list
 1 ?
 2 1.0
+3 0.9-1.1
 loop_
 _diffrn_radiation.diffrn_id
 _diffrn_radiation.pdbx_diffrn_protocol
 1 LAUE
 2 LAUE
+3 'SINGLE WAVELENGTH'
 """,
         rules,
     )
-    assert _ids(findings) == [("R145", 1), ("R146", 2)]
+    assert _ids(findings) == [("R145", 1), ("R146", 2), ("R147", 3)]
 
 
-def test_cross_reference_gated_on_experiment(rules):
-    text = "data_t\n_em_experiment.id 1\n_em_specimen.id 1\n_em_specimen.experiment_id 2\n"
-    assert _run(text, rules) == []
-    findings = _run(text, rules, Context({"em"}, set(), set()))
+def test_cross_reference_and_requested_codes(rules):
+    text = "data_t\n{}_em_experiment.id 1\n_em_specimen.id 1\n_em_specimen.experiment_id 2\n"
+    # R124 applies when _exptl.method says the entry is EM.
+    assert _run(text.format(""), rules) == []
+    findings = _run(text.format("_exptl.method 'ELECTRON MICROSCOPY'\n"), rules)
     assert [f.rule_id for f in findings] == ["R124"]
     assert findings[0].message.endswith("(value=2)")
+    # R117 applies only when a PDB code is requested.
+    assembly = "data_t\n_pdbx_struct_assembly_depositor_info.id 1\n"
+    assembly += "_pdbx_struct_assembly_auth_evidence_depositor_info.assembly_id 2\n"
+    assert _run(assembly, rules) == []
+    assert [f.rule_id for f in _run(assembly, rules, Context({"PDB"}))] == ["R117"]
 
 
 # -- evaluation features not used by the packaged rules -------------------------
@@ -441,6 +539,30 @@ def test_then_quantifier(custom):
     assert _run(SHELLS, rules_with("ANY")) == []
 
 
+def test_then_on_a_partner_item(custom):
+    rules = custom(
+        [("X1", "conditional_presence", "refine", "Every shell needs an R_free")],
+        [("X1", 1, "THEN", "_refine_ls_shell.R_factor_R_free", "NOT_EMPTY")],
+    )
+    text = SHELLS.replace("X 2.5 3.0 0.24", "X 2.5 3.0 ?")
+    findings = _run(text, rules)
+    # Reported at the shell that failed (ALL over the partner rows).
+    assert [(f.rule_id, f.item, f.row) for f in findings] == [("X1", "_refine_ls_shell.R_factor_R_free", 2)]
+
+
+def test_existence_over_no_partner_rows(custom):
+    def rules_with(quantifier):
+        return custom(
+            [("X1", "conditional_presence", "refine", "Shells required")],
+            [("X1", 1, "THEN", "_refine_ls_shell.d_res_high", "NOT_EMPTY", None, None, None, quantifier)],
+        )
+
+    no_shells = "data_t\n_refine.pdbx_refine_id X\n"
+    # ANY over no rows does not hold; ALL over no rows holds.
+    assert _ids(_run(no_shells, rules_with("ANY"))) == [("X1", None)]
+    assert _run(no_shells, rules_with("ALL")) == []
+
+
 def test_on_no_match(custom):
     def rules_with(on_no_match):
         return custom(
@@ -466,8 +588,8 @@ def test_composite_join(custom):
             (
                 "X1",
                 1,
-                "_struct_ref_seq.align_id, _struct_ref_seq.pdbx_strand_id",
-                "_struct_ref_seq_dif.align_id, _struct_ref_seq_dif.pdbx_pdb_strand_id",
+                "_struct_ref_seq.align_id,_struct_ref_seq.pdbx_strand_id",
+                "_struct_ref_seq_dif.align_id,_struct_ref_seq_dif.pdbx_pdb_strand_id",
                 "SKIP",
             )
         ],

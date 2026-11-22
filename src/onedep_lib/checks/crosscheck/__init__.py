@@ -7,7 +7,7 @@ enumerations come from the PDBx/mmCIF dictionary mmcif_pdbx_v50.dic. All are
 parsed with gemmi.cif. Dictionary validation of the input file is not done here.
 """
 
-from onedep_lib.checks.crosscheck.checks import Context, CrossChecker, Finding, detect_context, validate
+from onedep_lib.checks.crosscheck.checks import Context, CrossChecker, Finding, validate
 from onedep_lib.checks.crosscheck.dictionary import (
     DEFAULT_DICTIONARY_PATH,
     DEFAULT_EXTENSION_PATH,
@@ -42,7 +42,6 @@ __all__ = [
     "Rule",
     "RuleSet",
     "RulesError",
-    "detect_context",
     "load_dictionary",
     "load_extension",
     "load_rules",

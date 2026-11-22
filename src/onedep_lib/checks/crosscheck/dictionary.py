@@ -11,6 +11,7 @@ Two dictionaries are used:
 
 Item types decide how values are compared: a value is a number, a date or
 text, and a value that cannot be read as its type is treated as missing.
+Type constructs (_item_type_list.construct) are kept for MATCHES_TYPE.
 """
 
 from __future__ import annotations
@@ -54,13 +55,14 @@ def convert(value: str | None, kind: str, case_insensitive: bool = False):
     """
     The value as a number, a date tuple or stripped text; None when it is missing.
 
-    Blank values and values that cannot be read as `kind` count as missing.
-    Standard uncertainties such as `1.234(5)` are dropped from numbers.
+    A value that is empty, '?' or '.' once stripped (quoted or not) is missing,
+    as is one that cannot be read as `kind`. Standard uncertainties such as
+    `1.234(5)` are dropped from numbers.
     """
     if value is None:
         return None
     value = value.strip()
-    if not value:
+    if value in ("", "?", "."):
         return None
     if kind == NUMBER:
         if not _NUMBER.fullmatch(value):
@@ -82,6 +84,7 @@ class ItemDef:
     # Enumerated values, each with its detail text (or None), in dictionary order.
     enumeration: dict[str, str | None] = field(default_factory=dict)
     parent: str | None = None  # _item_linked.parent_name for this item
+    examples: list[str] = field(default_factory=list)  # _item_examples.case
 
 
 @dataclass
@@ -100,10 +103,10 @@ class Dictionary:
         self.items: dict[str, ItemDef] = {}
         self.categories: dict[str, CategoryDef] = {}
         # type code -> primitive code (numb, char, uchar)
-        self.primitives = {
-            **_STANDARD_PRIMITIVES,
-            **{_text(r[0]): _text(r[1]) for r in block.find("_item_type_list.", ["code", "primitive_code"])},
-        }
+        type_list = block.find("_item_type_list.", ["code", "primitive_code", "?construct"])
+        self.primitives = {**_STANDARD_PRIMITIVES, **{_text(r[0]): _text(r[1]) for r in type_list}}
+        # type code -> construct (a POSIX extended regular expression for the whole value)
+        self.constructs = {_text(r[0]): _text(r[2]) for r in type_list if r.has(2) and not cif.is_null(r[2])}
         self._links: dict[str, str] = {}  # child -> parent, from any frame's _item_linked
         for entry in block:
             if entry.frame is not None:
@@ -151,6 +154,7 @@ class Dictionary:
         for row in frame.find("_item_linked.", ["child_name", "parent_name"]):
             if _text(row[0]).lower() == name.lower():
                 item.parent = _text(row[1])
+        item.examples = [_text(v) for v in frame.find_values("_item_examples.case")]
         self.items[name.lower()] = item
 
     def item(self, tag: str) -> ItemDef | None:
