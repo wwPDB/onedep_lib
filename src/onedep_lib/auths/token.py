@@ -144,8 +144,13 @@ class TokenStore:
             ApiUnreachableError: If the request cannot reach the server.
             ApiError: If the server returns an unexpected error response.
         """
-        entry = self._read_entry()
+        # Fail fast when nothing is stored for this hostname, rather than letting
+        # get_access_token() bootstrap a new token pair only to revoke it.
+        self._read_entry()
         access_token = self.get_access_token()
+        # Read the entry only after get_access_token(): if it refreshed, the
+        # refresh token rotated and the one read earlier is already dead.
+        entry = self._read_entry()
         try:
             response = requests.post(
                 self._url(_REVOKE_PATH),

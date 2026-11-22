@@ -361,6 +361,52 @@ def test_revoke_posts_refresh_token_and_clears_local_storage(tmp_path: Path, htt
         store.get_access_token()
 
 
+def test_revoke_with_expired_access_token_revokes_the_rotated_refresh_token(tmp_path: Path, httpserver):
+    store = _server_store(tmp_path, httpserver)  # expired access token, refresh token "refresh"
+    fresh = _make_jwt(3600)
+    httpserver.expect_ordered_request(
+        "/deposition/auth/tokens/refresh",
+        method="POST",
+        json={"refresh_token": "refresh"},
+    ).respond_with_json({"access_token": fresh, "refresh_token": "rotated-refresh"})
+    httpserver.expect_ordered_request(
+        "/deposition/auth/tokens/revoke",
+        method="POST",
+        headers={"Authorization": f"Bearer {fresh}"},
+        json={"refresh_token": "rotated-refresh"},
+    ).respond_with_data(status=204)
+
+    store.revoke()
+
+    httpserver.check_assertions()
+    with pytest.raises(AuthError, match="No refresh token stored. Paste a refresh token first."):
+        store.get_access_token()
+
+
+def test_revoke_without_stored_tokens_does_not_bootstrap_from_another_site(monkeypatch, tmp_path: Path):
+    config_file = tmp_path / "config.toml"
+    config_file.write_text(
+        "[default]\n"
+        "\n"
+        "[auths.other-site.example.org]\n"
+        'refresh_token = "other-refresh"\n'
+    )
+    store = TokenStore(
+        config=DepositConfig(
+            hostname="https://deposit.wwpdb.org/deposition",
+            ssl_verify=True,
+            config_path=config_file,
+        ),
+    )
+
+    def fail(*args, **kwargs):
+        raise AssertionError("revoke must not make a network request when nothing is stored")
+
+    monkeypatch.setattr("onedep_lib.auths.token.requests.post", fail)
+    with pytest.raises(AuthError, match="No refresh token stored. Paste a refresh token first."):
+        store.revoke()
+
+
 def test_get_access_token_raises_auth_error_when_no_tokens_loaded(config: DepositConfig):
     store = TokenStore(config=config)
     # config was constructed directly (not via load()), so access_token is None
