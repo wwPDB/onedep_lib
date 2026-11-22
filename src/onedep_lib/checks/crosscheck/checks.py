@@ -1,21 +1,31 @@
 """
 Run the deposition rules against an mmCIF block parsed by gemmi.
 
-Each rule has a family (_pdbx_deposition_rule.family) and WHEN / THEN / UNLESS
-conditions: a rule is checked on the rows where every WHEN condition holds
-(any, for an OR group) and no UNLESS condition does, and reports the THEN
-conditions that fail. WHEN conditions on another category are matched through
-the rule's join_item / join_other_item parameters when it has them, and
-against any row of that category otherwise.
+Each rule is evaluated as the extension dictionary describes
+(_pdbx_deposition_rule_condition), separately for each row of its scope
+category:
 
-The input file is read with gemmi.cif; each category is accessed through
-gemmi's mmCIF table view (Block.find_mmcif_category). Values are read lazily,
-one column at a time, and unquoted with gemmi.cif.as_string. Unquoted '?' and
-'.' are treated as missing (gemmi.cif.is_null), so a quoted '?' is a value.
+1. rows of each category the rule refers to are restricted by
+   _pdbx_deposition_rule_row_selection (the MIN or MAX row per group);
+2. each remaining scope row is paired with rows of each partner category
+   through _pdbx_deposition_rule_join, or with every row when the rule has no
+   join; a scope row without a match is skipped, reported, or paired by the
+   single-row fallback, as on_no_match says;
+3. the rule applies when its WHEN conditions hold and its UNLESS conditions do
+   not; it fails when its THEN conditions do not hold. A condition on a partner
+   category is evaluated over the paired rows with its quantifier (ALL or ANY).
 
-gemmi records line numbers per item or loop, not per value. A finding on a
-key-value item carries that item's line; a finding inside a loop carries the
-line of the loop and the 1-based row number.
+Values are typed by the PDBx/mmCIF dictionary: numbers, dates or text, with
+uchar types (ucode, uline, ...) compared case-insensitively. A value is
+missing when its item or category is absent, when it is '?' or '.', when it is
+blank, or when it cannot be read as its type. A comparison with a missing
+value is skipped: the WHEN or UNLESS condition does not hold, and the THEN
+condition is satisfied. Only EXISTS, NOT_EXISTS, EMPTY and NOT_EMPTY test for
+missing values.
+
+Each failing scope row is reported once. gemmi records line numbers per item
+or loop, not per value: a finding on a key-value item carries that item's
+line; a finding inside a loop carries the line of the loop and the 1-based row.
 """
 
 from __future__ import annotations
@@ -23,19 +33,23 @@ from __future__ import annotations
 import operator
 import re
 from collections import defaultdict
-from collections.abc import Iterable
+from collections.abc import Iterable, Iterator
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
 from gemmi import cif
 
+from onedep_lib.checks.crosscheck.dictionary import DATE, NUMBER, TEXT, Dictionary, convert, load_dictionary
 from onedep_lib.checks.crosscheck.rules import (
+    EXISTENCE_OPERATORS,
+    ITEM_OPERATORS,
     Condition,
+    ItemName,
+    Join,
     Rule,
     RulesError,
-    load_dictionary_enum_details,
+    RuleSet,
     load_rules,
-    split_item,
 )
 
 
@@ -71,16 +85,27 @@ class Context:
         return cls(set(), set(), set())
 
 
-# Comparison against a constant value.
-_ORDER = {"LT": operator.lt, "LE": operator.le, "GT": operator.gt, "GE": operator.ge}
-# Comparison against another item, and the symbol of its violation (for messages).
-_ITEM_ORDER = {
-    "LT_ITEM": (operator.lt, ">="),
-    "LE_ITEM": (operator.le, ">"),
-    "GT_ITEM": (operator.gt, "<="),
-    "GE_ITEM": (operator.ge, "<"),
+# Comparison of two items, and the symbol of its violation (for messages).
+_ITEM_COMPARE = {
     "EQ_ITEM": (operator.eq, "!="),
+    "LE_ITEM": (operator.le, ">"),
+    "GE_ITEM": (operator.ge, "<"),
+    "LT_ITEM": (operator.lt, ">="),
+    "GT_ITEM": (operator.gt, "<="),
 }
+# Comparison with the literal value.
+_LITERAL_COMPARE = {
+    "EQ": operator.eq,
+    "NE": operator.ne,
+    "LT": operator.lt,
+    "LE": operator.le,
+    "GT": operator.gt,
+    "GE": operator.ge,
+}
+_AGGREGATES = {"SUM": sum, "COUNT": len}
+
+# Families evaluated row by row from their conditions alone.
+_CONDITION_FAMILIES = {"pairwise_order", "conditional_presence", "conditional_value", "format", "cross_reference"}
 
 # Accession formats used by the procedural accession rules: (regex, match lowercased).
 _FORMATS = {
@@ -96,8 +121,6 @@ _FORMATS = {
     ),
     "modelarchive_id": (r"^(ma-[\w\d]{5})?$", True),
 }
-
-_DATE = re.compile(r"^(\d{4})-(\d{1,2})-(\d{1,2})(?::(\d{1,2}):(\d{1,2}))?$")
 
 # _exptl.method -> experiment mode token used by the experiment_modes parameter.
 _METHOD_MODES = {
@@ -116,26 +139,6 @@ _EM_SUBTYPES = {
     "SUBTOMOGRAM AVERAGING": "EM-subtomogram",
     "CRYSTALLOGRAPHY": "EC",
 }
-
-
-def _empty(value: str | None) -> bool:
-    return value is None or not value.strip()
-
-
-def _number(value: str | None) -> float | None:
-    if value is None:
-        return None
-    try:
-        return float(value)
-    except ValueError:
-        return None
-
-
-def _date(value: str | None) -> tuple[int, ...] | None:
-    m = _DATE.match(value.strip()) if value else None
-    if not m:
-        return None
-    return tuple(int(g) if g is not None else 0 for g in m.groups())
 
 
 def _fmt_number(value: float) -> str:
@@ -176,11 +179,12 @@ def _combine(conditions: list[Condition], results: list[bool]) -> bool:
 
 
 class Category:
-    """A gemmi mmCIF category, read column by column."""
+    """A gemmi mmCIF category, read column by column and typed by the dictionary."""
 
-    def __init__(self, block: cif.Block, name: str):
+    def __init__(self, block: cif.Block, name: str, dictionary: Dictionary):
         self.name = name
         self.block = block
+        self.dictionary = dictionary
         self.table = block.find_mmcif_category(f"_{name}.")
         prefix = len(name) + 2
         # mmCIF tags are case-insensitive; keep the file's spelling for line lookup.
@@ -189,6 +193,7 @@ class Category:
         self.size = len(self.table) if self.index else 0
         self.is_loop = self.size > 0 and self.table.loop is not None
         self._columns: dict[str, list[str | None]] = {}
+        self._typed: dict[tuple[str, str, bool], list] = {}
 
     def __len__(self) -> int:
         return self.size
@@ -197,6 +202,7 @@ class Category:
         return item.lower() in self.index
 
     def column(self, item: str) -> list[str | None]:
+        """Raw values; None for '?', '.' and an absent item."""
         key = item.lower()
         col = self._columns.get(key)
         if col is None:
@@ -208,8 +214,23 @@ class Category:
             self._columns[key] = col
         return col
 
+    def values(self, item: str, kind: str | None = None, case_insensitive: bool | None = None) -> list:
+        """Typed values (by default the item's own type); None where a value is missing."""
+        tag = self.full(item)
+        kind = kind or self.dictionary.kind(tag)
+        if case_insensitive is None:
+            case_insensitive = self.dictionary.case_insensitive(tag)
+        key = (item.lower(), kind, case_insensitive)
+        typed = self._typed.get(key)
+        if typed is None:
+            typed = self._typed[key] = [convert(v, kind, case_insensitive) for v in self.column(item)]
+        return typed
+
     def get(self, row: int, item: str) -> str | None:
         return self.column(item)[row]
+
+    def missing(self, row: int, item: str) -> bool:
+        return self.values(item)[row] is None
 
     def text(self, row: int, *items: str, default: str = "") -> str:
         """First non-empty stripped value among items (fallback chain)."""
@@ -235,28 +256,35 @@ class Category:
 
 
 class CrossChecker:
-    """Runs every enabled rule from the rule store against one data block."""
+    """Runs every enabled rule of a RuleSet against one data block."""
 
     def __init__(
         self,
         block: cif.Block,
-        rules: list[Rule],
+        rules: RuleSet,
         context: Context,
-        dict_enum: dict[str, dict[str, list[str]]] | None = None,
     ):
         self.block = block
         self.rules = rules
+        self.dictionary = rules.dictionary
         self.context = context
-        self.dict_enum = dict_enum
         self.findings: list[Finding] = []
         self._categories: dict[str, Category] = {}
-        # (category, item, row) already reported by a rule with break_flag YES.
-        self._broken: set[tuple[str, str, int]] = set()
+        self._selected: dict[tuple[str, str], list[int]] = {}
+        self._join_index: dict[tuple[str, str], dict[tuple, list[int]]] = {}
+        self._column_sets: dict[tuple[str, int], set] = {}
+        self._literals: dict[tuple[str, int], list] = {}
+        for rule in rules:
+            if rule.family == "procedural":
+                if getattr(self, f"_proc_{rule.method}", None) is None:
+                    raise RulesError(f"rule {rule.id}: unknown procedural method {rule.method!r}")
+            elif rule.family not in _CONDITION_FAMILIES | {"uniqueness", "aggregate"}:
+                raise RulesError(f"rule {rule.id}: unknown family {rule.family!r}")
 
     def cat(self, name: str) -> Category:
         c = self._categories.get(name)
         if c is None:
-            c = self._categories[name] = Category(self.block, name)
+            c = self._categories[name] = Category(self.block, name, self.dictionary)
         return c
 
     def report(self, rule: Rule, cat: Category, item: str, row: int, message: str) -> None:
@@ -265,108 +293,280 @@ class CrossChecker:
 
     def run(self) -> list[Finding]:
         for rule in self.rules:
-            if not rule.enabled:
+            if not rule.enabled or not self._in_effect(rule):
                 continue
-            check = getattr(self, f"_family_{rule.family}", None)
-            if check is None:
-                raise RulesError(f"rule {rule.id}: unknown family {rule.family!r}")
-            check(rule)
+            if rule.family == "uniqueness":
+                self._uniqueness(rule)
+            elif rule.family == "aggregate":
+                self._aggregate(rule)
+            elif rule.family == "procedural":
+                getattr(self, f"_proc_{rule.method}")(rule)
+            else:
+                self._check_rows(rule)
         return self.findings
 
-    # -- conditions ---------------------------------------------------------
+    # -- whether a rule runs on this entry ------------------------------------
 
-    def _evaluate(self, cond: Condition, c: Category, i: int) -> bool | None:
-        """Whether row i of c satisfies cond; None when it cannot be decided (e.g. not a number)."""
-        op = cond.operator
-        if op == "EXISTS":
-            return c.has(cond.item)
-        if op == "NOT_EXISTS":
-            return not c.has(cond.item)
-        value = c.get(i, cond.item)
-        if op == "EMPTY":
-            return _empty(value)
-        if op == "NOT_EMPTY":
-            return not _empty(value)
-        if value is None:
-            return None
-        value = value.strip()
-        if op in ("EQ", "NE", "IN", "NOT_IN"):
-            return (value in cond.values) == (op in ("EQ", "IN"))
-        if op in _ORDER:
-            left, right = _number(value), _number(cond.value)
-            return None if left is None or right is None else _ORDER[op](left, right)
-        if op in ("MATCHES", "NOT_MATCHES"):
-            return (re.search(cond.value or "", _unwrap(value)) is not None) == (op == "MATCHES")
-        if op in _ITEM_ORDER and cond.other_category == c.name:
-            left, right = _number(value), _number(c.get(i, cond.other_item or ""))
-            return None if left is None or right is None else _ITEM_ORDER[op][0](left, right)
-        raise RulesError(f"operator {op} is not supported here ({cond.name})")
-
-    def _join(self, rule: Rule, c: Category, i: int) -> list[int]:
-        """Rows of the join_other_item category joined to row i of c (whose key is join_item)."""
-        key = rule.param_item("join_item")
-        other = rule.param_item("join_other_item")
-        if key is None or other is None:
-            return []
-        return self._matching_rows(
-            c, i, key[1], self.cat(other[0]), other[1], rule.param("fallback") == "single_row_if_key_missing"
-        )
-
-    def _clause(self, rule: Rule, conditions: list[Condition], c: Category, i: int) -> bool:
-        """
-        Evaluate WHEN or UNLESS conditions for row i of category c.
-
-        A condition on c is tested on row i. A condition on another category is
-        tested on the rows joined to row i when the rule joins to that category,
-        and on any of its rows otherwise.
-        """
-        other = rule.param_item("join_other_item")
-        results = []
-        for cond in conditions:
-            if cond.category == c.name:
-                results.append(bool(self._evaluate(cond, c, i)))
-                continue
-            target = self.cat(cond.category)
-            rows = self._join(rule, c, i) if other and other[0] == cond.category else range(len(target))
-            results.append(any(self._evaluate(cond, target, j) for j in rows))
-        return _combine(conditions, results)
-
-    def _applies(self, rule: Rule, c: Category, i: int) -> bool:
-        """WHEN holds and UNLESS does not for row i of c."""
-        if rule.when and not self._clause(rule, rule.when, c, i):
-            return False
-        return not (rule.unless and self._clause(rule, rule.unless, c, i))
-
-    @staticmethod
-    def _matching_rows(src: Category, i: int, s_key: str, tgt: Category, t_key: str, fallback: bool) -> list[int]:
-        """
-        Join source row i to target rows on s_key == t_key.
-
-        With the single-row fallback, a target category with exactly one row and
-        no join key is used when the key match finds nothing (and the source key
-        is present, or the source has one row too).
-        """
-        key = src.get(i, s_key)
-        if not _empty(key):
-            rows = [j for j in range(len(tgt)) if not _empty(tgt.get(j, t_key)) and tgt.get(j, t_key) == key]
-            if rows:
-                return rows
-        if not fallback or len(tgt) != 1 or not _empty(tgt.get(0, t_key)):
-            return []
-        if _empty(key) and len(src) != 1:
-            return []
-        return [0]
-
-    def _in_scope(self, rule: Rule) -> bool:
-        """Experiment gating from experiment_scope / experiment_code / experiment_modes."""
+    def _in_effect(self, rule: Rule) -> bool:
+        """Gating parameters: experiment, entry subtype, cross-reference type, skipped categories."""
         scope = (rule.param("experiment_scope") or "").lower()
-        if scope == "all":
-            return True
         if scope == "coded":
             code = rule.param("experiment_code")
-            return bool(code) and code.upper() in self.context.requested_codes
-        modes = {m.lower() for m in rule.param_list("experiment_modes")}
-        return not modes or bool(modes & self.context.experiment_modes)
+            if not code or code.upper() not in self.context.requested_codes:
+                return False
+        elif scope != "all":
+            modes = {m.lower() for m in rule.param_list("experiment_modes")}
+            if modes and not modes & self.context.experiment_modes:
+                return False
+        if (rule.param("xref_type") or "cross") != "cross" or (rule.param("xref_subtype") or "full") != "full":
+            return False
+        if rule.param("mandatory_scope") == "makeMandatorySubtypes":
+            if rule.param("subtype") not in self.context.entry_subtypes:
+                return False
+        return not any(len(self.cat(name)) for name in rule.param_list("skip_if_any_category_present"))
+
+    # -- rows: selection, pairing and conditions ------------------------------
+
+    def _selected_rows(self, rule: Rule, category: str) -> list[int]:
+        """Rows of a category left by the rule's row selection (all rows without one)."""
+        key = (rule.id, category)
+        rows = self._selected.get(key)
+        if rows is not None:
+            return rows
+        c = self.cat(category)
+        selection = rule.selections.get(category)
+        if selection is None:
+            rows = list(range(len(c)))
+        else:
+            ranks = c.values(selection.selector_item.item)
+            groups: dict[tuple, list[int]] = defaultdict(list)
+            for i in range(len(c)):
+                if ranks[i] is not None:
+                    groups[tuple(c.values(g.item, TEXT)[i] for g in selection.group_by)].append(i)
+            pick = min if selection.selector == "MIN" else max
+            rows = []
+            for members in groups.values():
+                best = pick(ranks[i] for i in members)
+                rows.extend(i for i in members if ranks[i] == best)
+            rows.sort()
+        self._selected[key] = rows
+        return rows
+
+    @staticmethod
+    def _key(c: Category, names: tuple[ItemName, ...], i: int) -> tuple | None:
+        values = tuple(c.values(n.item, TEXT)[i] for n in names)
+        return None if None in values else values
+
+    def _partners(self, rule: Rule, scope: Category, i: int) -> tuple[dict[str, list[int]], Join | None]:
+        """Partner rows paired with scope row i, by category, and the first join that found none."""
+        partners: dict[str, list[int]] = {}
+        for name in rule.partner_categories:
+            rows = self._selected_rows(rule, name)
+            join = rule.joins.get(name)
+            if join is None:
+                partners[name] = rows
+                continue
+            matches = self._joined(rule, join, rows).get(self._key(scope, join.scope_items, i) or (), [])
+            if not matches:
+                if join.on_no_match != "SINGLE_ROW_FALLBACK" or not self._single_row_fallback(
+                    rule, join, scope, i, rows
+                ):
+                    return partners, join
+                matches = rows
+            partners[name] = matches
+        return partners, None
+
+    def _joined(self, rule: Rule, join: Join, rows: list[int]) -> dict[tuple, list[int]]:
+        """Partner rows by join key (rows with a missing key part are left out)."""
+        key = (rule.id, join.partner_category)
+        index = self._join_index.get(key)
+        if index is None:
+            index = defaultdict(list)
+            partner = self.cat(join.partner_category)
+            for j in rows:
+                value = self._key(partner, join.partner_items, j)
+                if value is not None:
+                    index[value].append(j)
+            self._join_index[key] = index
+        return index
+
+    def _single_row_fallback(self, rule: Rule, join: Join, scope: Category, i: int, rows: list[int]) -> bool:
+        """Pair the only rows of both categories when a join item of either is missing."""
+        if len(self._selected_rows(rule, scope.name)) != 1 or len(rows) != 1:
+            return False
+        partner = self.cat(join.partner_category)
+        return self._key(scope, join.scope_items, i) is None or self._key(partner, join.partner_items, rows[0]) is None
+
+    def _applicable_rows(self, rule: Rule) -> Iterator[tuple[int, dict[str, list[int]]]]:
+        """Scope rows the rule applies to, with their partner rows."""
+        scope = self.cat(rule.scope_category)
+        signal = None
+        if rule.param("mandatory_scope"):
+            # makeMandatory: only rows that carry a value outside exclude_items.
+            exclude = {n.item.lower() for n in rule.param_items("exclude_items")}
+            signal = [item for item in scope.index if item not in exclude]
+        for i in self._selected_rows(rule, scope.name):
+            if signal is not None and not any(scope.get(i, item) is not None for item in signal):
+                continue
+            partners, unmatched = self._partners(rule, scope, i)
+            if unmatched is not None:
+                if unmatched.on_no_match == "FAIL":
+                    first = rule.then[0].item.item if rule.then else next(iter(scope.index), "")
+                    message = f"{_render(rule.message)} (no matching {unmatched.partner_category} row)"
+                    self.report(rule, scope, first, i, message)
+                continue
+            if self._clause(rule, rule.when, scope, i, partners, empty=True) and not self._clause(
+                rule, rule.unless, scope, i, partners, empty=False
+            ):
+                yield i, partners
+
+    def _clause(
+        self, rule: Rule, conditions: list[Condition], scope: Category, i: int, partners: dict, empty: bool
+    ) -> bool:
+        """WHEN or UNLESS: a skipped comparison counts as not holding."""
+        if not conditions:
+            return empty
+        return _combine(conditions, [bool(self._condition(rule, c, scope, i, partners)[0]) for c in conditions])
+
+    def _then_failure(
+        self, rule: Rule, scope: Category, i: int, partners: dict
+    ) -> tuple[Condition, tuple[Category, int] | None] | None:
+        """The first failing THEN condition (and its witness row), or None when THEN holds."""
+        outcomes = [(c, *self._condition(rule, c, scope, i, partners)) for c in rule.then]
+        satisfied = [result is None or result for _, result, _ in outcomes]
+        if _combine(rule.then, satisfied):
+            return None
+        return next((c, witness) for (c, _, witness), ok in zip(outcomes, satisfied) if not ok)
+
+    # -- one condition ----------------------------------------------------------
+
+    def _kind(self, cond: Condition) -> tuple[str, bool]:
+        """How the condition compares values: NUMBER, DATE or TEXT, and whether case-insensitively."""
+        names = [cond.item]
+        if cond.compare is not None and cond.operator in ITEM_OPERATORS | {"IN_COLUMN_OF"}:
+            names.append(cond.compare)
+        kinds = {self.dictionary.kind(n.tag) for n in names}
+        kind = NUMBER if NUMBER in kinds else DATE if DATE in kinds else TEXT
+        return kind, any(self.dictionary.case_insensitive(n.tag) for n in names)
+
+    def _literal_values(self, rule: Rule, cond: Condition) -> list:
+        key = (rule.id, cond.ordinal)
+        values = self._literals.get(key)
+        if values is None:
+            kind, ci = self._kind(cond)
+            values = [convert(v, kind, ci) for v in cond.values]
+            if None in values:
+                raise RulesError(f"rule {rule.id}: value {cond.value!r} cannot be read as {kind} for {cond.item}")
+            self._literals[key] = values
+        return values
+
+    def _condition(
+        self, rule: Rule, cond: Condition, scope: Category, i: int, partners: dict
+    ) -> tuple[bool | None, tuple[Category, int] | None]:
+        """
+        (result, witness): result is None when no comparison could be made; witness
+        is the row a failing comparison was made against.
+        """
+        if cond.operator == "IN_COLUMN_OF":
+            return self._in_column(rule, cond, scope, i), None
+        if cond.operator == "IN_ENUMERATION_OF":
+            return self._in_enumeration(cond, scope, i), None
+        item_in_scope = cond.item.category == scope.name
+        if item_in_scope and (cond.compare is None or cond.compare.category == scope.name):
+            result = self._test(rule, cond, scope, i, scope, i)
+            return result, (scope, i) if result is False else None
+        partner = self.cat(cond.compare.category if item_in_scope and cond.compare else cond.item.category)
+        existence = cond.operator in EXISTENCE_OPERATORS
+        results: list[bool] = []
+        witness = None
+        for j in partners.get(partner.name, []):
+            if item_in_scope:
+                result = self._test(rule, cond, scope, i, partner, j)
+            else:
+                result = self._test(rule, cond, partner, j, partner, j)
+            if result is None and not existence:
+                continue  # partner rows with a missing value are ignored
+            results.append(bool(result))
+            if result is False and witness is None:
+                witness = (partner, j)
+        if not results:
+            return None, None
+        holds = all(results) if cond.effective_quantifier == "ALL" else any(results)
+        return holds, None if holds else witness
+
+    def _test(self, rule: Rule, cond: Condition, a: Category, ai: int, b: Category, bi: int) -> bool | None:
+        """Evaluate cond with item_name from row ai of a and compare_item_name from row bi of b."""
+        op = cond.operator
+        if op == "EXISTS":
+            return a.has(cond.item.item)
+        if op == "NOT_EXISTS":
+            return not a.has(cond.item.item)
+        if op in ("EMPTY", "NOT_EMPTY"):
+            return a.missing(ai, cond.item.item) == (op == "EMPTY")
+        if op in ("MATCHES", "NOT_MATCHES"):
+            raw = a.get(ai, cond.item.item)
+            if a.missing(ai, cond.item.item) or raw is None:
+                return None
+            return (re.search(cond.value or "", _unwrap(raw)) is not None) == (op == "MATCHES")
+        if op == "UNIQUE":
+            return None  # checked over all rows by _uniqueness
+        kind, ci = self._kind(cond)
+        left = a.values(cond.item.item, kind, ci)[ai]
+        if left is None:
+            return None
+        absolute = cond.value_transform == "ABS" and kind == NUMBER
+        if absolute:
+            left = abs(left)
+        if op in _ITEM_COMPARE:
+            right = b.values(cond.compare.item, kind, ci)[bi] if cond.compare else None
+            if right is None:
+                return None
+            return _ITEM_COMPARE[op][0](left, abs(right) if absolute else right)
+        literals = self._literal_values(rule, cond)
+        if op in ("IN", "NOT_IN"):
+            return (left in literals) == (op == "IN")
+        if op in _LITERAL_COMPARE:
+            return _LITERAL_COMPARE[op](left, literals[0])
+        raise RulesError(f"rule {rule.id}: operator {op} is not supported")
+
+    def _in_column(self, rule: Rule, cond: Condition, scope: Category, i: int) -> bool | None:
+        """The value occurs among the compare item's values (after row selection); skipped if there are none."""
+        kind, ci = self._kind(cond)
+        value = scope.values(cond.item.item, kind, ci)[i]
+        if value is None or cond.compare is None:
+            return None
+        key = (rule.id, cond.ordinal)
+        targets = self._column_sets.get(key)
+        if targets is None:
+            other = self.cat(cond.compare.category)
+            column = other.values(cond.compare.item, kind, ci)
+            targets = self._column_sets[key] = {
+                column[j] for j in self._selected_rows(rule, other.name) if column[j] is not None
+            }
+        if not targets:
+            return None
+        return value in targets
+
+    def _in_enumeration(self, cond: Condition, scope: Category, i: int) -> bool | None:
+        """
+        The dictionary's _item_enumeration.detail for the value lists the values
+        allowed in the compare item of the same row.
+        """
+        details = self.dictionary.enum_details(cond.item.tag)
+        if scope.missing(i, cond.item.item) or not details or cond.compare is None:
+            return None
+        # A value the dictionary pairs with nothing (or does not enumerate) cannot be compared.
+        allowed = details.get((scope.get(i, cond.item.item) or "").strip())
+        if not allowed:
+            return None
+        # Typed values of a case-insensitive item are upper-cased; fold the allowed values the same way.
+        other = scope.values(cond.compare.item)[i]
+        if other is None:
+            return None
+        folded = self.dictionary.case_insensitive(cond.compare.tag)
+        return other in {a.upper() if folded else a for a in allowed}
+
+    # -- reporting ----------------------------------------------------------------
 
     @staticmethod
     def _atom_display(c: Category, i: int) -> dict[str, str]:
@@ -379,297 +579,130 @@ class CrossChecker:
             "atom": c.text(i, "label_atom_id", "auth_atom_id"),
         }
 
-    # -- pairwise_order -----------------------------------------------------
-
-    def _family_pairwise_order(self, rule: Rule) -> None:
-        """
-        THEN `item OP_ITEM other_item`: numbers, or dates when both values are dates.
-
-        With join_item / join_other_item, row i is compared with the joined rows
-        of the other category; otherwise with the same row when both items are in
-        one category, and with every row of the other category when they are not.
-        """
-        joined = rule.param("join_item") is not None
-        for cond in rule.then:
-            if cond.operator not in _ITEM_ORDER or not cond.other_category:
-                raise RulesError(f"rule {rule.id}: pairwise_order needs an *_ITEM operator")
-            holds, violation = _ITEM_ORDER[cond.operator]
-            left_cat, right_cat = self.cat(cond.category), self.cat(cond.other_category)
-            if not len(left_cat) or not len(right_cat):
-                continue
-            right_item = cond.other_item or ""
-            for i in range(len(left_cat)):
-                if not self._applies(rule, left_cat, i):
-                    continue
-                left_text = left_cat.get(i, cond.item)
-                if joined:
-                    self._compare_joined(rule, cond, holds, left_cat, i, left_text, right_cat)
-                    continue
-                rows = [i] if left_cat is right_cat else range(len(right_cat))
-                left_num, left_date = _number(left_text), _date(left_text)
-                for j in rows:
-                    right_text = right_cat.get(j, right_item)
-                    if left_num is not None:
-                        right_num = _number(right_text)
-                        if right_num is None or holds(left_num, right_num):
-                            continue
-                        text = _render(rule.message, item2CrossValue=right_text) or "Cross-check failed"
-                        message = f"{text} (value={left_text}, condition {violation} {cond.other_name})"
-                    elif left_date is not None:
-                        right_date = _date(right_text)
-                        if right_date is None or holds(left_date, right_date):
-                            continue
-                        message = _render(rule.message, left_value=left_text.strip(), right_value=right_text.strip())
-                    else:
-                        break
-                    self.report(rule, left_cat, cond.item, i, message)
-                    break
-
-    def _compare_joined(
-        self, rule: Rule, cond: Condition, holds, left_cat: Category, i: int, left_text: str | None, right_cat
+    def _report_failure(
+        self, rule: Rule, scope: Category, i: int, cond: Condition, witness: tuple[Category, int] | None
     ) -> None:
-        rows = self._join(rule, left_cat, i)
-        if not rows:
-            return
-        right_values = [right_cat.get(j, cond.other_item or "") for j in rows]
-        left = _number(left_text)
-        rights = [n for n in map(_number, right_values) if n is not None]
-        if left is None or not rights:
-            return
-        if rule.flag("absolute"):
-            left, rights = abs(left), [abs(n) for n in rights]
-        if all(holds(left, n) for n in rights):
-            return
-        display = next((v for v in right_values if v is not None), "")
-        self.report(
-            rule, left_cat, cond.item, i, _render(rule.message, item2CrossValue=display) or "Cross-check failed"
-        )
+        left = (scope.get(i, cond.item.item) or "").strip()
+        shown = left
+        if self.dictionary.kind(cond.item.tag) == NUMBER and scope.values(cond.item.item)[i] is not None:
+            shown = _fmt_number(scope.values(cond.item.item)[i])
+        fields = {"value": shown, cond.item.item: shown, "left_value": left}
+        if witness is not None and cond.compare is not None and cond.operator in ITEM_OPERATORS:
+            right = (witness[0].get(witness[1], cond.compare.item) or "").strip()
+            fields.update(item2CrossValue=right, right_value=right)
+        if scope.name == "atom_site":
+            fields.update(self._atom_display(scope, i))
+        message = _render(rule.message, **fields) or "Deposition rule failed"
+        detail = None
+        if cond.operator in _ITEM_COMPARE:
+            detail = f"value={left}, condition {_ITEM_COMPARE[cond.operator][1]} {cond.compare}"
+        elif cond.operator == "IN_COLUMN_OF":
+            detail = f"value={left}"
+        elif cond.operator == "IN_ENUMERATION_OF":
+            allowed = sorted(set(self.dictionary.enum_details(cond.item.tag).get(left, [])))
+            other = (scope.get(i, cond.compare.item) or "").strip() if cond.compare else ""
+            detail = f"value={left}, {cond.compare}={other}; allowed: {', '.join(allowed)}"
+        self.report(rule, scope, cond.item.item, i, f"{message} ({detail})" if detail else message)
 
-    # -- uniqueness ---------------------------------------------------------
+    # -- families -------------------------------------------------------------------
 
-    def _family_uniqueness(self, rule: Rule) -> None:
+    def _check_rows(self, rule: Rule) -> None:
+        """Report each applicable scope row whose THEN conditions fail."""
+        scope = self.cat(rule.scope_category)
+        for i, partners in self._applicable_rows(rule):
+            failure = self._then_failure(rule, scope, i, partners)
+            if failure is not None:
+                self._report_failure(rule, scope, i, *failure)
+
+    def _uniqueness(self, rule: Rule) -> None:
         """The THEN items marked UNIQUE form a (possibly composite) key that may not repeat."""
-        keys = [cond for cond in rule.then if cond.operator == "UNIQUE"]
-        if not keys:
-            return
-        c = self.cat(keys[0].category)
-        if len(c) < 2:
-            return
+        keys = [c.item for c in rule.then if c.operator == "UNIQUE"]
+        scope = self.cat(rule.scope_category)
         buckets: dict[tuple, list[int]] = defaultdict(list)
-        for i in range(len(c)):
-            values = [c.get(i, k.item) for k in keys]
-            if all(v is not None for v in values):
-                buckets[tuple(v.strip() for v in values)].append(i)
-        for key, rows in buckets.items():
+        for i, _ in self._applicable_rows(rule):
+            values = tuple(scope.values(k.item, TEXT)[i] for k in keys)
+            if None not in values:
+                buckets[values].append(i)
+        for rows in buckets.values():
             if len(rows) < 2:
                 continue
+            shown = ", ".join((scope.get(rows[0], k.item) or "").strip() for k in keys)
             message = _render(
                 rule.message,
-                duplicate_display=", ".join(key),
+                duplicate_display=shown,
                 key_columns=", ".join(k.item for k in keys),
-                category=c.name,
+                category=scope.name,
             )
             for i in rows:
-                self.report(rule, c, keys[0].item, i, message)
+                self.report(rule, scope, keys[0].item, i, message)
 
-    # -- conditional_presence -----------------------------------------------
-
-    def _family_conditional_presence(self, rule: Rule) -> None:
-        """
-        THEN items must be non-empty on the rows where the rule applies.
-
-        Without WHEN conditions, mandatory_scope rules require the THEN items in
-        any row that has a value, and an OR group requires one of the THEN items
-        somewhere in the category.
-        """
-        if not rule.then:
-            return
-        if rule.param("mandatory_scope"):
-            self._mandatory(rule)
-            return
-        c = self.cat(rule.then[0].category)
-        if not len(c) or any(len(self.cat(s)) for s in rule.param_list("skip_if_any_category_present")):
-            return
-        if not rule.when and any(cond.group_operator == "OR" for cond in rule.then):
-            if not any(not _empty(v) for cond in rule.then for v in c.column(cond.item)):
-                self.report(rule, c, rule.then[0].item, 0, _render(rule.message))
-            return
-        message = _render(rule.message) or "Required value missing"
-        breaks = rule.flag("break_flag")
-        for i in range(len(c)):
-            if not self._applies(rule, c, i):
-                continue
-            for cond in rule.then:
-                if self._evaluate(cond, c, i):
-                    continue
-                key = (c.name, cond.item.lower(), i)
-                if breaks and key in self._broken:
-                    continue
-                self.report(rule, c, cond.item, i, message)
-                if breaks:
-                    self._broken.add(key)
-
-    def _mandatory(self, rule: Rule) -> None:
-        """If a row carries any value (outside exclude_items), every THEN item needs one."""
-        if rule.param("mandatory_scope") == "makeMandatorySubtypes":
-            if rule.param("subtype") not in self.context.entry_subtypes:
-                return
-        c = self.cat(rule.then[0].category)
-        exclude = {split_item(name)[1].lower() for name in rule.param_list("exclude_items")}
-        signal_items = [item for item in c.index if item not in exclude]
-        message = _render(rule.message)
-        for i in range(len(c)):
-            if not any(c.get(i, item) is not None for item in signal_items):
-                continue
-            for cond in rule.then:
-                if not self._evaluate(cond, c, i):
-                    self.report(rule, c, cond.item, i, message)
-
-    # -- conditional_value and format ---------------------------------------
-
-    def _family_conditional_value(self, rule: Rule) -> None:
-        """THEN values present on the rows where the rule applies must satisfy their operator."""
-        for cond in rule.then:
-            c = self.cat(cond.category)
-            numeric = cond.operator in _ORDER
-            for i in range(len(c)):
-                value = c.get(i, cond.item)
-                if _empty(value) or not self._applies(rule, c, i):
-                    continue
-                if self._evaluate(cond, c, i) is not False:
-                    continue
-                shown = _fmt_number(float(value)) if numeric else value.strip()
-                fields = self._atom_display(c, i) if c.name == "atom_site" else {}
-                self.report(
-                    rule, c, cond.item, i, _render(rule.message, **{cond.item: shown, "value": shown}, **fields)
-                )
-
-    _family_format = _family_conditional_value
-
-    # -- cross_reference ----------------------------------------------------
-
-    def _family_cross_reference(self, rule: Rule) -> None:
-        """THEN `item IN_COLUMN_OF other_item`: each value must occur in the other item."""
-        if not self._in_scope(rule):
-            return
-        if (rule.param("xref_type") or "cross") != "cross" or (rule.param("xref_subtype") or "full") != "full":
-            return
-        dictionary = rule.param("other_item_domain") == "DICTIONARY_ENUMERATION"
-        for cond in rule.then:
-            if cond.operator != "IN_COLUMN_OF" or not cond.other_category:
-                raise RulesError(f"rule {rule.id}: cross_reference needs IN_COLUMN_OF")
-            if dictionary:
-                self._dictionary_pairing(rule, cond)
-                continue
-            src, tgt = self.cat(cond.category), self.cat(cond.other_category)
-            targets = {v for v in tgt.column(cond.other_item or "") if v is not None}
-            if not len(src) or not targets:
-                continue
-            for i, value in enumerate(src.column(cond.item)):
-                if value is not None and value not in targets:
-                    self.report(rule, src, cond.item, i, f"{_render(rule.message)} (value={value})")
-
-    def _dictionary_pairing(self, rule: Rule, cond: Condition) -> None:
-        """
-        The value's `_item_enumeration.detail` in the dictionary lists the values
-        allowed in other_item (same row). Needs a dictionary (--dict).
-        """
-        if self.dict_enum is None:
-            return
-        c = self.cat(cond.category)
-        details = self.dict_enum.get(cond.name)
-        if not details:
-            return
-        message = _render(rule.message)
-        for i in range(len(c)):
-            value, other = c.get(i, cond.item), c.get(i, cond.other_item or "")
-            if value is None:
-                continue
-            allowed = details.get(value)
-            if not allowed:
-                detail = f"value={value}; the dictionary pairs no {cond.other_name} values with it"
-            elif other is not None and other not in allowed:
-                detail = f"value={value}, {cond.other_name}={other}; allowed: {', '.join(sorted(set(allowed)))}"
-            else:
-                continue
-            self.report(rule, c, cond.item, i, f"{message} ({detail})")
-
-    # -- aggregate ----------------------------------------------------------
-
-    def _family_aggregate(self, rule: Rule) -> None:
-        """Sum the THEN item over group_by and compare the total with threshold."""
+    def _aggregate(self, rule: Rule) -> None:
+        """Aggregate the THEN item over group_by and test the THEN condition on each group's result."""
         cond = rule.then[0]
-        if (rule.param("aggregate") or "SUM").upper() != "SUM" or cond.operator not in _ORDER:
-            raise RulesError(f"rule {rule.id}: only SUM with LT/LE/GT/GE is supported")
-        c = self.cat(cond.category)
-        if not len(c):
-            return
-        group_by = [split_item(name)[1] for name in (rule.param("group_by") or "").split("+") if name.strip()]
-        threshold = float(rule.param("threshold") or cond.value or 0)
-        groups: dict[tuple, list[tuple[int, float]]] = defaultdict(list)
-        for i, text in enumerate(c.column(cond.item)):
-            number = _number(text)
-            if number is not None:
-                groups[tuple(c.text(i, *_with_label_fallback(item)) for item in group_by)].append((i, number))
+        function = _AGGREGATES.get((rule.param("aggregate") or "SUM").upper())
+        if function is None or cond.operator not in _LITERAL_COMPARE:
+            raise RulesError(f"rule {rule.id}: aggregate needs SUM or COUNT and a comparison with a value")
+        scope = self.cat(rule.scope_category)
+        values = scope.values(cond.item.item, NUMBER)
+        group_by = rule.param_items("group_by")
+        groups: dict[tuple, list[int]] = defaultdict(list)
+        for i, _ in self._applicable_rows(rule):
+            if values[i] is not None:  # rows with a missing value are excluded
+                groups[tuple(scope.text(i, *_with_label_fallback(g.item)) for g in group_by)].append(i)
+        limit = self._literal_values(rule, cond)[0]
         for members in groups.values():
-            total = round(sum(n for _, n in members), 4)
-            if _ORDER[cond.operator](total, threshold):
+            total = function([values[i] for i in members])
+            total = round(total, 4) if isinstance(total, float) else total
+            if _LITERAL_COMPARE[cond.operator](total, limit):
                 continue
-            first = members[0][0]
-            fields = self._atom_display(c, first) if c.name == "atom_site" else {}
+            fields = self._atom_display(scope, members[0]) if scope.name == "atom_site" else {}
             message = _render(rule.message, total=_fmt_number(total), **fields)
-            for i, _ in members:
-                self.report(rule, c, cond.item, i, message)
+            for i in members:
+                self.report(rule, scope, cond.item.item, i, message)
 
-    # -- procedural ---------------------------------------------------------
+    # -- procedural ---------------------------------------------------------------
 
-    def _family_procedural(self, rule: Rule) -> None:
-        check = getattr(self, f"_proc_{rule.method}", None)
-        if check is None:
-            raise RulesError(f"rule {rule.id}: unknown procedural method {rule.method!r}")
-        check(rule)
-
-    def _param_category(self, rule: Rule) -> tuple[Category, str]:
-        target = rule.param_item("item")
-        if target is None:
-            raise RulesError(f"rule {rule.id}: missing 'item' parameter")
-        return self.cat(target[0]), target[1]
+    def _param_item(self, rule: Rule) -> str:
+        items = rule.param_items("item")
+        if len(items) != 1 or items[0].category != rule.scope_category:
+            raise RulesError(f"rule {rule.id}: 'item' parameter must name one item of {rule.scope_category}")
+        return items[0].item
 
     def _proc_wavelength_protocol_consistency(self, rule: Rule) -> None:
         """A wavelength list must hold several values (requires=multi) or one (requires=single)."""
-        c, item = self._param_category(rule)
+        scope, item = self.cat(rule.scope_category), self._param_item(rule)
         multi = rule.param("requires") == "multi"
-        for i in range(len(c)):
-            value = c.get(i, item)
-            if _empty(value) or not self._applies(rule, c, i):
+        for i, _ in self._applicable_rows(rule):
+            value = scope.get(i, item)
+            if scope.missing(i, item) or value is None:
                 continue
             if ("," in value or "-" in value) != multi:
-                self.report(rule, c, item, i, _render(rule.message))
+                self.report(rule, scope, item, i, _render(rule.message))
 
     def _proc_accession_format_rule(self, rule: Rule) -> None:
-        """A non-empty value must match any (format_match=ANY) or all of the named formats."""
-        c, item = self._param_category(rule)
+        """A value must match any (format_match=ANY) or all of the named formats."""
+        scope, item = self.cat(rule.scope_category), self._param_item(rule)
         formats = rule.param_list("format")
         match = all if (rule.param("format_match") or "ANY").upper() == "ALL" else any
-        for i in range(len(c)):
-            value = c.get(i, item)
-            if _empty(value) or not self._applies(rule, c, i):
+        for i, _ in self._applicable_rows(rule):
+            value = scope.get(i, item)
+            if scope.missing(i, item) or value is None:
                 continue
             if not match(_format_ok(f, value.strip()) for f in formats):
-                self.report(rule, c, item, i, _render(rule.message) or "Invalid accession code format.")
+                self.report(rule, scope, item, i, _render(rule.message) or "Invalid accession code format.")
 
     _proc_conditional_accession_format_rule = _proc_accession_format_rule
 
     def _proc_sequence_predicate(self, rule: Rule) -> None:
-        c, item = self._param_category(rule)
+        scope, item = self.cat(rule.scope_category), self._param_item(rule)
         predicate = rule.param("predicate")
         if predicate != "homopolymer_ala":
             raise RulesError(f"rule {rule.id}: unknown sequence predicate {predicate!r}")
-        for i in range(len(c)):
+        for i, _ in self._applicable_rows(rule):
             # Sequences in text fields are wrapped over several lines.
-            seq = "".join((c.get(i, item) or "").split())
-            if seq and set(seq.upper()) == {"A"} and self._applies(rule, c, i):
-                self.report(rule, c, item, i, _render(rule.message))
+            seq = "".join((scope.get(i, item) or "").split())
+            if seq and set(seq.upper()) == {"A"}:
+                self.report(rule, scope, item, i, _render(rule.message))
 
     def _proc_seq_model_mismatch(self, rule: Rule) -> None:
         """
@@ -699,7 +732,7 @@ class CrossChecker:
         for seq in poly_seq.values():
             seq.sort()
 
-        atoms = self.cat(rule.param("source_category") or "atom_site")
+        atoms = self.cat(rule.param("source_category") or rule.scope_category)
         chains: dict[str, dict[tuple[int, str], dict]] = defaultdict(dict)
         for i in range(len(atoms)):
             eid = atoms.text(i, "label_entity_id")
@@ -776,10 +809,11 @@ class CrossChecker:
                     emit(res, seq[idx])
 
 
-def detect_context(block: cif.Block) -> Context:
+def detect_context(block: cif.Block, dictionary: Dictionary | None = None) -> Context:
     """Derive experiment modes and EM subtypes from _exptl and _em_experiment."""
-    exptl = Category(block, "exptl")
-    em = Category(block, "em_experiment")
+    dictionary = dictionary or load_dictionary()
+    exptl = Category(block, "exptl", dictionary)
+    em = Category(block, "em_experiment", dictionary)
     methods = {(v or "").strip().upper() for v in exptl.column("method")}
     modes = {_METHOD_MODES[m] for m in methods if m in _METHOD_MODES}
     subtypes = {
@@ -798,35 +832,31 @@ def validate(
     dictionary_path: Path | None = None,
     context: Context | None = None,
     detect: bool = False,
-    rules: list[Rule] | None = None,
+    rules: RuleSet | None = None,
     lenient: bool = False,
 ) -> list[Finding]:
     """
     Run all deposition rules on the first data block of an mmCIF file.
 
-    Without a context (or detect=True), rules gated on experiment mode, entry
-    subtype or requested code are skipped. dictionary_path enables the rules
-    checked against dictionary enumerations. lenient=True lets gemmi accept
-    duplicate tags (the last value wins) instead of rejecting the file.
+    rules is a RuleSet from load_rules(); without it the store at rules_path
+    (or the packaged one) is loaded against the PDBx/mmCIF dictionary at
+    dictionary_path (or the packaged v50 dictionary). Without a context (or
+    detect=True), rules gated on experiment mode, entry subtype or requested
+    code are skipped. lenient=True lets gemmi accept duplicate tags (the last
+    value wins) instead of rejecting the file.
     """
-    rules = rules or load_rules(rules_path)
+    rules = rules or load_rules(rules_path, dictionary_path)
     doc = cif.read_file(str(path), check_level=0) if lenient else cif.read(str(path))
     block = doc[0]
     ctx = context or Context.empty()
     if detect:
-        found = detect_context(block)
+        found = detect_context(block, rules.dictionary)
         ctx = Context(
             ctx.experiment_modes | found.experiment_modes,
             ctx.entry_subtypes | found.entry_subtypes,
             ctx.requested_codes,
         )
-    dict_enum = None
-    if dictionary_path is not None:
-        names = [
-            cond.name for r in rules if r.param("other_item_domain") == "DICTIONARY_ENUMERATION" for cond in r.then
-        ]
-        dict_enum = load_dictionary_enum_details(dictionary_path, names)
-    return CrossChecker(block, rules, ctx, dict_enum).run()
+    return CrossChecker(block, rules, ctx).run()
 
 
 def iter_errors(findings: Iterable[Finding]) -> Iterable[Finding]:

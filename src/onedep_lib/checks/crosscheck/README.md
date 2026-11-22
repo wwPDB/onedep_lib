@@ -2,46 +2,133 @@
 
 Runs the deposition rules defined in
 `onedep_lib/schemas/cif/cross_checks_deposition_rules.cif` on mmCIF files.
-[gemmi](https://gemmi.readthedocs.io/) parses both the rule store and the input
-file, so this package has no CIF parser of its own. Dictionary validation
-(types, enumerations, mandatory items, foreign keys) is not done here.
+[gemmi](https://gemmi.readthedocs.io/) parses the rule store, both
+dictionaries and the input file, so this package has no CIF parser of its own.
+Dictionary validation of the input file (types, enumerations, mandatory items,
+foreign keys) is not done here.
 
-| File | Purpose |
+Three schema files in `onedep_lib/schemas/cif/` are used:
+
+| File | Role |
 |---|---|
-| `rules.py` | Reads the rule store with `gemmi.cif` into one `Rule` per `_pdbx_deposition_rule` row, with its WHEN / THEN / UNLESS `Condition`s (ordered by `ordinal`) and its parameters attached. |
-| `checks.py` | `Category` wraps a gemmi mmCIF table (`Block.find_mmcif_category`) and reads values column by column; `CrossChecker` runs each enabled rule by family; `validate()` is the entry point. |
+| `cross_checks_deposition_rules.cif` | The rules. |
+| `mmcif_pdbx_deposition_rules_ext.dic` | Defines the rule store's categories and how rules are evaluated. The store is checked against it when loaded. |
+| `mmcif_pdbx_v50.dic` | The PDBx/mmCIF dictionary: types and enumerations of the items the rules name. |
+
+| Code | Purpose |
+|---|---|
+| `dictionary.py` | Reads a DDL2 dictionary with `gemmi.cif`: categories and keys, item types, mandatory codes, defaults, enumerations (with details) and links. Converts values to numbers, dates or text by item type. |
+| `rules.py` | Reads the rule store into a `RuleSet` of `Rule`s, each with its `Condition`s, parameters, `Join`s and `RowSelection`s, and checks it against both dictionaries. |
+| `checks.py` | `Category` wraps a gemmi mmCIF table (`Block.find_mmcif_category`) and reads values column by column; `CrossChecker` evaluates each enabled rule; `validate()` is the entry point. |
 | `__main__.py` | Command line interface. |
 
 ## The rule store
 
-The store's three categories are defined in
-`schemas/cif/mmcif_pdbx_deposition_rules_ext.dic`:
+The store has five categories, all defined in the extension dictionary:
 
 - `_pdbx_deposition_rule`: id, family, severity (`ERROR`, `WARNING`, `INFO`),
-  message (with `[{placeholder}]` fields), `enabled`, and `procedural_method`
-  for procedural rules.
-- `_pdbx_deposition_rule_condition`: the clauses. A rule is checked on the
-  rows where its WHEN conditions hold (all of them, or any for a `group_operator`
-  OR group) and its UNLESS conditions do not, and it reports the THEN
-  conditions that fail. A WHEN condition on another category is matched through
-  the rule's `join_item` / `join_other_item` parameters when it has them, and
-  against any row of that category otherwise.
-- `_pdbx_deposition_rule_param`: name/value settings, listed below.
+  scope category, message (with `[{placeholder}]` fields), `enabled`,
+  `procedural_method`, and flags saying which of the other records it has.
+- `_pdbx_deposition_rule_condition`: the WHEN, THEN and UNLESS conditions, each
+  with an operator, a value or `compare_item_name`, a `group_operator`, a
+  `quantifier` and a `value_transform`.
+- `_pdbx_deposition_rule_join`: how scope rows pair with partner rows, and
+  `on_no_match` (`SKIP`, `FAIL`, `SINGLE_ROW_FALLBACK`).
+- `_pdbx_deposition_rule_row_selection`: restricts a category to its MIN or MAX
+  row by an item, per `group_by` group.
+- `_pdbx_deposition_rule_param`: name/value settings.
 
-How each family is checked:
+### Checks when loading
+
+`load_rules()` collects every problem and raises them together as a
+`RulesError`:
+
+- **Against the extension dictionary:** every column is defined there,
+  mandatory items have a value, enumerated items use an enumerated value
+  (case-insensitively for `ucode`), category keys are unique and every
+  `rule_id` names a rule. Defaults fill unset values.
+- **Against the constraints the extension dictionary describes:**
+  - every non-procedural rule has a THEN condition, and THEN items are in the scope category;
+  - one group operator per role, and at most one partner category per condition;
+  - operators have the value or compare item they need, and patterns compile;
+  - ordering operators compare numeric or date items, and `ABS` applies to numeric items;
+  - joins and row selections refer to the right categories, with one join per partner category;
+  - `param_flag`, `join_flag` and `row_selection_flag` match the records present.
+- **Against the PDBx/mmCIF dictionary:** every category the rules name must
+  exist. An item missing from it is only a warning (`RuleSet.warnings`), since
+  dictionary versions differ.
+
+### How a rule is evaluated
+
+As the extension dictionary describes, separately for each row of the rule's
+scope category:
+
+1. **Row selection:** each category the rule refers to is restricted to its
+   selected rows.
+2. **Pairing:** each scope row is paired with rows of each partner category,
+   through the rule's join, or with every row when it has none. A scope row
+   with no match is skipped, reported (`FAIL`), or paired by the single-row
+   fallback.
+3. **Conditions:** the rule applies when its WHEN conditions hold and its
+   UNLESS conditions do not, and fails when its THEN conditions do not hold.
+   - Conditions with one role are ANDed, or ORed for an OR group.
+   - A condition on a partner category is evaluated over the paired rows with
+     its quantifier: by default ANY for WHEN and UNLESS, and ALL for THEN.
+
+Each failing scope row is reported once, against its first failing THEN item.
+
+Families with special handling:
 
 | Family | Check |
 |---|---|
-| `pairwise_order` | THEN `item OP_ITEM other_item`, comparing numbers, or dates when both values are dates. Joined rows with `join_item` / `join_other_item` (plus `fallback`, `absolute`); otherwise the same row in one category, or every row of the other category. |
-| `uniqueness` | The THEN items marked `UNIQUE` form a key that may not repeat. |
-| `conditional_presence` | THEN items must be non-empty where the rule applies. Without WHEN: `mandatory_scope` rules (`makeMandatory`, or `makeMandatorySubtypes` with `subtype`) require them in any row that has a value outside `exclude_items`; an OR group requires one of them somewhere in the category. `skip_if_any_category_present` and `break_flag` (report at most one such rule per item and row) are honoured. |
-| `conditional_value`, `format` | THEN values that are present must satisfy their operator (`EQ`, `IN`, `GE`, `MATCHES`, `NOT_MATCHES`, …). |
-| `cross_reference` | THEN `item IN_COLUMN_OF other_item`. Gated by `experiment_scope` (`all`, or `coded` with `experiment_code`) or `experiment_modes`. With `other_item_domain` = `DICTIONARY_ENUMERATION`, the allowed values come from the dictionary's `_item_enumeration.detail` instead (needs `--dict`). |
-| `aggregate` | Sums the THEN item over `group_by` and compares the total with `threshold`. |
-| `procedural` | A built-in check named by `procedural_method`: `wavelength_protocol_consistency`, `accession_format_rule` / `conditional_accession_format_rule` (named `format`s, `format_match`), `sequence_predicate` (`homopolymer_ala`), `seq_model_mismatch`. |
+| `uniqueness` | The THEN items marked `UNIQUE` form a key that may not repeat among the rows the rule applies to. |
+| `aggregate` | The THEN item is aggregated (`aggregate` = `SUM` or `COUNT`) over the `group_by` groups, and the THEN condition is tested on each group's result. Every row of a failing group is reported. |
+| `procedural` | A built-in check named by `procedural_method`: `wavelength_protocol_consistency` (`item`, `requires`), `accession_format_rule` / `conditional_accession_format_rule` (`item`, `format`, `format_match`), `sequence_predicate` (`item`, `predicate` = `homopolymer_ala`), `seq_model_mismatch`. |
 
-An unknown family, operator or procedural method raises `RulesError` rather
-than being skipped.
+The other families (`pairwise_order`, `conditional_presence`,
+`conditional_value`, `format`, `cross_reference`) are evaluated from their
+conditions alone.
+
+Parameters that gate a rule for the whole entry, for any family:
+
+- `experiment_scope` (`all`, or `coded` with `experiment_code`) and `experiment_modes`;
+- `xref_type` / `xref_subtype` (only `cross` / `full` run);
+- `mandatory_scope`: `makeMandatorySubtypes` with `subtype` runs only for that
+  entry subtype, and `makeMandatory` rows are checked only if they have a value
+  outside `exclude_items`;
+- `skip_if_any_category_present`.
+
+An unknown family or procedural method raises `RulesError` rather than being
+skipped.
+
+### Values and types
+
+- **Missing values:** a value is missing when its item or category is absent,
+  when it is unquoted `?` or `.`, when it is blank, or when it cannot be read as
+  its type. A quoted `'?'` is a value.
+- **Types:** item types from the PDBx/mmCIF dictionary make values numbers
+  (standard uncertainties such as `1.23(4)` dropped), dates (`yyyy-mm-dd`,
+  optionally with `:hh:mm`) or text.
+  - Two items are compared as numbers if either is numeric, and as dates if
+    either is a date.
+  - Text of `uchar` types (`ucode`, `uline`, ...) compares case-insensitively.
+- **Skipped comparisons:** a comparison with a missing value is skipped. A
+  skipped WHEN or UNLESS condition does not hold, and a skipped THEN condition
+  is satisfied. Partner rows with a missing value are ignored.
+- **Existence operators:** `EMPTY` / `NOT_EMPTY` test whether the value is
+  missing; `EXISTS` / `NOT_EXISTS` test whether the item is in the file.
+- **`IN_COLUMN_OF`:** the value must occur among the compare item's values
+  (after row selection). When that item has no values at all, the condition is
+  skipped.
+- **`IN_ENUMERATION_OF`:** the `_item_enumeration.detail` (or
+  `_pdbx_item_enumeration.detail`) of the value in the PDBx/mmCIF dictionary
+  lists the values allowed in the compare item of the same row. A value the
+  dictionary pairs with nothing is skipped.
+- **Patterns:** `MATCHES` / `NOT_MATCHES` join a text field wrapped over several
+  lines before matching, so a run of alanines wrapped across lines of
+  `_entity_poly.pdbx_seq_one_letter_code` is still found.
+- **`group_by`:** an `auth_*` item in an aggregate's `group_by` falls back to
+  its `label_*` counterpart when it has no value.
 
 ## Install
 
@@ -62,10 +149,10 @@ python -m onedep_lib.checks.crosscheck path/to/entry.cif
 Several files can be given at once. Example output:
 
 ```
-8ozl.cif: 7 issue(s)
-WARNING: _refine_ls_shell.R_factor_R_work (line 4509) [pairwise_refine_ls_shell_r_factor_r_work_1]
+8ozl.cif: 8 issue(s)
+WARNING: _refine_ls_shell.R_factor_R_work (line 4509) [R009]
   Shell R_work is higher than shell R_free 0.000. (value=2.166, condition > _refine_ls_shell.R_factor_R_free)
-ERROR: _em_software.version (line 8100, row 10) [condreq_em_software_5]
+ERROR: _em_software.version (line 8100, row 10) [R076]
   RELION software version must be provided.
 ```
 
@@ -83,13 +170,15 @@ Exit status: `0` no errors (warnings and info allowed), `1` at least one error,
 |---|---|
 | `--json` | Print findings as JSON (`severity`, `item`, `message`, `rule_id`, `line`, `row`). |
 | `--errors-only` | Drop warnings and info findings. |
-| `--dict FILE` | PDBx/mmCIF dictionary; enables the `DICTIONARY_ENUMERATION` cross-reference rules. Skipped without it. |
 | `--expt MODE` | Experiment mode for rules gated on `experiment_modes` (`xray`, `nd`, `fd`, `ec`, `em`, `nmr`, `ssnmr`). Repeatable. |
 | `--subtype NAME` | Entry subtype for `makeMandatorySubtypes` rules (`EC`, `EM-helical`, `EM-single_part`, `EM-subtomogram`). Repeatable. |
 | `--code CODE` | Requested accession code for rules with `experiment_scope` = `coded` (e.g. `PDB`). Repeatable. |
 | `--detect-context` | Also derive experiment modes from `_exptl.method` and EM subtypes from `_em_experiment.reconstruction_method`. |
 | `--lenient` | Accept duplicate tags (last value wins) instead of rejecting the file. Not available for `.gz` files. |
 | `--rules FILE` | Use another rule store instead of the packaged `cross_checks_deposition_rules.cif`. |
+| `--dict FILE` | Use another PDBx/mmCIF dictionary instead of the packaged `mmcif_pdbx_v50.dic`. |
+| `--extension FILE` | Use another extension dictionary instead of the packaged `mmcif_pdbx_deposition_rules_ext.dic`. |
+| `--rule-warnings` | Print rule-store warnings (e.g. items missing from the PDBx/mmCIF dictionary) to stderr. |
 
 Without `--expt`, `--subtype`, `--code` or `--detect-context`, gated rules are
 skipped.
@@ -100,8 +189,8 @@ Examples:
 # X-ray entry, gated rules on, JSON output
 python -m onedep_lib.checks.crosscheck --expt xray --json entry.cif
 
-# Let the file say which method it is, and check dictionary enum pairings
-python -m onedep_lib.checks.crosscheck --detect-context --dict mmcif_pdbx_v50.dic entry.cif
+# Let the file say which method it is
+python -m onedep_lib.checks.crosscheck --detect-context entry.cif
 ```
 
 ## Use from Python
@@ -110,7 +199,7 @@ python -m onedep_lib.checks.crosscheck --detect-context --dict mmcif_pdbx_v50.di
 from pathlib import Path
 from onedep_lib.checks.crosscheck import Context, load_rules, validate
 
-rules = load_rules()  # parse the rule store once, reuse for many files
+rules = load_rules()  # read and check the rule store and dictionaries once, reuse for many files
 for f in validate(Path("entry.cif"), rules=rules, context=Context({"xray"}, set(), {"PDB"})):
     print(f.severity, f.item, f.line, f.row, f.rule_id, f.message)
 ```
@@ -125,12 +214,13 @@ block = cif.read("entry.cif")[0]
 findings = CrossChecker(block, load_rules(), Context.empty()).run()
 ```
 
+`load_rules()` returns a `RuleSet`: iterate it for the rules, use
+`rules.get("R056")` for one rule, `rules.subset("R056", "R062")` to run a few,
+and `rules.dictionary` / `rules.warnings` for the dictionary and warnings.
+
 ## Behaviour notes
 
 - Only the first data block is checked.
-- Unquoted `?` and `.` are missing values (`gemmi.cif.is_null`); quoted `'?'` is a value. `EMPTY` / `NOT_EMPTY` treat a missing or blank value as empty.
-- `EQ`, `NE`, `IN` and `NOT_IN` compare the stripped value, case-sensitively.
 - Item names in the input file are matched case-insensitively.
-- `MATCHES` / `NOT_MATCHES` join a text field wrapped over several lines before matching, so a run of alanines wrapped across lines of `_entity_poly.pdbx_seq_one_letter_code` is still found.
-- An `auth_*` item in `group_by` falls back to its `label_*` counterpart when it has no value.
 - gemmi rejects files with syntax errors (unterminated text fields, wrong number of values in a loop, and duplicate tags unless `--lenient`). These are reported as unreadable (exit status 2) rather than checked.
+- The dictionaries are cached per path, so loading rules again is cheap.

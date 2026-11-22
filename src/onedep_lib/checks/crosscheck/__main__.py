@@ -13,6 +13,7 @@ import sys
 from pathlib import Path
 
 from onedep_lib.checks.crosscheck.checks import Context, validate
+from onedep_lib.checks.crosscheck.dictionary import DEFAULT_DICTIONARY_PATH, DEFAULT_EXTENSION_PATH
 from onedep_lib.checks.crosscheck.rules import DEFAULT_RULES_PATH, load_rules
 
 
@@ -32,7 +33,19 @@ def main(argv=None) -> int:
         "--dict",
         dest="dictionary",
         type=Path,
-        help="PDBx/mmCIF dictionary file; enables the rules checked against dictionary enumerations",
+        default=DEFAULT_DICTIONARY_PATH,
+        help="PDBx/mmCIF dictionary for item types and enumerations (default: the packaged mmcif_pdbx_v50.dic)",
+    )
+    parser.add_argument(
+        "--extension",
+        type=Path,
+        default=DEFAULT_EXTENSION_PATH,
+        help="dictionary defining the rule store (default: the packaged mmcif_pdbx_deposition_rules_ext.dic)",
+    )
+    parser.add_argument(
+        "--rule-warnings",
+        action="store_true",
+        help="print rule-store warnings (e.g. items missing from the PDBx/mmCIF dictionary) to stderr",
     )
     parser.add_argument(
         "--expt",
@@ -68,10 +81,13 @@ def main(argv=None) -> int:
     args = parser.parse_args(argv)
 
     try:
-        rules = load_rules(args.rules)
+        rules = load_rules(args.rules, args.dictionary, args.extension)
     except Exception as exc:  # noqa: BLE001 - report any rule-store failure and stop
         print(f"Cannot load rules from {args.rules}: {exc}", file=sys.stderr)
         return 2
+    if args.rule_warnings:
+        for warning in rules.warnings:
+            print(f"warning: {warning}", file=sys.stderr)
 
     context = Context(
         {m.lower() for m in args.expt},
@@ -85,7 +101,6 @@ def main(argv=None) -> int:
         try:
             findings = validate(
                 path,
-                dictionary_path=args.dictionary,
                 context=context,
                 detect=args.detect_context,
                 rules=rules,
