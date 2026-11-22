@@ -9,9 +9,24 @@ _item_type_list.code
 _item_type_list.primitive_code
 _item_type_list.construct
 _item_type_list.detail
-               alphanum-csv     uchar
-               '[0-9A-Za-z ]+(?:\s*,\s*[0-9A-Za-z ]+)*'
-               "comma separated alphanumeric codes (no spaces)  ..."
+               value_csv        char
+               '[^ \t\n,]+((, ?| )[^ \t\n,]+)*'
+               'value or comma-separated list of values; single spaces are allowed inside a value and after a comma; no tabs, newlines, spaces before a comma, or empty entries'
+               pdb_id_u         uchar
+               '([1-9][A-Za-z0-9]{3}|[Pp][Dd][Bb]_[A-Za-z0-9]{8})'
+               'PDB code (case insensitive)'
+               emd_id           char
+               'EMD-[0-9]{4,}'
+               'EMDB code'
+               pdb_id_dep       char
+               '([1-9][A-Za-z0-9]{3}|pdb_0000[1-9][a-z0-9]{3}|pdb_[1-9a-z][a-z0-9]{7})'
+               'PDB code accepted at deposition: 4-character code (case insensitive), pdb_0000 followed by a 4-character code, or pdb_ followed by 8 lowercase alphanumeric characters not starting with 0'
+               deposition_id    char
+               'D_1[0-9]{9}'
+               'OneDep deposition identifier, e.g. D_1000123456'
+               item_name_csv    char
+               '_[_A-Za-z0-9]+\.[][_A-Za-z0-9%-]+(,_[_A-Za-z0-9]+\.[][_A-Za-z0-9%-]+)*'
+               'comma-separated list of full item names, without spaces'
 
 ##########################
 ## PDBX_DEPOSITION_RULE ##
@@ -261,18 +276,13 @@ save_pdbx_deposition_rule_condition
 
    Categories:
      - The items in a single condition may belong to the scope
-       category and at most one partner category. The compare_item_name
-       of an IN_ENUMERATION_OF condition is not counted, because its
-       values are not read from the file.
+       category and at most one partner category.
      - If one item of a condition belongs to the scope category and
        the other to a partner category, the scope item is given in
        item_name and the partner item in compare_item_name.
-     - THEN conditions: item_name must belong to the scope category;
-       compare_item_name may belong to the scope category or to a
-       partner category.
-     - WHEN and UNLESS conditions: item_name may belong to the scope
-       category or to a partner category. compare_item_name may belong
-       to:
+     - WHEN, THEN and UNLESS conditions: item_name may belong to the
+       scope category or to a partner category. compare_item_name may
+       belong to:
          the scope category, when item_name also belongs to the scope
            category (both values are taken from the scope row);
          a partner category, when item_name belongs to the scope
@@ -286,22 +296,34 @@ save_pdbx_deposition_rule_condition
      - For the IN_COLUMN_OF operator, compare_item_name refers to the
        values of that item in all rows of its category remaining after
        row selection; joins and the quantifier do not apply to it.
-     - For the IN_ENUMERATION_OF operator, compare_item_name refers to
-       the values enumerated for that item in the main dictionary; its
-       values in the file are not used, and row selection, joins and
-       the quantifier do not apply to it. The item must have an
-       enumeration in the main dictionary and may belong to any
-       category.
+     - For the IN_ENUMERATION_DETAILS_OF operator, compare_item_name
+       must belong to the same category as item_name, and its value is
+       taken from the same row. That value is looked up among the
+       values enumerated for compare_item_name in the main dictionary
+       (_item_enumeration.value or _pdbx_item_enumeration.value). The
+       detail of the matching entry (_item_enumeration.detail or
+       _pdbx_item_enumeration.detail) is a comma-separated list of the
+       values allowed for item_name, and the value of item_name must
+       be one of them. Values are compared without regard to case when
+       item_name has a case-insensitive type (e.g. ucode, uline). If
+       the value of compare_item_name is not enumerated, or its entry
+       has no detail, the comparison is skipped as for a missing value.
+       Joins and the quantifier do not apply.
      - Procedural rules may have no THEN condition; the item checked
        is then given in PDBX_DEPOSITION_RULE_PARAM.
 
    Missing values:
    A value is missing if the item or its category is absent from the
-   file, or if the value is '?' or '.'. A value that cannot be
+   data, or if the value, after leading and trailing whitespace is
+   removed, is empty, '?' or '.'. A value that cannot be
    interpreted according to its item type in the main dictionary is
    reported by dictionary validation and treated as missing here.
      - The operators EXISTS, NOT_EXISTS, EMPTY and NOT_EMPTY test for
-       missing values and are evaluated normally.
+       missing values and are evaluated normally. Over partner rows,
+       every paired partner row is tested, including rows with missing
+       values. If there are no partner rows, for example because the
+       partner category is absent, a condition with quantifier ANY does
+       not hold and a condition with quantifier ALL holds.
      - For all other operators (comparisons such as EQ, IN, MATCHES,
        GE or GE_ITEM), a comparison cannot be made if the value of
        item_name is missing, or, for operators that compare two items
@@ -315,7 +337,7 @@ save_pdbx_deposition_rule_condition
                  violation is reported by this rule.
        Missing values are reported only by rules that test for them
        explicitly using NOT_EMPTY or EXISTS.
-     - For conditions evaluated over partner rows, partner rows with a
+     - For comparisons evaluated over partner rows, partner rows with a
        missing value are ignored. If every partner row has a missing
        value, no comparison can be made and the condition is skipped
        as described above, whatever its quantifier: a WHEN or UNLESS
@@ -359,17 +381,17 @@ save_pdbx_deposition_rule_condition
     _pdbx_deposition_rule_condition.compare_item_name
     _pdbx_deposition_rule_condition.group_operator
     _pdbx_deposition_rule_condition.quantifier
-    R001 1 WHEN '_exptl.method'                               EQ         'X-RAY DIFFRACTION' . . .
+    R001 1 WHEN '_exptl.method'                               EQ         'X-RAY DIFFRACTION' . . ANY
     R001 2 THEN '_diffrn_radiation_wavelength.wavelength'     NOT_EMPTY  .                   . . .
-    R002 1 THEN '_pdbx_audit_revision_history.revision_date'  GE_ITEM    .                   '_pdbx_database_status.recvd_initial_deposition_date' . .
+    R002 1 THEN '_pdbx_audit_revision_history.revision_date'  GE_ITEM    .                   '_pdbx_database_status.recvd_initial_deposition_date' . ALL
     R003 1 WHEN '_pdbx_initial_refinement_model.source_name'  EQ         PDB                 . . .
     R003 2 THEN '_pdbx_initial_refinement_model.accession_code' MATCHES  '^[0-9][A-Za-z0-9]{3}$' . . .
     R004 1 THEN '_atom_site.occupancy'                        LE         1.0                 . . .
     R006 1 WHEN '_em_support_film.material'                   NOT_EMPTY  .                   . . ANY
     R006 2 THEN '_em_sample_support.grid_type'                NOT_EMPTY  .                   . . .
     R007 1 THEN '_reflns.d_resolution_high'                   LE_ITEM    .                   '_refine.ls_d_res_high' . ALL
-    R008 1 THEN '_refine_ls_shell.d_res_high'                 EQ_ITEM    .                   '_refine.ls_d_res_high' . .
-    R009 1 THEN '_refine.ls_R_factor_R_free'                  LE_ITEM    .                   '_refine_ls_shell.R_factor_R_free' . .
+    R008 1 THEN '_refine_ls_shell.d_res_high'                 EQ_ITEM    .                   '_refine.ls_d_res_high' . ALL
+    R009 1 THEN '_refine.ls_R_factor_R_free'                  LE_ITEM    .                   '_refine_ls_shell.R_factor_R_free' . ALL
 ;
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     _pdbx_category_context.type         CONTRIBUTED
@@ -418,10 +440,9 @@ save__pdbx_deposition_rule_condition.item_name
     _item_description.description
 ;    Full item name where the rule condition applies.
      Must be an item name defined in the main dictionary.
-     For THEN conditions, the item must belong to the rule's scope
-     category; for WHEN and UNLESS conditions, it may belong to the
-     scope category or to a partner category (see the
-     PDBX_DEPOSITION_RULE_CONDITION category description).
+     The item may belong to the rule's scope category or to a partner
+     category (see the PDBX_DEPOSITION_RULE_CONDITION category
+     description).
 ;
   _item.name               '_pdbx_deposition_rule_condition.item_name'
   _item.category_id        pdbx_deposition_rule_condition
@@ -431,7 +452,13 @@ save__pdbx_deposition_rule_condition.item_name
 
 save__pdbx_deposition_rule_condition.operator
     _item_description.description
-;    Operator for the rule condition
+;    Operator for the rule condition.
+     MATCHES_TYPE: the value of item_name must match the construct of
+     at least one of the item types listed in value, given as a
+     comma-separated list of _item_type_list.code values from this
+     dictionary or the main dictionary. As in DDL2 type checking, the
+     construct is a POSIX extended regular expression that must match
+     the whole value.
 ;
   _item.name               '_pdbx_deposition_rule_condition.operator'
   _item.category_id        pdbx_deposition_rule_condition
@@ -439,51 +466,59 @@ save__pdbx_deposition_rule_condition.operator
   _item_type.code          ucode
   loop_
   _item_enumeration.value
-    EXISTS
-    NOT_EXISTS
-    EMPTY
-    NOT_EMPTY
-    EQ
-    NE
-    LT
-    LE
-    GT
-    GE
-    IN
-    NOT_IN
-    MATCHES
-    NOT_MATCHES
-    EQ_ITEM
-    LE_ITEM
-    GE_ITEM
-    LT_ITEM
-    GT_ITEM
-    UNIQUE
-    IN_COLUMN_OF
-    IN_ENUMERATION_OF
+  _item_enumeration.detail
+    EXISTS                     "item_name is present in the data, whatever its value, including '?', '.', an empty string or whitespace"
+    NOT_EXISTS                 'item_name is not present in the data'
+    EMPTY                      "item_name is absent, or its value, with leading and trailing whitespace removed, is empty, '?' or '.'"
+    NOT_EMPTY                  "item_name is present and its value, with leading and trailing whitespace removed, is not empty, '?' or '.'"
+    EQ                         'value of item_name equals value'
+    NE                         'value of item_name does not equal value'
+    LT                         'value of item_name is less than value; numbers and dates are compared according to the item type'
+    LE                         'value of item_name is less than or equal to value; numbers and dates are compared according to the item type'
+    GT                         'value of item_name is greater than value; numbers and dates are compared according to the item type'
+    GE                         'value of item_name is greater than or equal to value; numbers and dates are compared according to the item type'
+    IN                         'value of item_name is one of the comma-separated values given in value'
+    NOT_IN                     'value of item_name is none of the comma-separated values given in value'
+    MATCHES                    'value of item_name matches the regular expression given in value'
+    NOT_MATCHES                'value of item_name does not match the regular expression given in value'
+    MATCHES_TYPE               'value of item_name matches the construct of at least one of the item types listed in value'
+    EQ_ITEM                    'value of item_name equals the value of compare_item_name'
+    LE_ITEM                    'value of item_name is less than or equal to the value of compare_item_name'
+    GE_ITEM                    'value of item_name is greater than or equal to the value of compare_item_name'
+    LT_ITEM                    'value of item_name is less than the value of compare_item_name'
+    GT_ITEM                    'value of item_name is greater than the value of compare_item_name'
+    UNIQUE                     'value of item_name occurs in only one row of its category'
+    IN_COLUMN_OF               'value of item_name occurs among the values of compare_item_name in its category'
+    IN_ENUMERATION_DETAILS_OF  'value of item_name is listed in the main dictionary enumeration detail for the value of compare_item_name in the same row'
    save_
 
 save__pdbx_deposition_rule_condition.value
     _item_description.description
-;    Comma-separated lis of value corresponding the rule condition.
-     Can be a single value, regex, or a list of enumerations.
+;    Value used by the rule condition.
+     For IN and NOT_IN, a comma-separated list of values; for
+     MATCHES_TYPE, a comma-separated list of item type codes. A single
+     space after a comma is allowed and is not part of the next entry.
+     A list entry cannot itself contain a comma.
+     For MATCHES and NOT_MATCHES, a regular expression; for other
+     comparison operators, a single value. For these operators a comma
+     is part of the value.
 ;
   _item.name               '_pdbx_deposition_rule_condition.value'
   _item.category_id        pdbx_deposition_rule_condition
   _item.mandatory_code     no
-  _item_type.code          alphanum-csv
+  _item_type.code          value_csv
   loop_
   _item_examples.case
    'X-RAY DIFFRACTION'
    'PDB'
-   'ELECTRON MICROSCOPY, ELECTRON CRYSTALLOGRAPHY'
+   'ELECTRON MICROSCOPY,ELECTRON CRYSTALLOGRAPHY'
    save_
 
 save__pdbx_deposition_rule_condition.compare_item_name
     _item_description.description
 ;    Full item name of the second item involved in the condition.
      Applies for cases where operators are *_ITEM, IN_COLUMN_OF and
-     IN_ENUMERATION_OF.
+     IN_ENUMERATION_DETAILS_OF.
      Must be an item name defined in the main dictionary.
      The item may belong to the scope category or to a partner
      category, as described in the PDBX_DEPOSITION_RULE_CONDITION
@@ -493,8 +528,10 @@ save__pdbx_deposition_rule_condition.compare_item_name
      of the partner category is a partner of every scope row. For
      IN_COLUMN_OF, the item refers to the values in all rows of its
      category remaining after row selection, and joins do not apply.
-     For IN_ENUMERATION_OF, the item refers to the values enumerated
-     for it in the main dictionary, not to its values in the file.
+     For IN_ENUMERATION_DETAILS_OF, the item must belong to the same
+     category as item_name; its value in the same row selects the
+     enumeration entry in the main dictionary whose detail lists the
+     values allowed for item_name.
 ;
   _item.name               '_pdbx_deposition_rule_condition.compare_item_name'
   _item.category_id        pdbx_deposition_rule_condition
@@ -531,11 +568,14 @@ save__pdbx_deposition_rule_condition.quantifier
      If not given, the default is ANY for WHEN and UNLESS conditions
      and ALL for THEN conditions. The quantifier has no effect when
      both items belong to the scope category, when there is only one
-     partner row, or for the IN_COLUMN_OF and IN_ENUMERATION_OF
+     partner row, or for the IN_COLUMN_OF and IN_ENUMERATION_DETAILS_OF
      operators.
      Each condition is quantified independently; two ANY conditions
      on the same partner category may be satisfied by different
      partner rows.
+     To require that a partner category is present, use EXISTS or
+     NOT_EMPTY with quantifier ANY; with ALL, a condition over no
+     partner rows holds.
 ;
   _item.name               '_pdbx_deposition_rule_condition.quantifier'
   _item.category_id        pdbx_deposition_rule_condition
@@ -595,7 +635,7 @@ save_pdbx_deposition_rule_param
     _pdbx_deposition_rule_param.rule_id
     _pdbx_deposition_rule_param.name
     _pdbx_deposition_rule_param.value
-    R004 group_by   '_atom_site.pdbx_PDB_model_num, _atom_site.auth_asym_id, _atom_site.auth_seq_id, _atom_site.pdbx_PDB_ins_code, _atom_site.auth_atom_id'
+    R004 group_by   '_atom_site.pdbx_PDB_model_num,_atom_site.auth_asym_id,_atom_site.auth_seq_id,_atom_site.pdbx_PDB_ins_code,_atom_site.auth_atom_id'
     R004 aggregate  SUM
 ;
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -629,34 +669,12 @@ save__pdbx_deposition_rule_param.name
   _item_examples.detail
     aggregate
 ;   Aggregate rules: function applied to the rows of each group
-    defined by group_by (e.g. SUM); the THEN condition is tested on
-    the result.
+    defined by group_by; the value SUM. The THEN condition is tested
+    on the result.
 ;
     group_by
-;   Aggregate rules: comma-separated list of item names whose values
-    define the groups.
-;
-    item
-;   Procedural rules: full name of the item the procedural method is
-    applied to.
-;
-    format
-;   Procedural rules: comma-separated list of named accession code
-    formats the value must match (e.g. pdb_id, emdb_id, uniprot_id,
-    genbank_id).
-;
-    format_match
-;   Procedural rules: how the value is matched against the formats
-    listed in format; ANY means the value must match at least one of
-    them.
-;
-    requires
-;   Procedural rules: number of values required in a list item; single
-    or multi.
-;
-    predicate
-;   Procedural rules: named test applied to the item value (e.g.
-    homopolymer_ala).
+;   Aggregate rules: comma-separated list of item names, without
+    spaces, whose values define the groups.
 ;
     source_category
 ;   Procedural rules: category providing the values to be checked
@@ -670,12 +688,16 @@ save__pdbx_deposition_rule_param.name
 ;   Procedural rules: message reported when a source value has no
     counterpart in the target category.
 ;
+    experiment_code
+;   Code-gated rules: the rule applies only when this accession code
+    type (e.g. PDB) is requested for the entry.
+;
    save_
 
 save__pdbx_deposition_rule_param.value
     _item_description.description
-;    Value for the rule parameter. Lists of values or item names are
-     comma-separated; whitespace after a comma is ignored.
+;    Value for the rule parameter. Lists of item names are
+     comma-separated without spaces, as for item_name_csv.
 ;
   _item.name               '_pdbx_deposition_rule_param.value'
   _item.category_id        pdbx_deposition_rule_param
@@ -767,7 +789,7 @@ save__pdbx_deposition_rule_join.ordinal
 
 save__pdbx_deposition_rule_join.scope_item_names
     _item_description.description
-;    Comma-separated list of full item names in the rule's scope category
+;    Comma-separated list (without spaces) of full item names in the rule's scope category
      whose values are matched against
      _pdbx_deposition_rule_join.partner_item_names, which belong to a
      partner category. More than one item defines a composite join:
@@ -780,16 +802,16 @@ save__pdbx_deposition_rule_join.scope_item_names
   _item.name               '_pdbx_deposition_rule_join.scope_item_names'
   _item.category_id        pdbx_deposition_rule_join
   _item.mandatory_code     yes
-  _item_type.code          code
+  _item_type.code          item_name_csv
   loop_
   _item_examples.case
     '_refine_ls_shell.pdbx_refine_id'
-    '_struct_ref_seq.align_id, _struct_ref_seq.pdbx_strand_id'
+    '_struct_ref_seq.align_id,_struct_ref_seq.pdbx_strand_id'
    save_
 
 save__pdbx_deposition_rule_join.partner_item_names
     _item_description.description
-;    Comma-separated list of full item names in the partner category,
+;    Comma-separated list (without spaces) of full item names in the partner category,
      matched position by position with
      _pdbx_deposition_rule_join.scope_item_names; the list must have the same
      length. The items need not be the category key. If they form the
@@ -802,7 +824,7 @@ save__pdbx_deposition_rule_join.partner_item_names
   _item.name               '_pdbx_deposition_rule_join.partner_item_names'
   _item.category_id        pdbx_deposition_rule_join
   _item.mandatory_code     yes
-  _item_type.code          code
+  _item_type.code          item_name_csv
   loop_
   _item_examples.case
     '_refine.pdbx_refine_id'
@@ -832,9 +854,10 @@ save__pdbx_deposition_rule_join.on_no_match
 
 save_pdbx_deposition_rule_row_selection
   _category.description
-;  Data items in PDBX_DEPOSITION_RULE_ROW_SELECTION restrict a rule to
-   a single row (or one row per group) of a category, chosen by the
-   smallest or largest value of an item. Used when
+;  Data items in PDBX_DEPOSITION_RULE_ROW_SELECTION restrict the rows
+   of a category on which a rule is evaluated, either by choosing one
+   row (or one row per group) with the smallest or largest value of an
+   item, or by keeping only rows that contain a value. Used when
    _pdbx_deposition_rule.row_selection_flag is YES. Rules are evaluated
    in this order: (1) row selection in each category, (2) pairing of
    rows as defined in PDBX_DEPOSITION_RULE_JOIN, (3) evaluation of
@@ -912,6 +935,10 @@ save__pdbx_deposition_rule_row_selection.selector
      group; when category_id is a partner category, the scope rows
      paired with that group have no partner and
      _pdbx_deposition_rule_join.on_no_match applies.
+     ANY_VALUE keeps every row in which at least one item of
+     category_id that is present in the data, other than those listed
+     in exclude_items, has a value; rows without such a value are not
+     evaluated. selector_item and group_by are not used with ANY_VALUE.
 ;
   _item.name               '_pdbx_deposition_rule_row_selection.selector'
   _item.category_id        pdbx_deposition_rule_row_selection
@@ -920,8 +947,9 @@ save__pdbx_deposition_rule_row_selection.selector
   loop_
   _item_enumeration.value
   _item_enumeration.detail
-    MIN   'row with the smallest value of selector_item'
-    MAX   'row with the largest value of selector_item'
+    MIN        'row with the smallest value of selector_item'
+    MAX        'row with the largest value of selector_item'
+    ANY_VALUE  'every row in which at least one item of category_id, other than those listed in exclude_items, has a value'
    save_
 
 save__pdbx_deposition_rule_row_selection.selector_item
@@ -933,10 +961,11 @@ save__pdbx_deposition_rule_row_selection.selector_item
      type. Text, code and range types are not allowed. To select the
      first or last row in a category, use an ordinal item
      (e.g. pdbx_ordinal) rather than row order in the file.
+     Required when selector is MIN or MAX; not used with ANY_VALUE.
 ;
   _item.name               '_pdbx_deposition_rule_row_selection.selector_item'
   _item.category_id        pdbx_deposition_rule_row_selection
-  _item.mandatory_code     yes
+  _item.mandatory_code     no
   _item_type.code          code
   loop_
   _item_examples.case
@@ -949,7 +978,7 @@ save__pdbx_deposition_rule_row_selection.selector_item
 
 save__pdbx_deposition_rule_row_selection.group_by
     _item_description.description
-;    Optional comma-separated list of items in the category that partition
+;    Optional comma-separated list (without spaces) of items in the category that partition
      rows into groups; one row is selected within each group, e.g. one
      highest-resolution shell per dataset or per refinement. When the
      category is joined to another category through
@@ -959,9 +988,24 @@ save__pdbx_deposition_rule_row_selection.group_by
   _item.name               '_pdbx_deposition_rule_row_selection.group_by'
   _item.category_id        pdbx_deposition_rule_row_selection
   _item.mandatory_code     no
-  _item_type.code          code
+  _item_type.code          item_name_csv
   loop_
   _item_examples.case
     '_reflns_shell.pdbx_diffrn_id'
     '_refine_ls_shell.pdbx_refine_id'
+   save_
+
+save__pdbx_deposition_rule_row_selection.exclude_items
+    _item_description.description
+;    Optional comma-separated list (without spaces) of items in category_id that are
+     ignored when selector is ANY_VALUE, e.g. key items that are
+     filled in automatically. Not used with MIN or MAX.
+;
+  _item.name               '_pdbx_deposition_rule_row_selection.exclude_items'
+  _item.category_id        pdbx_deposition_rule_row_selection
+  _item.mandatory_code     no
+  _item_type.code          item_name_csv
+  loop_
+  _item_examples.case
+    '_refine_ls_shell.pdbx_refine_id,_refine_ls_shell.pdbx_ordinal'
    save_
