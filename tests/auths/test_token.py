@@ -43,6 +43,12 @@ def test_token_http_errors_preserve_classes_storage_and_diagnostics(tmp_path, ht
         )
     else:
         endpoint.respond_with_data("<html>private response</html>", status=status)
+    if operation == "refresh" and status in (401, 403):
+        # The exchange attempt that follows yields no token pair, so the
+        # refresh error is the one reported.
+        httpserver.expect_oneshot_request("/deposition/auth/tokens/exchange", method="POST").respond_with_data(
+            status=500
+        )
     expected_class = AuthError if status in (401, 403) else ApiError
     with pytest.raises(expected_class) as error:
         if operation == "exchange":
@@ -216,8 +222,29 @@ def test_refresh_401_explains_manual_token_required(tmp_path: Path, httpserver):
     )
     store.store_tokens(_make_jwt(-60), "bad-refresh")
     httpserver.expect_request("/deposition/auth/tokens/refresh", method="POST").respond_with_data(status=401)
+    httpserver.expect_request("/deposition/auth/tokens/exchange", method="POST").respond_with_data(status=401)
     with pytest.raises(AuthError, match="generate and paste a new token pair"):
         store.refresh()
+
+
+def test_get_access_token_exchanges_a_token_the_active_site_refuses_to_refresh(tmp_path: Path, httpserver):
+    # A token issued by another OneDep site, stored under the active host's
+    # key: the host refuses to refresh it and accepts it for exchange.
+    store = _server_store(tmp_path, httpserver)
+    fresh = _make_jwt(3600)
+    httpserver.expect_oneshot_request(
+        "/deposition/auth/tokens/refresh", method="POST", json={"refresh_token": "refresh"}
+    ).respond_with_json(
+        {"code": "authentication_failed", "message": "Incorrect authentication credentials."},
+        status=403,
+    )
+    httpserver.expect_oneshot_request(
+        "/deposition/auth/tokens/exchange", method="POST", json={"refresh_token": "refresh"}
+    ).respond_with_json({"access_token": fresh, "refresh_token": "active-site-refresh"})
+
+    assert store.get_access_token() == fresh
+    assert store._read_entry() == {"access_token": fresh, "refresh_token": "active-site-refresh"}
+    httpserver.check_assertions()
 
 
 def _offline_store(tmp_path: Path) -> TokenStore:
