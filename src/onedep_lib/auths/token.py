@@ -82,6 +82,10 @@ class TokenStore:
         The rotated refresh token replaces the old one; refresh token
         rotation is mandatory on every call.
 
+        A site refuses to refresh a token another site issued, so a
+        refused token is offered once to /auth/tokens/exchange. Unless that
+        returns a token pair, the refresh error is raised.
+
         Returns:
             The new access token.
 
@@ -92,7 +96,13 @@ class TokenStore:
             ApiError: If the server returns an unexpected error response.
         """
         entry = self._read_entry()
-        access_token, refresh_token = self._request_refresh(self._config.hostname, entry["refresh_token"])
+        try:
+            access_token, refresh_token = self._request_refresh(self._config.hostname, entry["refresh_token"])
+        except AuthError as refresh_error:
+            try:
+                access_token, refresh_token = self._request_exchange(self._config.hostname, entry["refresh_token"])
+            except (AuthError, ApiError) as exchange_error:
+                raise refresh_error from exchange_error
         self.store_tokens(access_token, refresh_token)
         return access_token
 
