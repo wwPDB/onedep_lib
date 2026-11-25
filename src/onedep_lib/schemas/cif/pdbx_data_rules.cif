@@ -1,170 +1,312 @@
-#######################
-## DEPOSITION RULES  ##
-#######################
+################
+## DATA RULES ##
+################
 
-data_cross_checks_deposition_rules
+data_pdbx_data_rules
 #
 loop_
-_pdbx_deposition_rule.id
-_pdbx_deposition_rule.family
-_pdbx_deposition_rule.severity
-_pdbx_deposition_rule.scope_category
-_pdbx_deposition_rule.procedural_method
-_pdbx_deposition_rule.message
-_pdbx_deposition_rule.enabled
-_pdbx_deposition_rule.param_flag
-_pdbx_deposition_rule.join_flag
-_pdbx_deposition_rule.row_selection_flag
-R001 pairwise_order ERROR em_3d_reconstruction . '3D reconstruction resolution is higher than diffraction-statistics high-resolution limit [{item2CrossValue}].' YES NO NO NO
-R002 pairwise_order ERROR em_diffraction_shell . 'Diffraction-shell high-resolution limit is higher than diffraction-statistics high-resolution limit [{item2CrossValue}].' YES NO NO NO
-R003 pairwise_order ERROR em_diffraction_shell . 'Number of shell structure factors is higher than total collected structure factors [{item2CrossValue}].' YES NO NO NO
-R004 pairwise_order ERROR em_focused_ion_beam . 'Final thickness is larger than initial thickness [{item2CrossValue}].' YES NO NO NO
-R005 pairwise_order ERROR em_imaging . 'Maximum recording temperature is lower than minimum recording temperature [{item2CrossValue}].' YES NO NO NO
-R006 pairwise_order ERROR em_imaging . 'Minimum recording temperature is higher than maximum recording temperature [{item2CrossValue}].' YES NO NO NO
-R007 pairwise_order ERROR pdbx_nmr_ensemble . 'Submitted conformer count is higher than calculated conformer count [{item2CrossValue}].' YES NO NO NO
-R008 pairwise_order ERROR pdbx_nmr_representative . 'Representative conformer identifier is higher than submitted conformer count [{item2CrossValue}].' YES NO NO NO
-R009 pairwise_order WARNING refine_ls_shell . 'Shell R_work is higher than shell R_free [{item2CrossValue}].' YES NO NO NO
-R010 pairwise_order ERROR refine_ls_shell . 'Shell high-resolution limit is lower than shell low-resolution limit [{item2CrossValue}].' YES NO NO NO
-R011 pairwise_order ERROR refine_ls_shell . 'Shell low-resolution limit is higher than shell high-resolution limit [{item2CrossValue}].' YES NO NO NO
-R012 pairwise_order ERROR reflns_shell . 'Shell high-resolution limit is lower than shell low-resolution limit [{item2CrossValue}].' YES NO NO NO
-R013 pairwise_order ERROR reflns_shell . 'Shell low-resolution limit is higher than shell high-resolution limit [{item2CrossValue}].' YES NO NO NO
-R014 pairwise_order ERROR pdbx_database_status . 'Initial deposition date must not be after the date coordinates were received (coordinates date: [{right_value}]).' YES NO NO NO
-R015 pairwise_order ERROR pdbx_database_status . 'Initial deposition date must not be after the author release request date (release request date: [{right_value}]).' YES NO NO NO
-R016 pairwise_order ERROR pdbx_database_status . 'Deposition form date must not be after the initial deposition received date (initial deposition date: [{right_value}]).' YES NO NO NO
-R017 pairwise_order ERROR pdbx_database_status . 'Begin processing date must not be after end processing date (end processing date: [{right_value}]).' YES NO NO NO
-R018 uniqueness ERROR entity . 'Duplicate _entity.id in this file: [{duplicate_display}]. Each entity id must appear at most once.' YES NO NO NO
-R019 uniqueness ERROR struct_asym . 'Duplicate _struct_asym.id in this file: [{duplicate_display}]. Each chain (asym) id must appear at most once.' YES NO NO NO
-R020 uniqueness ERROR entity_poly . 'Duplicate _entity_poly.entity_id in this file: [{duplicate_display}]. Each polymer entity must have at most one entity_poly row.' YES NO NO NO
-R021 conditional_presence ERROR em_3d_fitting_list . 'Source name must be provided.' YES NO NO NO
-R026 conditional_presence ERROR em_3d_fitting_list . 'Type must be provided.' YES NO NO NO
-R031 conditional_presence ERROR em_buffer_component . 'Concentration must be provided when a buffer name, concentration units or formula is given.' YES NO NO NO
-R034 conditional_presence ERROR em_buffer_component . 'Concentration units must be provided when a buffer name, concentration or formula is given.' YES NO NO NO
-R037 conditional_presence ERROR em_buffer_component . 'Name must be provided when a buffer concentration, concentration units or formula is given.' YES NO NO NO
-R040 conditional_presence ERROR em_entity_assembly_molwt . 'Experimental flag must be provided when molecular weight value or units are given.' YES NO NO NO
-R042 conditional_presence ERROR em_entity_assembly_molwt . 'Molecular weight units must be provided when molecular weight value is given.' YES NO NO NO
-R043 conditional_presence ERROR em_entity_assembly_molwt . 'Molecular weight value must be provided when molecular weight units are given.' YES NO NO NO
-R044 pairwise_order ERROR em_imaging . 'Absolute minimum calibrated defocus is greater than absolute maximum calibrated defocus.' YES NO NO NO
-R045 pairwise_order ERROR em_imaging . 'Absolute minimum calibrated defocus is greater than absolute maximum calibrated defocus.' YES NO NO NO
-R046 pairwise_order ERROR em_imaging . 'Absolute minimum nominal defocus is greater than absolute maximum nominal defocus.' YES NO NO NO
-R047 pairwise_order ERROR em_imaging . 'Absolute minimum nominal defocus is greater than absolute maximum nominal defocus.' YES NO NO NO
-R048 conditional_presence ERROR em_sample_support . 'Grid information must be provided when support film information is present.' YES NO YES NO
-R051 conditional_presence ERROR em_sample_support . 'Grid information must be provided when grid pretreatment information is present.' YES NO YES NO
-R055 pairwise_order WARNING refine . 'R_work is higher than R_free [{item2CrossValue}]' YES NO NO NO
-R056 pairwise_order ERROR refine . 'Refined high-resolution limit is higher than collected data high-resolution limit [{item2CrossValue}]' YES NO YES NO
-R057 pairwise_order ERROR refine . 'Refined high-resolution limit is lower than refined low-resolution limit [{item2CrossValue}]' YES NO NO NO
-R058 pairwise_order ERROR refine . 'Refined low-resolution limit is lower than collected data low-resolution limit [{item2CrossValue}]' YES NO YES NO
-R059 pairwise_order ERROR refine . 'Refined low-resolution limit is higher than refined high-resolution limit [{item2CrossValue}]' YES NO NO NO
-R060 pairwise_order ERROR refine_ls_shell . 'Shell high-resolution limit is higher than overall refined high-resolution limit [{item2CrossValue}]' YES NO YES NO
-R061 pairwise_order ERROR refine_ls_shell . 'Shell low-resolution limit is lower than overall refined low-resolution limit [{item2CrossValue}]' YES NO YES NO
-R062 pairwise_order ERROR reflns . 'Collected data high-resolution limit is lower than high-resolution limit used in refinement [{item2CrossValue}]' YES NO YES NO
-R063 pairwise_order ERROR reflns . 'Collected data low-resolution limit is higher than low-resolution limit used in refinement [{item2CrossValue}]' YES NO YES NO
-R064 pairwise_order ERROR reflns . 'Total collected reflections is lower than total reflections used in refinement [{item2CrossValue}]' YES NO YES NO
-R065 pairwise_order ERROR reflns . 'Observed reflections is lower than total reflections used in refinement [{item2CrossValue}]' YES NO YES NO
-R066 pairwise_order ERROR reflns_shell . 'Shell high-resolution limit is higher than overall collected data high-resolution limit [{item2CrossValue}]' YES NO YES NO
-R067 conditional_presence ERROR em_3d_fitting_list . 'Details must be provided.' YES NO NO NO
-R068 conditional_presence ERROR em_3d_fitting_list . 'Details must be provided.' YES NO NO NO
-R069 conditional_presence ERROR em_3d_fitting_list . 'PDB accession code must be provided.' YES NO NO NO
-R070 conditional_presence ERROR em_3d_reconstruction . 'FSC type must be provided when an FSC resolution method is selected.' YES NO NO NO
-R071 conditional_presence ERROR em_entity_assembly_molwt . 'Must be supplied when experimentally measured.' YES NO NO NO
-R072 conditional_presence ERROR em_software . 'Software name must be provided.' YES NO NO NO
-R073 conditional_presence ERROR em_software . 'Software name must be provided.' YES NO NO NO
-R074 conditional_presence ERROR em_software . 'Software name must be provided.' YES NO NO NO
-R075 conditional_presence ERROR em_software . 'Software name must be provided.' YES NO NO NO
-R076 conditional_presence ERROR em_software . 'RELION software version must be provided.' YES NO NO NO
-R077 conditional_presence ERROR em_start_model . 'Must be supplied when EMDB map selected.' YES NO NO NO
-R078 conditional_presence ERROR em_start_model . 'Must be supplied when PDB entry selected.' YES NO NO NO
-R079 conditional_presence ERROR em_start_model . 'Must be supplied when orthogonal tilt selected.' YES NO NO NO
-R080 conditional_presence ERROR em_start_model . 'Must be supplied when orthogonal tilt selected.' YES NO NO NO
-R081 conditional_presence ERROR em_start_model . 'Must be supplied when orthogonal tilt selected.' YES NO NO NO
-R082 conditional_presence ERROR em_start_model . 'Must be supplied when random conical tilt selected.' YES NO NO NO
-R083 conditional_presence ERROR em_start_model . 'Must be supplied when random conical tilt selected.' YES NO NO NO
-R084 conditional_presence ERROR pdbx_audit_support . 'Country must be provided when funding organization is "Other government" or "Other private".' YES NO NO NO
-R085 conditional_presence ERROR pdbx_audit_support . 'Funding organization details must be provided when funding organization is "Other government" or "Other private".' YES NO NO NO
-R086 conditional_presence ERROR pdbx_initial_refinement_model . 'Initial refinement model details must be provided.' YES NO NO NO
-R087 conditional_presence ERROR pdbx_initial_refinement_model . 'Initial refinement model details must be provided.' YES NO NO NO
-R088 conditional_presence ERROR refine . 'No value present for this mandatory item.' YES NO NO NO
-R089 conditional_presence ERROR software . 'Refinement software version must be provided.' YES NO NO NO
-R090 format ERROR em_3d_fitting_list . 'Please provide a valid PDB accession code e.g. 1csb, pdb_00001csb' YES NO NO NO
-R091 conditional_value ERROR em_3d_fitting_list . 'For type "experimental model", source name must be PDB or Other.' YES NO NO NO
-R092 conditional_value ERROR em_3d_fitting_list . 'For type "integrative model", source name must be Other.' YES NO NO NO
-R093 conditional_value ERROR em_3d_fitting_list . 'For type "other", source name must be Other.' YES NO NO NO
-R094 conditional_value ERROR em_3d_fitting_list . 'For source name "PDB", type must be "experimental model".' YES NO NO NO
-R095 conditional_value ERROR pdbx_initial_refinement_model . 'For type "experimental model", source name must be PDB or Other.' YES NO NO NO
-R096 conditional_value ERROR pdbx_initial_refinement_model . 'For type "other", source name must be Other.' YES NO NO NO
-R097 conditional_value ERROR pdbx_initial_refinement_model . 'For source name "PDB", type must be "experimental model".' YES NO NO NO
-R098 conditional_presence ERROR pdbx_initial_refinement_model . 'This field cannot be empty when "MOLECULAR REPLACEMENT" is selected.' YES NO NO NO
-R099 conditional_presence ERROR pdbx_initial_refinement_model . 'This field cannot be empty when "MOLECULAR REPLACEMENT" is selected.' YES NO NO NO
-R100 cross_reference ERROR diffrn_detector . 'Value of _diffrn_detector.detector is not consistent with the detector class given for the value of _diffrn_detector.type in the PDBx/mmCIF dictionary.' YES NO NO NO
-R101 cross_reference ERROR diffrn_source . 'Value of _diffrn_source.source is not consistent with the source class given for the value of _diffrn_source.type in the PDBx/mmCIF dictionary.' YES NO NO NO
-R102 cross_reference ERROR pdbx_database_related . 'Value of _pdbx_database_related.content_type is not one of the content types given for the value of _pdbx_database_related.db_name in the PDBx/mmCIF dictionary.' YES NO NO NO
-R103 cross_reference ERROR software . 'Value of _software.classification is not one of the classifications given for the value of _software.name in the PDBx/mmCIF dictionary.' YES NO NO NO
-R104 cross_reference ERROR entity_poly . 'Value of _entity_poly.entity_id must exist in _entity_src_gen.entity_id when _entity.src_method is man.' YES NO YES NO
-R105 cross_reference ERROR entity_poly . 'Value of _entity_poly.entity_id must exist in _entity_src_nat.entity_id when _entity.src_method is nat.' YES NO YES NO
-R106 cross_reference ERROR entity_poly . 'Value of _entity_poly.entity_id must exist in _pdbx_entity_src_syn.entity_id when _entity.src_method is syn.' YES NO YES NO
-R107 cross_reference ERROR exptl_crystal_grow . 'Value of _exptl_crystal_grow.crystal_id must exist in _exptl_crystal.id.' YES NO NO NO
-R108 cross_reference ERROR diffrn . 'Value of _diffrn.crystal_id must exist in _exptl_crystal.id.' YES NO NO NO
-R109 cross_reference ERROR diffrn_detector . 'Value of _diffrn_detector.diffrn_id must exist in _diffrn.id.' YES NO NO NO
-R110 cross_reference ERROR diffrn_radiation . 'Value of _diffrn_radiation.diffrn_id must exist in _diffrn.id.' YES NO NO NO
-R111 cross_reference ERROR diffrn_source . 'Value of _diffrn_source.diffrn_id must exist in _diffrn.id.' YES NO NO NO
-R112 cross_reference ERROR pdbx_serial_crystallography_measurement . 'Value of _pdbx_serial_crystallography_measurement.diffrn_id must exist in _diffrn.id.' YES NO NO NO
-R113 cross_reference ERROR pdbx_serial_crystallography_sample_delivery . 'Value of _pdbx_serial_crystallography_sample_delivery.diffrn_id must exist in _diffrn.id.' YES NO NO NO
-R114 cross_reference ERROR pdbx_serial_crystallography_sample_delivery_injection . 'Value of _pdbx_serial_crystallography_sample_delivery_injection.diffrn_id must exist in _diffrn.id.' YES NO NO NO
-R115 cross_reference ERROR pdbx_serial_crystallography_sample_delivery_fixed_target . 'Value of _pdbx_serial_crystallography_sample_delivery_fixed_target.diffrn_id must exist in _diffrn.id.' YES NO NO NO
-R116 cross_reference ERROR pdbx_serial_crystallography_data_reduction . 'Value of _pdbx_serial_crystallography_data_reduction.diffrn_id must exist in _diffrn.id.' YES NO NO NO
-R117 cross_reference ERROR pdbx_struct_assembly_depositor_info . 'Value of _pdbx_struct_assembly_depositor_info.id must exist in _pdbx_struct_assembly_auth_evidence_depositor_info.assembly_id.' YES YES NO NO
-R118 cross_reference ERROR pdbx_struct_assembly_depositor_info . 'Value of _pdbx_struct_assembly_depositor_info.id must exist in _pdbx_struct_assembly_gen_depositor_info.assembly_id.' YES YES NO NO
-R119 cross_reference ERROR pdbx_nmr_exptl_sample . 'Value of _pdbx_nmr_exptl_sample.solution_id must exist in _pdbx_nmr_sample_details.solution_id.' YES NO NO NO
-R120 cross_reference ERROR pdbx_nmr_chem_shift_reference . 'Value of _pdbx_nmr_chem_shift_reference.id must exist in _pdbx_nmr_chem_shift_ref.chem_shift_reference_id.' YES NO NO NO
-R121 cross_reference ERROR pdbx_nmr_assigned_chem_shift_list . 'Value of _pdbx_nmr_assigned_chem_shift_list.id must exist in _pdbx_nmr_chem_shift_experiment.assigned_chem_shift_list_id.' YES NO NO NO
-R122 cross_reference ERROR pdbx_nmr_assigned_chem_shift_list . 'Value of _pdbx_nmr_assigned_chem_shift_list.id must exist in _pdbx_nmr_chem_shift_software.assigned_chem_shift_list_id.' YES NO NO NO
-R123 cross_reference ERROR pdbx_nmr_assigned_chem_shift_list . 'Value of _pdbx_nmr_assigned_chem_shift_list.id must exist in _pdbx_nmr_systematic_chem_shift_offset.assigned_chem_shift_list_id.' YES NO NO NO
-R124 cross_reference ERROR em_specimen . 'Value of _em_specimen.experiment_id must exist in _em_experiment.id.' YES NO NO NO
-R125 cross_reference ERROR em_imaging_optics . 'Value of _em_imaging_optics.imaging_id must exist in _em_imaging.id.' YES NO NO NO
-R126 cross_reference ERROR em_image_scans . 'Value of _em_image_scans.image_recording_id must exist in _em_image_recording.id.' YES NO NO NO
-R127 cross_reference ERROR em_particle_selection . 'Value of _em_particle_selection.image_processing_id must exist in _em_image_processing.id.' YES NO NO NO
-R128 cross_reference ERROR em_volume_selection . 'Value of _em_volume_selection.image_processing_id must exist in _em_image_processing.id.' YES NO NO NO
-R129 cross_reference ERROR em_ctf_correction . 'Value of _em_ctf_correction.em_image_processing_id must exist in _em_image_processing.id.' YES NO NO NO
-R130 cross_reference ERROR em_start_model . 'Value of _em_start_model.image_processing_id must exist in _em_image_processing.id.' YES NO NO NO
-R131 cross_reference ERROR em_3d_reconstruction . 'Value of _em_3d_reconstruction.image_processing_id must exist in _em_image_processing.id.' YES NO NO NO
-R132 cross_reference ERROR em_final_classification . 'Value of _em_final_classification.image_processing_id must exist in _em_image_processing.id.' YES NO NO NO
-R133 cross_reference ERROR em_3d_fitting_list . 'Value of _em_3d_fitting_list.3d_fitting_id must exist in _em_3d_fitting.id.' YES NO NO NO
-R134 conditional_presence ERROR em_imaging . 'Mandatory item(s) must be provided in em_imaging: nominal_defocus_min, nominal_defocus_max.' YES NO NO YES
-R135 conditional_presence ERROR pdbx_database_related . 'Mandatory item(s) must be provided in pdbx_database_related: db_name.' YES NO NO YES
-R136 conditional_presence ERROR refine_ls_shell . 'Mandatory item(s) must be provided in refine_ls_shell: d_res_high, d_res_low.' YES NO NO YES
-R137 conditional_presence ERROR em_3d_reconstruction . 'Mandatory item(s) must be provided in em_3d_reconstruction: resolution, resolution_method.' YES NO NO YES
-R141 conditional_presence ERROR em_image_recording . 'Mandatory item(s) must be provided in em_image_recording: avg_electron_dose_per_subtomogram.' YES NO NO YES
-R142 conditional_presence ERROR refine . 'At least one of the following items must be provided in refine: ls_R_factor_obs, ls_R_factor_R_work, ls_R_factor_R_free.' YES NO NO NO
-R143 conditional_presence ERROR reflns . 'At least one of the following items must be provided in reflns: pdbx_CC_half, pdbx_Rmerge_I_obs, pdbx_Rsym_value, pdbx_Rpim_I_all, pdbx_Rrim_I_all, pdbx_R_split.' YES NO NO NO
-R144 conditional_presence ERROR reflns_shell . 'At least one of the following items must be provided in reflns_shell: pdbx_CC_half, Rmerge_I_obs, pdbx_Rsym_value, pdbx_Rpim_I_all, pdbx_Rrim_I_all, pdbx_R_split.' YES NO NO NO
-R145 conditional_presence ERROR diffrn_source . 'pdbx_wavelength_list must not be empty when pdbx_diffrn_protocol is LAUE or SINGLE WAVELENGTH for the same diffrn_id.' YES NO YES NO
-R146 format ERROR diffrn_source . "Wavelength list is inconsistent with diffraction protocol 'LAUE'; provide multiple wavelengths or a wavelength range." YES NO YES NO
-R147 format ERROR diffrn_source . "Wavelength list is inconsistent with diffraction protocol 'SINGLE WAVELENGTH'; provide a single wavelength value." YES NO YES NO
-R148 format ERROR pdbx_database_related . 'Invalid PDB accession code format.' YES NO NO NO
-R149 format ERROR pdbx_database_related . 'Invalid EMDB accession code format.' YES NO NO NO
-R150 format ERROR pdbx_struct_ref_seq_depositor_info . "Invalid GenBank accession code format. The format should be 'A12345.1' or 'AB123456.1'." YES NO NO NO
-R151 format ERROR pdbx_struct_ref_seq_depositor_info . 'Invalid UniProt accession code format.' YES NO NO NO
-R152 format ERROR pdbx_initial_refinement_model . 'Invalid PDB accession code format.' YES NO NO NO
-R153 format ERROR pdbx_initial_refinement_model . 'Invalid PDB-Dev accession code format.' YES NO NO NO
-R154 format ERROR pdbx_initial_refinement_model . 'Invalid AlphaFold accession code format.' YES NO NO NO
-R155 format ERROR pdbx_initial_refinement_model . 'Invalid ModelArchive accession code format.' YES NO NO NO
-R156 conditional_value ERROR pdbx_initial_refinement_model . 'Source name for integrative model type can be only PDB-Dev.' YES NO NO NO
-R157 aggregate ERROR atom_site . 'Chain [{chain}] residue [{residue}] [{comp}] atom [{atom}] in model [{model}] has a total occupancy of [{total}].' YES YES NO NO
-R158 conditional_value WARNING atom_site . 'Chain [{chain}] residue [{residue}] [{comp}] atom [{atom}] in model [{model}] has occupancy [{occupancy}] (below 0.1).' YES NO NO NO
-R159 procedural ERROR atom_site seq_model_mismatch "Residue ([{chain}] [{comp}] [{residue}]) does not match with the residue '[{sequence_comp}]' in sequence." YES YES NO NO
-R160 format WARNING entity_poly . 'We detected one or more chain(s) composed only of poly-ALA. If the residues have poorly defined side chains, they should be called by the register. If the register is unknown, the residues should be called UNK rather than ALA.' YES NO NO NO
-R161 format WARNING entity_poly . 'We detected one or more chain(s) containing stretches of poly-ALA. If the residues have poorly defined side chains, they should be called by the register.' YES NO NO NO
+_pdbx_data_rule.id
+_pdbx_data_rule.family
+_pdbx_data_rule.scope_category
+_pdbx_data_rule.procedural_method
+_pdbx_data_rule.message
+_pdbx_data_rule.param_flag
+_pdbx_data_rule.join_flag
+_pdbx_data_rule.row_selection_flag
+R001 pairwise_order em_3d_reconstruction . '3D reconstruction resolution is higher than diffraction-statistics high-resolution limit [{item2CrossValue}].' NO NO NO
+R002 pairwise_order em_diffraction_shell . 'Diffraction-shell high-resolution limit is higher than diffraction-statistics high-resolution limit [{item2CrossValue}].' NO NO NO
+R003 pairwise_order em_diffraction_shell . 'Number of shell structure factors is higher than total collected structure factors [{item2CrossValue}].' NO NO NO
+R004 pairwise_order em_focused_ion_beam . 'Final thickness is larger than initial thickness [{item2CrossValue}].' NO NO NO
+R005 pairwise_order em_imaging . 'Maximum recording temperature is lower than minimum recording temperature [{item2CrossValue}].' NO NO NO
+R006 pairwise_order em_imaging . 'Minimum recording temperature is higher than maximum recording temperature [{item2CrossValue}].' NO NO NO
+R007 pairwise_order pdbx_nmr_ensemble . 'Submitted conformer count is higher than calculated conformer count [{item2CrossValue}].' NO NO NO
+R008 pairwise_order pdbx_nmr_representative . 'Representative conformer identifier is higher than submitted conformer count [{item2CrossValue}].' NO NO NO
+R009 pairwise_order refine_ls_shell . 'Shell R_work is higher than shell R_free [{item2CrossValue}].' NO NO NO
+R010 pairwise_order refine_ls_shell . 'Shell high-resolution limit is lower than shell low-resolution limit [{item2CrossValue}].' NO NO NO
+R011 pairwise_order refine_ls_shell . 'Shell low-resolution limit is higher than shell high-resolution limit [{item2CrossValue}].' NO NO NO
+R012 pairwise_order reflns_shell . 'Shell high-resolution limit is lower than shell low-resolution limit [{item2CrossValue}].' NO NO NO
+R013 pairwise_order reflns_shell . 'Shell low-resolution limit is higher than shell high-resolution limit [{item2CrossValue}].' NO NO NO
+R014 pairwise_order pdbx_database_status . 'Initial deposition date must not be after the date coordinates were received (coordinates date: [{right_value}]).' NO NO NO
+R015 pairwise_order pdbx_database_status . 'Initial deposition date must not be after the author release request date (release request date: [{right_value}]).' NO NO NO
+R016 pairwise_order pdbx_database_status . 'Deposition form date must not be after the initial deposition received date (initial deposition date: [{right_value}]).' NO NO NO
+R017 pairwise_order pdbx_database_status . 'Begin processing date must not be after end processing date (end processing date: [{right_value}]).' NO NO NO
+R018 uniqueness entity . 'Duplicate _entity.id in this file: [{duplicate_display}]. Each entity id must appear at most once.' NO NO NO
+R019 uniqueness struct_asym . 'Duplicate _struct_asym.id in this file: [{duplicate_display}]. Each chain (asym) id must appear at most once.' NO NO NO
+R020 uniqueness entity_poly . 'Duplicate _entity_poly.entity_id in this file: [{duplicate_display}]. Each polymer entity must have at most one entity_poly row.' NO NO NO
+R021 conditional_presence em_3d_fitting_list . 'Source name must be provided.' NO NO NO
+R026 conditional_presence em_3d_fitting_list . 'Type must be provided.' NO NO NO
+R031 conditional_presence em_buffer_component . 'Concentration must be provided when a buffer name, concentration units or formula is given.' NO NO NO
+R034 conditional_presence em_buffer_component . 'Concentration units must be provided when a buffer name, concentration or formula is given.' NO NO NO
+R037 conditional_presence em_buffer_component . 'Name must be provided when a buffer concentration, concentration units or formula is given.' NO NO NO
+R040 conditional_presence em_entity_assembly_molwt . 'Experimental flag must be provided when molecular weight value or units are given.' NO NO NO
+R042 conditional_presence em_entity_assembly_molwt . 'Molecular weight units must be provided when molecular weight value is given.' NO NO NO
+R043 conditional_presence em_entity_assembly_molwt . 'Molecular weight value must be provided when molecular weight units are given.' NO NO NO
+R044 pairwise_order em_imaging . 'Absolute minimum calibrated defocus is greater than absolute maximum calibrated defocus.' NO NO NO
+R045 pairwise_order em_imaging . 'Absolute minimum calibrated defocus is greater than absolute maximum calibrated defocus.' NO NO NO
+R046 pairwise_order em_imaging . 'Absolute minimum nominal defocus is greater than absolute maximum nominal defocus.' NO NO NO
+R047 pairwise_order em_imaging . 'Absolute minimum nominal defocus is greater than absolute maximum nominal defocus.' NO NO NO
+R048 conditional_presence em_sample_support . 'Grid information must be provided when support film information is present.' NO YES NO
+R051 conditional_presence em_sample_support . 'Grid information must be provided when grid pretreatment information is present.' NO YES NO
+R055 pairwise_order refine . 'R_work is higher than R_free [{item2CrossValue}]' NO NO NO
+R056 pairwise_order refine . 'Refined high-resolution limit is higher than collected data high-resolution limit [{item2CrossValue}]' NO YES NO
+R057 pairwise_order refine . 'Refined high-resolution limit is lower than refined low-resolution limit [{item2CrossValue}]' NO NO NO
+R058 pairwise_order refine . 'Refined low-resolution limit is lower than collected data low-resolution limit [{item2CrossValue}]' NO YES NO
+R059 pairwise_order refine . 'Refined low-resolution limit is higher than refined high-resolution limit [{item2CrossValue}]' NO NO NO
+R060 pairwise_order refine_ls_shell . 'Shell high-resolution limit is higher than overall refined high-resolution limit [{item2CrossValue}]' NO YES NO
+R061 pairwise_order refine_ls_shell . 'Shell low-resolution limit is lower than overall refined low-resolution limit [{item2CrossValue}]' NO YES NO
+R062 pairwise_order reflns . 'Collected data high-resolution limit is lower than high-resolution limit used in refinement [{item2CrossValue}]' NO YES NO
+R063 pairwise_order reflns . 'Collected data low-resolution limit is higher than low-resolution limit used in refinement [{item2CrossValue}]' NO YES NO
+R064 pairwise_order reflns . 'Total collected reflections is lower than total reflections used in refinement [{item2CrossValue}]' NO YES NO
+R065 pairwise_order reflns . 'Observed reflections is lower than total reflections used in refinement [{item2CrossValue}]' NO YES NO
+R066 pairwise_order reflns_shell . 'Shell high-resolution limit is higher than overall collected data high-resolution limit [{item2CrossValue}]' NO YES NO
+R067 conditional_presence em_3d_fitting_list . 'Details must be provided.' NO NO NO
+R068 conditional_presence em_3d_fitting_list . 'Details must be provided.' NO NO NO
+R069 conditional_presence em_3d_fitting_list . 'PDB accession code must be provided.' NO NO NO
+R070 conditional_presence em_3d_reconstruction . 'FSC type must be provided when an FSC resolution method is selected.' NO NO NO
+R071 conditional_presence em_entity_assembly_molwt . 'Must be supplied when experimentally measured.' NO NO NO
+R072 conditional_presence em_software . 'Software name must be provided.' NO NO NO
+R073 conditional_presence em_software . 'Software name must be provided.' NO NO NO
+R074 conditional_presence em_software . 'Software name must be provided.' NO NO NO
+R075 conditional_presence em_software . 'Software name must be provided.' NO NO NO
+R076 conditional_presence em_software . 'RELION software version must be provided.' NO NO NO
+R077 conditional_presence em_start_model . 'Must be supplied when EMDB map selected.' NO NO NO
+R078 conditional_presence em_start_model . 'Must be supplied when PDB entry selected.' NO NO NO
+R079 conditional_presence em_start_model . 'Must be supplied when orthogonal tilt selected.' NO NO NO
+R080 conditional_presence em_start_model . 'Must be supplied when orthogonal tilt selected.' NO NO NO
+R081 conditional_presence em_start_model . 'Must be supplied when orthogonal tilt selected.' NO NO NO
+R082 conditional_presence em_start_model . 'Must be supplied when random conical tilt selected.' NO NO NO
+R083 conditional_presence em_start_model . 'Must be supplied when random conical tilt selected.' NO NO NO
+R084 conditional_presence pdbx_audit_support . 'Country must be provided when funding organization is "Other government" or "Other private".' NO NO NO
+R085 conditional_presence pdbx_audit_support . 'Funding organization details must be provided when funding organization is "Other government" or "Other private".' NO NO NO
+R086 conditional_presence pdbx_initial_refinement_model . 'Initial refinement model details must be provided.' NO NO NO
+R087 conditional_presence pdbx_initial_refinement_model . 'Initial refinement model details must be provided.' NO NO NO
+R088 conditional_presence refine . 'No value present for this mandatory item.' NO NO NO
+R089 conditional_presence software . 'Refinement software version must be provided.' NO NO NO
+R090 format em_3d_fitting_list . 'Please provide a valid PDB accession code e.g. 1csb, pdb_00001csb' NO NO NO
+R091 conditional_value em_3d_fitting_list . 'For type "experimental model", source name must be PDB or Other.' NO NO NO
+R092 conditional_value em_3d_fitting_list . 'For type "integrative model", source name must be Other.' NO NO NO
+R093 conditional_value em_3d_fitting_list . 'For type "other", source name must be Other.' NO NO NO
+R094 conditional_value em_3d_fitting_list . 'For source name "PDB", type must be "experimental model".' NO NO NO
+R095 conditional_value pdbx_initial_refinement_model . 'For type "experimental model", source name must be PDB or Other.' NO NO NO
+R096 conditional_value pdbx_initial_refinement_model . 'For type "other", source name must be Other.' NO NO NO
+R097 conditional_value pdbx_initial_refinement_model . 'For source name "PDB", type must be "experimental model".' NO NO NO
+R098 conditional_presence pdbx_initial_refinement_model . 'This field cannot be empty when "MOLECULAR REPLACEMENT" is selected.' NO NO NO
+R099 conditional_presence pdbx_initial_refinement_model . 'This field cannot be empty when "MOLECULAR REPLACEMENT" is selected.' NO NO NO
+R100 cross_reference diffrn_detector . 'Value of _diffrn_detector.detector is not consistent with the detector class given for the value of _diffrn_detector.type in the PDBx/mmCIF dictionary.' NO NO NO
+R101 cross_reference diffrn_source . 'Value of _diffrn_source.source is not consistent with the source class given for the value of _diffrn_source.type in the PDBx/mmCIF dictionary.' NO NO NO
+R102 cross_reference pdbx_database_related . 'Value of _pdbx_database_related.content_type is not one of the content types given for the value of _pdbx_database_related.db_name in the PDBx/mmCIF dictionary.' NO NO NO
+R103 cross_reference software . 'Value of _software.classification is not one of the classifications given for the value of _software.name in the PDBx/mmCIF dictionary.' NO NO NO
+R104 cross_reference entity_poly . 'Value of _entity_poly.entity_id must exist in _entity_src_gen.entity_id when _entity.src_method is man.' NO YES NO
+R105 cross_reference entity_poly . 'Value of _entity_poly.entity_id must exist in _entity_src_nat.entity_id when _entity.src_method is nat.' NO YES NO
+R106 cross_reference entity_poly . 'Value of _entity_poly.entity_id must exist in _pdbx_entity_src_syn.entity_id when _entity.src_method is syn.' NO YES NO
+R107 cross_reference exptl_crystal_grow . 'Value of _exptl_crystal_grow.crystal_id must exist in _exptl_crystal.id.' NO NO NO
+R108 cross_reference diffrn . 'Value of _diffrn.crystal_id must exist in _exptl_crystal.id.' NO NO NO
+R109 cross_reference diffrn_detector . 'Value of _diffrn_detector.diffrn_id must exist in _diffrn.id.' NO NO NO
+R110 cross_reference diffrn_radiation . 'Value of _diffrn_radiation.diffrn_id must exist in _diffrn.id.' NO NO NO
+R111 cross_reference diffrn_source . 'Value of _diffrn_source.diffrn_id must exist in _diffrn.id.' NO NO NO
+R112 cross_reference pdbx_serial_crystallography_measurement . 'Value of _pdbx_serial_crystallography_measurement.diffrn_id must exist in _diffrn.id.' NO NO NO
+R113 cross_reference pdbx_serial_crystallography_sample_delivery . 'Value of _pdbx_serial_crystallography_sample_delivery.diffrn_id must exist in _diffrn.id.' NO NO NO
+R114 cross_reference pdbx_serial_crystallography_sample_delivery_injection . 'Value of _pdbx_serial_crystallography_sample_delivery_injection.diffrn_id must exist in _diffrn.id.' NO NO NO
+R115 cross_reference pdbx_serial_crystallography_sample_delivery_fixed_target . 'Value of _pdbx_serial_crystallography_sample_delivery_fixed_target.diffrn_id must exist in _diffrn.id.' NO NO NO
+R116 cross_reference pdbx_serial_crystallography_data_reduction . 'Value of _pdbx_serial_crystallography_data_reduction.diffrn_id must exist in _diffrn.id.' NO NO NO
+R117 cross_reference pdbx_struct_assembly_depositor_info . 'Value of _pdbx_struct_assembly_depositor_info.id must exist in _pdbx_struct_assembly_auth_evidence_depositor_info.assembly_id.' YES NO NO
+R118 cross_reference pdbx_struct_assembly_depositor_info . 'Value of _pdbx_struct_assembly_depositor_info.id must exist in _pdbx_struct_assembly_gen_depositor_info.assembly_id.' YES NO NO
+R119 cross_reference pdbx_nmr_exptl_sample . 'Value of _pdbx_nmr_exptl_sample.solution_id must exist in _pdbx_nmr_sample_details.solution_id.' NO NO NO
+R120 cross_reference pdbx_nmr_chem_shift_reference . 'Value of _pdbx_nmr_chem_shift_reference.id must exist in _pdbx_nmr_chem_shift_ref.chem_shift_reference_id.' NO NO NO
+R121 cross_reference pdbx_nmr_assigned_chem_shift_list . 'Value of _pdbx_nmr_assigned_chem_shift_list.id must exist in _pdbx_nmr_chem_shift_experiment.assigned_chem_shift_list_id.' NO NO NO
+R122 cross_reference pdbx_nmr_assigned_chem_shift_list . 'Value of _pdbx_nmr_assigned_chem_shift_list.id must exist in _pdbx_nmr_chem_shift_software.assigned_chem_shift_list_id.' NO NO NO
+R123 cross_reference pdbx_nmr_assigned_chem_shift_list . 'Value of _pdbx_nmr_assigned_chem_shift_list.id must exist in _pdbx_nmr_systematic_chem_shift_offset.assigned_chem_shift_list_id.' NO NO NO
+R124 cross_reference em_specimen . 'Value of _em_specimen.experiment_id must exist in _em_experiment.id.' NO NO NO
+R125 cross_reference em_imaging_optics . 'Value of _em_imaging_optics.imaging_id must exist in _em_imaging.id.' NO NO NO
+R126 cross_reference em_image_scans . 'Value of _em_image_scans.image_recording_id must exist in _em_image_recording.id.' NO NO NO
+R127 cross_reference em_particle_selection . 'Value of _em_particle_selection.image_processing_id must exist in _em_image_processing.id.' NO NO NO
+R128 cross_reference em_volume_selection . 'Value of _em_volume_selection.image_processing_id must exist in _em_image_processing.id.' NO NO NO
+R129 cross_reference em_ctf_correction . 'Value of _em_ctf_correction.em_image_processing_id must exist in _em_image_processing.id.' NO NO NO
+R130 cross_reference em_start_model . 'Value of _em_start_model.image_processing_id must exist in _em_image_processing.id.' NO NO NO
+R131 cross_reference em_3d_reconstruction . 'Value of _em_3d_reconstruction.image_processing_id must exist in _em_image_processing.id.' NO NO NO
+R132 cross_reference em_final_classification . 'Value of _em_final_classification.image_processing_id must exist in _em_image_processing.id.' NO NO NO
+R133 cross_reference em_3d_fitting_list . 'Value of _em_3d_fitting_list.3d_fitting_id must exist in _em_3d_fitting.id.' NO NO NO
+R134 conditional_presence em_imaging . 'Mandatory item(s) must be provided in em_imaging: nominal_defocus_min, nominal_defocus_max.' NO NO YES
+R135 conditional_presence pdbx_database_related . 'Mandatory item(s) must be provided in pdbx_database_related: db_name.' NO NO YES
+R136 conditional_presence refine_ls_shell . 'Mandatory item(s) must be provided in refine_ls_shell: d_res_high, d_res_low.' NO NO YES
+R137 conditional_presence em_3d_reconstruction . 'Mandatory item(s) must be provided in em_3d_reconstruction: resolution, resolution_method.' NO NO YES
+R141 conditional_presence em_image_recording . 'Mandatory item(s) must be provided in em_image_recording: avg_electron_dose_per_subtomogram.' NO NO YES
+R142 conditional_presence refine . 'At least one of the following items must be provided in refine: ls_R_factor_obs, ls_R_factor_R_work, ls_R_factor_R_free.' NO NO NO
+R143 conditional_presence reflns . 'At least one of the following items must be provided in reflns: pdbx_CC_half, pdbx_Rmerge_I_obs, pdbx_Rsym_value, pdbx_Rpim_I_all, pdbx_Rrim_I_all, pdbx_R_split.' NO NO NO
+R144 conditional_presence reflns_shell . 'At least one of the following items must be provided in reflns_shell: pdbx_CC_half, Rmerge_I_obs, pdbx_Rsym_value, pdbx_Rpim_I_all, pdbx_Rrim_I_all, pdbx_R_split.' NO NO NO
+R145 conditional_presence diffrn_source . 'pdbx_wavelength_list must not be empty when pdbx_diffrn_protocol is LAUE or SINGLE WAVELENGTH for the same diffrn_id.' NO YES NO
+R146 format diffrn_source . "Wavelength list is inconsistent with diffraction protocol 'LAUE'; provide multiple wavelengths or a wavelength range." NO YES NO
+R147 format diffrn_source . "Wavelength list is inconsistent with diffraction protocol 'SINGLE WAVELENGTH'; provide a single wavelength value." NO YES NO
+R148 format pdbx_database_related . 'Invalid PDB accession code format.' NO NO NO
+R149 format pdbx_database_related . 'Invalid EMDB accession code format.' NO NO NO
+R150 format pdbx_struct_ref_seq_depositor_info . "Invalid GenBank accession code format. The format should be 'A12345.1' or 'AB123456.1'." NO NO NO
+R151 format pdbx_struct_ref_seq_depositor_info . 'Invalid UniProt accession code format.' NO NO NO
+R152 format pdbx_initial_refinement_model . 'Invalid PDB accession code format.' NO NO NO
+R153 format pdbx_initial_refinement_model . 'Invalid PDB-Dev accession code format.' NO NO NO
+R154 format pdbx_initial_refinement_model . 'Invalid AlphaFold accession code format.' NO NO NO
+R155 format pdbx_initial_refinement_model . 'Invalid ModelArchive accession code format.' NO NO NO
+R156 conditional_value pdbx_initial_refinement_model . 'Source name for integrative model type can be only PDB-Dev.' NO NO NO
+R157 aggregate atom_site . 'Chain [{chain}] residue [{residue}] [{comp}] atom [{atom}] in model [{model}] has a total occupancy of [{total}].' YES NO NO
+R158 conditional_value atom_site . 'Chain [{chain}] residue [{residue}] [{comp}] atom [{atom}] in model [{model}] has occupancy [{occupancy}] (below 0.1).' NO NO NO
+R159 procedural atom_site seq_model_mismatch "Residue ([{chain}] [{comp}] [{residue}]) does not match with the residue '[{sequence_comp}]' in sequence." YES NO NO
+R160 format entity_poly . 'We detected one or more chain(s) composed only of poly-ALA. If the residues have poorly defined side chains, they should be called by the register. If the register is unknown, the residues should be called UNK rather than ALA.' NO NO NO
+R161 format entity_poly . 'We detected one or more chain(s) containing stretches of poly-ALA. If the residues have poorly defined side chains, they should be called by the register.' NO NO NO
 #
 loop_
-_pdbx_deposition_rule_condition.rule_id
-_pdbx_deposition_rule_condition.ordinal
-_pdbx_deposition_rule_condition.role
-_pdbx_deposition_rule_condition.item_name
-_pdbx_deposition_rule_condition.operator
-_pdbx_deposition_rule_condition.value
-_pdbx_deposition_rule_condition.compare_item_name
-_pdbx_deposition_rule_condition.group_operator
-_pdbx_deposition_rule_condition.quantifier
-_pdbx_deposition_rule_condition.value_transform
+_pdbx_data_rule_context.rule_id
+_pdbx_data_rule_context.context
+_pdbx_data_rule_context.severity
+_pdbx_data_rule_context.enabled
+R001 deposition ERROR YES
+R002 deposition ERROR YES
+R003 deposition ERROR YES
+R004 deposition ERROR YES
+R005 deposition ERROR YES
+R006 deposition ERROR YES
+R007 deposition ERROR YES
+R008 deposition ERROR YES
+R009 deposition WARNING YES
+R010 deposition ERROR YES
+R011 deposition ERROR YES
+R012 deposition ERROR YES
+R013 deposition ERROR YES
+R014 deposition ERROR YES
+R015 deposition ERROR YES
+R016 deposition ERROR YES
+R017 deposition ERROR YES
+R018 deposition ERROR YES
+R019 deposition ERROR YES
+R020 deposition ERROR YES
+R021 deposition ERROR YES
+R026 deposition ERROR YES
+R031 deposition ERROR YES
+R034 deposition ERROR YES
+R037 deposition ERROR YES
+R040 deposition ERROR YES
+R042 deposition ERROR YES
+R043 deposition ERROR YES
+R044 deposition ERROR YES
+R045 deposition ERROR YES
+R046 deposition ERROR YES
+R047 deposition ERROR YES
+R048 deposition ERROR YES
+R051 deposition ERROR YES
+R055 deposition WARNING YES
+R056 deposition ERROR YES
+R057 deposition ERROR YES
+R058 deposition ERROR YES
+R059 deposition ERROR YES
+R060 deposition ERROR YES
+R061 deposition ERROR YES
+R062 deposition ERROR YES
+R063 deposition ERROR YES
+R064 deposition ERROR YES
+R065 deposition ERROR YES
+R066 deposition ERROR YES
+R067 deposition ERROR YES
+R068 deposition ERROR YES
+R069 deposition ERROR YES
+R070 deposition ERROR YES
+R071 deposition ERROR YES
+R072 deposition ERROR YES
+R073 deposition ERROR YES
+R074 deposition ERROR YES
+R075 deposition ERROR YES
+R076 deposition ERROR YES
+R077 deposition ERROR YES
+R078 deposition ERROR YES
+R079 deposition ERROR YES
+R080 deposition ERROR YES
+R081 deposition ERROR YES
+R082 deposition ERROR YES
+R083 deposition ERROR YES
+R084 deposition ERROR YES
+R085 deposition ERROR YES
+R086 deposition ERROR YES
+R087 deposition ERROR YES
+R088 deposition ERROR YES
+R089 deposition ERROR YES
+R090 deposition ERROR YES
+R091 deposition ERROR YES
+R092 deposition ERROR YES
+R093 deposition ERROR YES
+R094 deposition ERROR YES
+R095 deposition ERROR YES
+R096 deposition ERROR YES
+R097 deposition ERROR YES
+R098 deposition ERROR YES
+R099 deposition ERROR YES
+R100 deposition ERROR YES
+R101 deposition ERROR YES
+R102 deposition ERROR YES
+R103 deposition ERROR YES
+R104 deposition ERROR YES
+R105 deposition ERROR YES
+R106 deposition ERROR YES
+R107 deposition ERROR YES
+R108 deposition ERROR YES
+R109 deposition ERROR YES
+R110 deposition ERROR YES
+R111 deposition ERROR YES
+R112 deposition ERROR YES
+R113 deposition ERROR YES
+R114 deposition ERROR YES
+R115 deposition ERROR YES
+R116 deposition ERROR YES
+R117 deposition ERROR YES
+R118 deposition ERROR YES
+R119 deposition ERROR YES
+R120 deposition ERROR YES
+R121 deposition ERROR YES
+R122 deposition ERROR YES
+R123 deposition ERROR YES
+R124 deposition ERROR YES
+R125 deposition ERROR YES
+R126 deposition ERROR YES
+R127 deposition ERROR YES
+R128 deposition ERROR YES
+R129 deposition ERROR YES
+R130 deposition ERROR YES
+R131 deposition ERROR YES
+R132 deposition ERROR YES
+R133 deposition ERROR YES
+R134 deposition ERROR YES
+R135 deposition ERROR YES
+R136 deposition ERROR YES
+R137 deposition ERROR YES
+R141 deposition ERROR YES
+R142 deposition ERROR YES
+R143 deposition ERROR YES
+R144 deposition ERROR YES
+R145 deposition ERROR YES
+R146 deposition ERROR YES
+R147 deposition ERROR YES
+R148 deposition ERROR YES
+R149 deposition ERROR YES
+R150 deposition ERROR YES
+R151 deposition ERROR YES
+R152 deposition ERROR YES
+R153 deposition ERROR YES
+R154 deposition ERROR YES
+R155 deposition ERROR YES
+R156 deposition ERROR YES
+R157 deposition ERROR YES
+R158 deposition WARNING YES
+R159 deposition ERROR YES
+R160 deposition WARNING YES
+R161 deposition WARNING YES
+#
+loop_
+_pdbx_data_rule_condition.rule_id
+_pdbx_data_rule_condition.ordinal
+_pdbx_data_rule_condition.role
+_pdbx_data_rule_condition.item_name
+_pdbx_data_rule_condition.operator
+_pdbx_data_rule_condition.value
+_pdbx_data_rule_condition.compare_item_name
+_pdbx_data_rule_condition.group_operator
+_pdbx_data_rule_condition.quantifier
+_pdbx_data_rule_condition.value_transform
 R001 1 THEN '_em_3d_reconstruction.resolution' GE_ITEM . '_em_diffraction_stats.high_resolution' . ALL .
 R002 1 THEN '_em_diffraction_shell.high_resolution' GE_ITEM . '_em_diffraction_stats.high_resolution' . ALL .
 R003 1 THEN '_em_diffraction_shell.num_structure_factors' LE_ITEM . '_em_diffraction_stats.num_structure_factors' . ALL .
@@ -458,9 +600,9 @@ R160 1 THEN '_entity_poly.pdbx_seq_one_letter_code' NOT_MATCHES '^[Aa]+$' . . . 
 R161 1 THEN '_entity_poly.pdbx_seq_one_letter_code' NOT_MATCHES AAAAAAAAAA . . . .
 #
 loop_
-_pdbx_deposition_rule_param.rule_id
-_pdbx_deposition_rule_param.name
-_pdbx_deposition_rule_param.value
+_pdbx_data_rule_param.rule_id
+_pdbx_data_rule_param.name
+_pdbx_data_rule_param.value
 R117 experiment_code PDB
 R118 experiment_code PDB
 R157 group_by '_atom_site.pdbx_PDB_model_num,_atom_site.auth_asym_id,_atom_site.auth_seq_id,_atom_site.pdbx_PDB_ins_code,_atom_site.auth_atom_id'
@@ -470,11 +612,11 @@ R159 source_category atom_site
 R159 target_category entity_poly_seq
 #
 loop_
-_pdbx_deposition_rule_join.rule_id
-_pdbx_deposition_rule_join.ordinal
-_pdbx_deposition_rule_join.scope_item_names
-_pdbx_deposition_rule_join.partner_item_names
-_pdbx_deposition_rule_join.on_no_match
+_pdbx_data_rule_join.rule_id
+_pdbx_data_rule_join.ordinal
+_pdbx_data_rule_join.scope_item_names
+_pdbx_data_rule_join.partner_item_names
+_pdbx_data_rule_join.on_no_match
 R048 1 '_em_sample_support.id' '_em_support_film.sample_support_id' SKIP
 R051 1 '_em_sample_support.id' '_em_grid_pretreatment.sample_support_id' SKIP
 R056 1 '_refine.pdbx_diffrn_id' '_reflns.pdbx_diffrn_id' SINGLE_ROW_FALLBACK
@@ -494,12 +636,12 @@ R146 1 '_diffrn_source.diffrn_id' '_diffrn_radiation.diffrn_id' SKIP
 R147 1 '_diffrn_source.diffrn_id' '_diffrn_radiation.diffrn_id' SKIP
 #
 loop_
-_pdbx_deposition_rule_row_selection.rule_id
-_pdbx_deposition_rule_row_selection.category_id
-_pdbx_deposition_rule_row_selection.selector
-_pdbx_deposition_rule_row_selection.selector_item
-_pdbx_deposition_rule_row_selection.group_by
-_pdbx_deposition_rule_row_selection.exclude_items
+_pdbx_data_rule_row_selection.rule_id
+_pdbx_data_rule_row_selection.category_id
+_pdbx_data_rule_row_selection.selector
+_pdbx_data_rule_row_selection.selector_item
+_pdbx_data_rule_row_selection.group_by
+_pdbx_data_rule_row_selection.exclude_items
 R134 em_imaging ANY_VALUE . . .
 R135 pdbx_database_related ANY_VALUE . . '_pdbx_database_related.content_type'
 R136 refine_ls_shell ANY_VALUE . . '_refine_ls_shell.pdbx_refine_id,_refine_ls_shell.pdbx_ordinal'
