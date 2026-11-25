@@ -228,8 +228,8 @@ save_pdbx_data_rule_context
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ;
     Example 1 - all rules are evaluated at deposition. R003 is also
-    evaluated in the archive, where it is an error rather than a
-    warning. R005 has an archive record but is disabled there.
+    evaluated in the archive, where it is a warning rather than an
+    error. R005 has an archive record but is disabled there.
 ;
 ;
     loop_
@@ -239,8 +239,8 @@ save_pdbx_data_rule_context
     _pdbx_data_rule_context.enabled
     R001 deposition ERROR   YES
     R002 deposition ERROR   YES
-    R003 deposition WARNING YES
-    R003 archive    ERROR   YES
+    R003 deposition ERROR   YES
+    R003 archive    WARNING YES
     R004 deposition WARNING YES
     R005 deposition WARNING YES
     R005 archive    WARNING NO
